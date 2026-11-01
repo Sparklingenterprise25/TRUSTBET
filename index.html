@@ -3,96 +3,210 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#102d59">
 <title>TRUSTBET | Virtual Naira</title>
 <style>
 :root{
-  --navy:#102d59;--blue:#174b91;--light:#f2f5fa;
-  --white:#fff;--text:#172b4d;--muted:#78869c;
-  --border:#e3e9f1;--green:#12a875;--red:#c43d4b;
+  --navy:#102d59;
+  --blue:#174b91;
+  --light:#f2f5fa;
+  --white:#fff;
+  --text:#172b4d;
+  --muted:#78869c;
+  --border:#e3e9f1;
+  --green:#12a875;
+  --red:#c43d4b;
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--light);color:var(--text);font-family:Arial,sans-serif;padding-bottom:82px}
+body{
+  margin:0;
+  padding-bottom:78px;
+  background:var(--light);
+  color:var(--text);
+  font-family:Arial,sans-serif;
+}
 button,input,select{font:inherit}
-button{border:0;background:var(--navy);color:#fff;padding:12px 16px;border-radius:9px;font-weight:700;cursor:pointer}
-button:hover{opacity:.91}
+button{
+  border:0;
+  background:var(--navy);
+  color:white;
+  padding:12px 16px;
+  border-radius:9px;
+  font-weight:700;
+  cursor:pointer;
+}
 button:disabled{opacity:.55;cursor:wait}
 button.secondary{background:#edf3fb;color:var(--navy)}
-header{background:var(--navy);color:white;padding:15px 5%;display:flex;justify-content:space-between;align-items:center;gap:12px}
+header{
+  background:var(--navy);
+  color:white;
+  padding:15px 5%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
 .brand{font-size:25px;font-weight:900;letter-spacing:1px}
 .brand span{color:#8fc2ff}
 .top-label{font-size:11px;background:#244778;padding:9px 12px;border-radius:8px}
-main{max-width:1100px;margin:auto;padding:18px 15px 30px}
+main{max-width:1100px;margin:auto;padding:18px 14px}
 h1{font-size:23px;margin:0 0 6px}
 h2{font-size:19px;margin:0 0 14px}
 h3{font-size:16px;margin:0 0 6px}
 p{line-height:1.5}
 .muted{color:var(--muted);font-size:13px}
-.card{background:white;border:1px solid var(--border);border-radius:13px;padding:18px;margin-bottom:15px;box-shadow:0 3px 12px #102d5908}
-.balance-card{background:linear-gradient(120deg,#102d59,#174b91);color:white;padding:21px;border-radius:13px;margin:16px 0}
+.card{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:13px;
+  padding:18px;
+  margin-bottom:15px;
+  box-shadow:0 3px 12px #102d5908;
+}
+.balance-card{
+  background:linear-gradient(120deg,#102d59,#174b91);
+  color:white;
+  padding:22px;
+  border-radius:13px;
+  margin:15px 0;
+}
 .balance-label{font-size:12px;color:#c5d6ef}
 .balance{font-size:32px;font-weight:800;margin:12px 0}
 .balance-card button{background:white;color:var(--navy);min-width:125px}
 .welcome{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:10px 0}
-.category-nav{display:flex;gap:7px;overflow-x:auto;padding:5px 0 12px;scrollbar-width:none}
-.category-nav button{white-space:nowrap;background:white;color:var(--navy);border:1px solid var(--border);padding:11px 16px;border-radius:8px}
+.category-nav,.sport-nav{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding:5px 0 13px;
+  scrollbar-width:none;
+}
+.category-nav button{
+  white-space:nowrap;
+  background:white;
+  color:var(--navy);
+  border:1px solid var(--border);
+  border-radius:8px;
+}
 .category-nav button.active{background:var(--navy);color:white}
-.sport-nav{display:flex;gap:9px;overflow-x:auto;padding:4px 0 14px;scrollbar-width:none}
-.sport-nav button{background:#e6edf7;color:#28456c;border-radius:8px;padding:9px 13px;font-size:12px;white-space:nowrap}
-.sport-nav button.active{background:#d5e5fa;color:var(--navy)}
-.feature-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:12px;margin:8px 0 18px}
-.feature{min-height:112px;padding:17px;border-radius:12px;background:linear-gradient(120deg,#102d59,#2865a8);color:white;display:flex;flex-direction:column;justify-content:space-between}
-.feature.light-feature{background:linear-gradient(120deg,#e4edf9,#cbdcf2);color:var(--navy)}
-.feature small{font-size:11px;opacity:.85}
-.feature strong{font-size:19px}
-.section-heading{display:flex;justify-content:space-between;align-items:center;margin:18px 0 12px}
+.sport-nav button{
+  background:#e6edf7;
+  color:#28456c;
+  border-radius:8px;
+  padding:9px 13px;
+  font-size:12px;
+  white-space:nowrap;
+}
+.feature-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:12px;margin:12px 0}
+.feature{
+  min-height:115px;
+  padding:15px;
+  border-radius:12px;
+  background:linear-gradient(120deg,#102d59,#2865a8);
+  color:white;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+.feature.light{background:linear-gradient(120deg,#e4edf9,#cbdcf2);color:var(--navy)}
+.feature small{font-size:11px}
+.feature strong{font-size:18px}
+.feature button{background:white;color:var(--navy);align-self:flex-start}
+.section-heading{display:flex;justify-content:space-between;align-items:center;margin:19px 0 12px}
 .section-heading h2{margin:0}
-.section-heading span{font-size:12px;color:var(--blue);font-weight:700}
+.section-heading span{font-size:12px;color:var(--blue);font-weight:bold}
 .event-list{display:grid;gap:9px}
-.event{background:white;border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.event-info{display:flex;align-items:center;gap:12px;min-width:0}
-.event-icon{width:39px;height:39px;display:grid;place-items:center;border-radius:9px;background:#edf3fb;font-size:20px;flex-shrink:0}
-.event-info p{font-size:12px;color:var(--muted);margin:4px 0 0}
-.event button{font-size:11px;padding:9px 12px;white-space:nowrap}
+.event{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:13px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+.event-info{display:flex;align-items:center;gap:11px}
+.event-icon,.game-icon{
+  display:grid;
+  place-items:center;
+  background:#edf3fb;
+  border-radius:10px;
+  flex-shrink:0;
+}
+.event-icon{width:40px;height:40px;font-size:20px}
+.event p{font-size:12px;color:var(--muted);margin:4px 0 0}
+.event button{font-size:11px;padding:9px 12px}
 .games{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.game{background:white;border:1px solid var(--border);border-radius:11px;padding:15px;min-width:0}
-.game-icon{width:43px;height:43px;display:grid;place-items:center;background:#edf3fb;color:var(--navy);border-radius:10px;font-size:22px;margin-bottom:11px}
-.game p{font-size:12px;color:var(--muted);min-height:30px;margin:5px 0 12px}
-.game button{width:100%;font-size:12px;padding:10px 8px}
+.game{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:11px;
+  padding:14px;
+  min-width:0;
+}
+.game-icon{width:43px;height:43px;font-size:22px;margin-bottom:10px}
+.game p{font-size:12px;color:var(--muted);min-height:30px}
+.game button{width:100%;font-size:12px;padding:10px}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:15px 0}
 .stat{background:white;border:1px solid var(--border);padding:14px;border-radius:10px}
-.stat strong{display:block;font-size:17px;margin-top:7px;color:var(--navy)}
-label{display:block;font-size:13px;font-weight:700;margin-top:10px}
-input,select{width:100%;padding:13px;margin:7px 0 13px;border:1px solid #dce3ed;background:white;border-radius:8px;outline:none;color:var(--text)}
+.stat strong{display:block;color:var(--navy);font-size:17px;margin-top:7px}
+label{display:block;font-size:13px;font-weight:bold;margin-top:10px}
+input,select{
+  width:100%;
+  padding:13px;
+  margin:7px 0 13px;
+  border:1px solid #dce3ed;
+  background:white;
+  border-radius:8px;
+  outline:none;
+  color:var(--text);
+}
 input:focus,select:focus{border-color:var(--blue)}
-.message{font-size:13px;color:var(--green);line-height:1.5;overflow-wrap:anywhere}
-.error{color:var(--red)}
-.hidden{display:none!important}
-.wide{width:100%}
 .button-row{display:flex;gap:10px;flex-wrap:wrap}
 .button-row button{flex:1;min-width:120px}
-.info-line{padding:13px;background:#f0f5fc;color:#405675;border-radius:8px;font-size:13px;line-height:1.5;margin:12px 0;overflow-wrap:anywhere}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(4,1fr);padding:8px 5px calc(8px + env(safe-area-inset-bottom));z-index:10}
-.bottom-nav button{background:transparent;color:#75849b;border-radius:8px;padding:8px 3px;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:5px}
+.wide{width:100%}
+.message{font-size:13px;color:var(--green);line-height:1.5;overflow-wrap:anywhere}
+.error{color:var(--red)}
+.info-line{padding:13px;background:#f0f5fc;color:#405675;border-radius:8px;font-size:13px;overflow-wrap:anywhere}
+.hidden{display:none!important}
+.bottom-nav{
+  position:fixed;
+  bottom:0;left:0;right:0;
+  background:white;
+  border-top:1px solid var(--border);
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  padding:8px 5px calc(8px + env(safe-area-inset-bottom));
+  z-index:20;
+}
+.bottom-nav button{
+  background:transparent;
+  color:#75849b;
+  border-radius:8px;
+  padding:8px 3px;
+  font-size:11px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:5px;
+}
 .bottom-nav button span{font-size:19px}
 .bottom-nav button.active{color:var(--navy);background:#edf3fb}
-footer{text-align:center;padding:24px;color:var(--muted);font-size:12px}
-#auth{max-width:440px;margin:50px auto}
+footer{text-align:center;padding:22px;color:var(--muted);font-size:12px}
+#auth{max-width:440px;margin:45px auto}
 @media(max-width:650px){
-  main{padding:14px 12px 25px}
+  main{padding:14px 12px}
   header{padding:14px 15px}
   .brand{font-size:23px}
   .games{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .feature-grid{grid-template-columns:1fr 1fr}
-  .feature{min-height:105px;padding:13px}
-  .feature strong{font-size:16px}
   .stats{grid-template-columns:repeat(2,1fr)}
+  .feature-grid{grid-template-columns:1fr 1fr}
+  .feature strong{font-size:16px}
   .balance{font-size:29px}
 }
 @media(max-width:360px){
   .games{grid-template-columns:1fr}
-  .event{padding:11px}
 }
 </style>
 </head>
@@ -106,15 +220,19 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px}
 <section id="auth" class="card">
   <h1>Welcome to TRUSTBET</h1>
   <p class="muted">Sign in to access your account.</p>
+
   <label for="email">Email address</label>
   <input id="email" type="email" autocomplete="email" placeholder="Email address">
+
   <label for="password">Password</label>
   <input id="password" type="password" autocomplete="current-password" placeholder="Password">
+
   <div class="button-row">
-    <button id="loginBtn">Sign in</button>
-    <button id="signupBtn" class="secondary">Create account</button>
+    <button id="loginBtn" type="button">Sign in</button>
+    <button id="signupBtn" type="button" class="secondary">Create account</button>
   </div>
-  <p id="authMessage" class="message" role="status"></p>
+
+  <p id="authMessage" class="message" role="status">Loading TRUSTBET...</p>
 </section>
 
 <div id="app" class="hidden">
@@ -123,22 +241,22 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px}
       <h1 id="pageTitle">Home</h1>
       <div class="muted" id="welcome">Welcome back</div>
     </div>
-    <button class="secondary" id="logoutBtn">Log out</button>
+    <button type="button" class="secondary" id="logoutBtn">Log out</button>
   </div>
 
-  <nav class="category-nav" aria-label="Sportsbook categories">
-    <button class="active" data-category="top">Top</button>
+  <nav class="category-nav">
+    <button class="active" data-category="dashboard">Top</button>
     <button data-category="sports">Sports</button>
     <button data-category="esports">Esports</button>
     <button data-category="casino">Casino</button>
     <button data-category="games">1xGames</button>
   </nav>
 
-  <div id="dashboard">
+  <section id="dashboard">
     <div class="balance-card">
       <div class="balance-label">AVAILABLE VIRTUAL NAIRA</div>
       <div class="balance" id="balance">₦0.00</div>
-      <button onclick="goTo('deposit')">Deposit</button>
+      <button type="button" onclick="goTo('deposit')">Deposit</button>
     </div>
 
     <div class="stats">
@@ -148,10 +266,10 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px}
     </div>
 
     <div class="sport-nav">
-      <button class="active" onclick="showCategory('top')">Popular</button>
-      <button onclick="showCategory('sports')">Football</button>
-      <button onclick="showCategory('esports')">Esports</button>
-      <button onclick="showCategory('casino')">Casino</button>
+      <button onclick="goTo('games')">Popular</button>
+      <button onclick="goTo('sports')">Football</button>
+      <button onclick="goTo('esports')">Esports</button>
+      <button onclick="goTo('casino')">Casino</button>
       <button onclick="goTo('games')">All games</button>
     </div>
 
@@ -161,7 +279,7 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px}
         <strong>Explore 10 Games</strong>
         <button onclick="goTo('games')">Play now</button>
       </div>
-      <div class="feature light-feature">
+      <div class="feature light">
         <small>YOUR ACCOUNT</small>
         <strong>Virtual Naira</strong>
         <button onclick="goTo('wallet')">My wallet</button>
@@ -174,15 +292,15 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px}
     </div>
     <div class="event-list">
       <div class="event">
-        <div class="event-info"><div class="event-icon">⚽</div><div><strong>Football</strong><p>Explore football games and events</p></div></div>
+        <div class="event-info"><div class="event-icon">⚽</div><div><strong>Football</strong><p>Explore football entertainment</p></div></div>
         <button onclick="goTo('sports')">Explore</button>
       </div>
       <div class="event">
-        <div class="event-info"><div class="event-icon">🎮</div><div><strong>Esports</strong><p>Discover esports entertainment</p></div></div>
+        <div class="event-info"><div class="event-icon">🎮</div><div><strong>Esports</strong><p>Explore esports entertainment</p></div></div>
         <button onclick="goTo('esports')">Explore</button>
       </div>
       <div class="event">
-        <div class="event-info"><div class="event-icon">🎰</div><div><strong>Casino games</strong><p>Browse casino-style games</p></div></div>
+        <div class="event-info"><div class="event-icon">🎰</div><div><strong>Casino</strong><p>Browse casino-style games</p></div></div>
         <button onclick="goTo('casino')">Explore</button>
       </div>
     </div>
@@ -192,12 +310,12 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px}
       <span onclick="goTo('games')">VIEW ALL</span>
     </div>
     <div class="games" id="homeGames"></div>
-  </div>
+  </section>
 
   <section id="sports" class="hidden">
     <div class="card">
       <h2>Sports</h2>
-      <p class="muted">Explore the TRUSTBET sports section.</p>
+      <p class="muted">Explore sports entertainment.</p>
       <div class="event-list">
         <div class="event"><div class="event-info"><div class="event-icon">⚽</div><div><strong>Football</strong><p>Football entertainment</p></div></div><button onclick="goTo('games')">Games</button></div>
         <div class="event"><div class="event-info"><div class="event-icon">🏀</div><div><strong>Basketball</strong><p>Basketball entertainment</p></div></div><button onclick="goTo('games')">Games</button></div>
@@ -210,14 +328,13 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px}
     <div class="card">
       <h2>Esports</h2>
       <p class="muted">Explore esports entertainment.</p>
-      <button onclick="goTo('games')">Explore TRUSTBET games</button>
+      <button onclick="goTo('games')">Explore games</button>
     </div>
   </section>
 
   <section id="casino" class="hidden">
     <div class="card">
       <h2>Casino</h2>
-      <p class="muted">Browse the available casino-style games.</p>
       <div class="games" id="casinoGames"></div>
     </div>
   </section>
@@ -227,17 +344,17 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px}
       <h2>All 10 TRUSTBET Games</h2>
       <p class="muted">Minimum game stake: ₦200</p>
       <div class="games" id="allGames"></div>
-      <p id="gameMessage" class="message" role="status"></p>
+      <p id="gameMessage" class="message"></p>
     </div>
   </section>
 
   <section id="deposit" class="hidden">
     <div class="card">
       <h2>Deposit Virtual Naira</h2>
-      <p class="muted">Enter the amount you want to deposit. Minimum ₦200.</p>
+      <p class="muted">Minimum deposit ₦200.</p>
       <label for="depositAmount">Amount</label>
-      <input id="depositAmount" type="number" min="200" step="1" inputmode="numeric" placeholder="Enter amount">
-      <button id="depositBtn" class="wide">Submit deposit request</button>
+      <input id="depositAmount" type="number" min="200" step="1" placeholder="Enter amount">
+      <button id="depositBtn" type="button" class="wide">Submit deposit request</button>
       <p id="depositMessage" class="message" role="status"></p>
       <div id="depositReference" class="info-line hidden"></div>
     </div>
@@ -246,7 +363,7 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px}
   <section id="wallet" class="hidden">
     <div class="card">
       <h2>My Wallet</h2>
-      <p class="muted">Your available Virtual Naira balance</p>
+      <p class="muted">Your Virtual Naira balance</p>
       <div class="balance" id="walletBalance">₦0.00</div>
       <div class="button-row">
         <button onclick="goTo('deposit')">Deposit</button>
@@ -260,14 +377,18 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px}
       <h2>Withdraw Virtual Naira</h2>
       <p class="muted">Minimum withdrawal: ₦20,000</p>
       <label for="withdrawAmount">Amount</label>
-      <input id="withdrawAmount" type="number" min="20000" step="1" inputmode="numeric" placeholder="Minimum ₦20,000">
+      <input id="withdrawAmount" type="number" min="20000" step="1" placeholder="Minimum ₦20,000">
+
       <label for="bankName">Bank / financial provider</label>
       <select id="bankName"><option value="">Loading bank list...</option></select>
+
       <label for="accountName">Account name</label>
       <input id="accountName" type="text" autocomplete="name" placeholder="Account name">
+
       <label for="accountNumber">Account number</label>
       <input id="accountNumber" type="text" inputmode="numeric" maxlength="10" placeholder="10-digit account number">
-      <button id="withdrawBtn" class="wide">Submit withdrawal request</button>
+
+      <button id="withdrawBtn" type="button" class="wide">Submit withdrawal request</button>
       <p id="withdrawMessage" class="message" role="status"></p>
     </div>
   </section>
@@ -275,11 +396,9 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px}
   <section id="account" class="hidden">
     <div class="card">
       <h2>My Account</h2>
-      <p class="muted" id="accountEmail"></p>
-      <div class="button-row">
-        <button onclick="goTo('deposit')">Deposit</button>
-        <button class="secondary" onclick="goTo('withdraw')">Withdraw</button>
-      </div>
+      <p id="accountEmail" class="muted"></p>
+      <button onclick="goTo('deposit')">Deposit</button>
+      <button class="secondary" onclick="goTo('withdraw')">Withdraw</button>
       <button class="secondary wide" style="margin-top:12px" onclick="refreshBalance()">Refresh balance</button>
     </div>
   </section>
@@ -296,138 +415,320 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px}
 <footer>© 2026 TRUSTBET. All rights reserved.</footer>
 
 <script type="module">
-import { supabase } from './supabase.js';
-
-const authBox=document.getElementById('auth');
-const app=document.getElementById('app');
-const bottomNav=document.getElementById('bottomNav');
+const $=id=>document.getElementById(id);
+let supabase=null;
 let currentUser=null;
 
-const gameData=[
-  {name:'Aviator',icon:'✈️',description:'Multiplier-style flight game.',category:'casino'},
-  {name:'Flip the Bottle',icon:'🍾',description:'Bottle flipping challenge.',category:'casino'},
-  {name:'Under or Over 7',icon:'🎲',description:'Predict the dice total.',category:'casino'},
-  {name:'Dice',icon:'🎲',description:'Dice prediction game.',category:'casino'},
-  {name:'Coin Flip',icon:'🪙',description:'Choose heads or tails.',category:'casino'},
-  {name:'Slots',icon:'🎰',description:'Classic slot-style game.',category:'casino'},
-  {name:'Roulette',icon:'🎡',description:'Roulette-style game.',category:'casino'},
-  {name:'Lucky Wheel',icon:'🎯',description:'Spin the lucky wheel.',category:'casino'},
-  {name:'Number Prediction',icon:'🔢',description:'Predict a number.',category:'casino'},
-  {name:'Penalty Shootout',icon:'⚽',description:'Take your penalty shot.',category:'sports'}
-];
-
-function formatMoney(value){
-  return '₦'+Number(value||0).toLocaleString('en-NG',{minimumFractionDigits:2,maximumFractionDigits:2});
-}
-function setMessage(id,text,isError=false){
-  const el=document.getElementById(id);
+function message(id,text,error=false){
+  const el=$(id);
+  if(!el)return;
   el.textContent=text;
-  el.classList.toggle('error',isError);
+  el.classList.toggle('error',error);
 }
-
-function renderGames(targetId,limit=10){
-  const target=document.getElementById(targetId);
-  target.innerHTML='';
-  gameData.slice(0,limit).forEach(game=>{
-    const item=document.createElement('div');
-    item.className='game';
-    const icon=document.createElement('div');
-    icon.className='game-icon';
-    icon.textContent=game.icon;
-    const title=document.createElement('h3');
-    title.textContent=game.name;
-    const description=document.createElement('p');
-    description.textContent=game.description;
-    const button=document.createElement('button');
-    button.textContent='Open game';
-    button.addEventListener('click',()=>openGame(game.name));
-    item.append(icon,title,description,button);
-    target.appendChild(item);
+function money(value){
+  return '₦'+Number(value||0).toLocaleString('en-NG',{
+    minimumFractionDigits:2,maximumFractionDigits:2
   });
 }
-renderGames('allGames');
-renderGames('homeGames',4);
-renderGames('casinoGames');
+function busy(id,state){
+  $(id).disabled=state;
+}
+
+const games=[
+  ['Aviator','✈️','Multiplier-style flight game'],
+  ['Flip the Bottle','🍾','Bottle flipping challenge'],
+  ['Under or Over 7','🎲','Predict the dice total'],
+  ['Dice','🎲','Dice prediction game'],
+  ['Coin Flip','🪙','Heads or tails'],
+  ['Slots','🎰','Slot machine'],
+  ['Roulette','🎡','Roulette game'],
+  ['Lucky Wheel','🎯','Spin the lucky wheel'],
+  ['Number Prediction','🔢','Predict a number'],
+  ['Penalty Shootout','⚽','Take your penalty shot']
+];
+
+function renderGames(id,items){
+  const target=$(id);
+  target.replaceChildren();
+  items.forEach(game=>{
+    const card=document.createElement('div');
+    card.className='game';
+    const icon=document.createElement('div');
+    icon.className='game-icon';
+    icon.textContent=game[1];
+    const title=document.createElement('h3');
+    title.textContent=game[0];
+    const description=document.createElement('p');
+    description.textContent=game[2];
+    const button=document.createElement('button');
+    button.type='button';
+    button.textContent='Open game';
+    button.addEventListener('click',()=>openGame(game[0]));
+    card.append(icon,title,description,button);
+    target.appendChild(card);
+  });
+}
+renderGames('allGames',games);
+renderGames('homeGames',games.slice(0,4));
+renderGames('casinoGames',games);
 
 const pages=['dashboard','sports','esports','casino','games','deposit','wallet','withdraw','account'];
+const titles={
+  dashboard:'Home',sports:'Sports',esports:'Esports',casino:'Casino',
+  games:'Games',deposit:'Deposit',wallet:'My Wallet',
+  withdraw:'Withdraw',account:'My Account'
+};
 
 function goTo(page){
   if(!pages.includes(page))return;
-  pages.forEach(id=>document.getElementById(id).classList.toggle('hidden',id!==page));
-  document.querySelectorAll('.bottom-nav button').forEach(btn=>
-    btn.classList.toggle('active',btn.dataset.bottom===page ||
-      (page==='sports'||page==='esports'||page==='casino')&&btn.dataset.bottom==='games')
-  );
-  document.querySelectorAll('.category-nav button').forEach(btn=>
-    btn.classList.toggle('active',btn.dataset.category===page ||
-      (page==='dashboard'&&btn.dataset.category==='top'))
-  );
-  const titles={dashboard:'Home',sports:'Sports',esports:'Esports',casino:'Casino',games:'Games',deposit:'Deposit',wallet:'My Wallet',withdraw:'Withdraw',account:'My Account'};
-  document.getElementById('pageTitle').textContent=titles[page];
+  pages.forEach(id=>$(id).classList.toggle('hidden',id!==page));
+  $('pageTitle').textContent=titles[page];
+  document.querySelectorAll('[data-bottom]').forEach(button=>{
+    button.classList.toggle('active',button.dataset.bottom===page||
+      (['sports','esports','casino'].includes(page)&&button.dataset.bottom==='games'));
+  });
+  document.querySelectorAll('[data-category]').forEach(button=>{
+    button.classList.toggle('active',button.dataset.category===page);
+  });
   window.scrollTo({top:0,behavior:'smooth'});
 }
 window.goTo=goTo;
 
-document.querySelectorAll('[data-bottom]').forEach(btn=>
-  btn.addEventListener('click',()=>goTo(btn.dataset.bottom))
-);
-document.querySelectorAll('[data-category]').forEach(btn=>
-  btn.addEventListener('click',()=>goTo(({top:'dashboard',sports:'sports',esports:'esports',casino:'casino',games:'games'})[btn.dataset.category]))
-);
+document.querySelectorAll('[data-bottom]').forEach(button=>{
+  button.addEventListener('click',()=>goTo(button.dataset.bottom));
+});
+document.querySelectorAll('[data-category]').forEach(button=>{
+  button.addEventListener('click',()=>goTo(button.dataset.category));
+});
 
-window.showCategory=category=>goTo(category==='top'?'dashboard':category);
+window.refreshBalance=refreshBalance;
+
+function openGame(name){
+  message('gameMessage',name+' selected. Its playable engine and secure server-side betting functions are not yet connected.');
+  goTo('games');
+}
+
+function makeTrackingCode(){
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const bytes=new Uint8Array(7);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes,b=>chars[b%chars.length]).join('');
+}
 
 async function loadProfile(user){
+  message('authMessage','Loading your account...');
   const {data,error}=await supabase.from('profiles')
     .select('email,virtual_balance').eq('id',user.id).single();
+
   if(error){
-    setMessage('authMessage','Profile loading failed: '+error.message,true);
+    message('authMessage','Account profile error: '+error.message,true);
     return;
   }
+
   currentUser=user;
-  const balance=formatMoney(data.virtual_balance);
-  document.getElementById('balance').textContent=balance;
-  document.getElementById('walletBalance').textContent=balance;
-  document.getElementById('welcome').textContent='Welcome, '+(data.email||user.email);
-  document.getElementById('accountEmail').textContent=data.email||user.email;
-  authBox.classList.add('hidden');
-  app.classList.remove('hidden');
-  bottomNav.classList.remove('hidden');
+  updateBalances(data.virtual_balance);
+  $('welcome').textContent='Welcome, '+(data.email||user.email);
+  $('accountEmail').textContent=data.email||user.email;
+  $('auth').classList.add('hidden');
+  $('app').classList.remove('hidden');
+  $('bottomNav').classList.remove('hidden');
   goTo('dashboard');
   loadBanks();
+}
+
+function updateBalances(value){
+  $('balance').textContent=money(value);
+  $('walletBalance').textContent=money(value);
 }
 
 async function refreshBalance(){
   if(!currentUser)return;
   const {data,error}=await supabase.from('profiles')
     .select('virtual_balance').eq('id',currentUser.id).single();
-  if(error)return;
-  const balance=formatMoney(data.virtual_balance);
-  document.getElementById('balance').textContent=balance;
-  document.getElementById('walletBalance').textContent=balance;
+  if(error){
+    alert('Balance refresh failed: '+error.message);
+    return;
+  }
+  updateBalances(data.virtual_balance);
 }
-window.refreshBalance=refreshBalance;
 
-document.getElementById('loginBtn').onclick=async()=>{
-  const email=document.getElementById('email').value.trim();
-  const password=document.getElementById('password').value;
-  setMessage('authMessage','Signing in...');
-  const {data,error}=await supabase.auth.signInWithPassword({email,password});
-  if(error)return setMessage('authMessage',error.message,true);
-  await loadProfile(data.user);
-};
+async function loadBanks(){
+  const select=$('bankName');
+  const {data,error}=await supabase.from('bank_directory')
+    .select('bank_name,category').order('category').order('bank_name');
 
-document.getElementById('signupBtn').onclick=async()=>{
-  const email=document.getElementById('email').value.trim();
-  const password=document.getElementById('password').value;
-  if(password.length<8)return setMessage('authMessage','Password must contain at least 8 characters.',true);
-  setMessage('authMessage','Creating your account...');
-  const {data,error}=await supabase.auth.signUp({email,password});
-  if(error)return setMessage('authMessage',error.message,true);
-  if(data.session)await loadProfile(data.user);
-  else setMessage('authMessage','Account created. Confirm your email, then sign in.');
-};
+  select.innerHTML='<option value="">Select bank / provider</option>';
+  if(error||!data?.length){
+    select.innerHTML='<option value="">Bank list unavailable</option>';
+    if(error)message('withdrawMessage','Bank list error: '+error.message,true);
+    return;
+  }
 
-document.getElementById('logoutBtn').onclick=async()=>{
-  const {error}=await supabase.auth.signOut();
-  if(
+  let category='';
+  let group=null;
+  data.forEach(bank=>{
+    if(bank.category!==category){
+      category=bank.category;
+      group=document.createElement('optgroup');
+      group.label=category;
+      select.appendChild(group);
+    }
+    const option=document.createElement('option');
+    option.value=bank.bank_name;
+    option.textContent=bank.bank_name;
+    group.appendChild(option);
+  });
+}
+
+async function startApp(){
+  try{
+    message('authMessage','Connecting to TRUSTBET...');
+    const module=await import('https://esm.sh/@supabase/supabase-js@2');
+    const SUPABASE_URL='https://gzhxsdwhrrphbrjcnytj.supabase.co';
+    const SUPABASE_ANON_KEY='sb_publishable_ziI0kZ7KGO04M2GkuIoQXw_KSf95rN9';
+    supabase=module.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+
+    $('loginBtn').addEventListener('click',async()=>{
+      const email=$('email').value.trim();
+      const password=$('password').value;
+      if(!email||!password){
+        message('authMessage','Enter your email address and password.',true);
+        return;
+      }
+      busy('loginBtn',true);
+      message('authMessage','Signing in...');
+      try{
+        const {data,error}=await supabase.auth.signInWithPassword({email,password});
+        if(error)throw error;
+        await loadProfile(data.user);
+      }catch(error){
+        message('authMessage','Sign-in failed: '+error.message,true);
+      }finally{busy('loginBtn',false);}
+    });
+
+    $('signupBtn').addEventListener('click',async()=>{
+      const email=$('email').value.trim();
+      const password=$('password').value;
+      if(!email||!password){
+        message('authMessage','Enter your email address and password.',true);
+        return;
+      }
+      if(password.length<8){
+        message('authMessage','Password must contain at least 8 characters.',true);
+        return;
+      }
+      busy('signupBtn',true);
+      message('authMessage','Creating your account...');
+      try{
+        const {data,error}=await supabase.auth.signUp({email,password});
+        if(error)throw error;
+        if(data.session)await loadProfile(data.user);
+        else message('authMessage','Account created. Confirm your email, then sign in.');
+      }catch(error){
+        message('authMessage','Account creation failed: '+error.message,true);
+      }finally{busy('signupBtn',false);}
+    });
+
+    $('logoutBtn').addEventListener('click',async()=>{
+      const {error}=await supabase.auth.signOut();
+      if(error){
+        alert(error.message);
+        return;
+      }
+      currentUser=null;
+      $('app').classList.add('hidden');
+      $('bottomNav').classList.add('hidden');
+      $('auth').classList.remove('hidden');
+      message('authMessage','You have signed out.');
+    });
+
+    $('depositBtn').addEventListener('click',async()=>{
+      const amount=Number($('depositAmount').value);
+      const btn=$('depositBtn');
+      $('depositReference').classList.add('hidden');
+
+      if(!currentUser)return message('depositMessage','Please sign in again.',true);
+      if(!Number.isSafeInteger(amount)||amount<200)
+        return message('depositMessage','Minimum deposit is ₦200.',true);
+
+      btn.disabled=true;
+      message('depositMessage','Submitting your request...');
+      try{
+        let saved=false,code='',lastError=null;
+        for(let i=0;i<5&&!saved;i++){
+          code=makeTrackingCode();
+          const {error}=await supabase.from('deposit_requests').insert({
+            user_id:currentUser.id,
+            tracking_code:code,
+            amount,
+            status:'pending'
+          });
+          if(!error)saved=true;
+          else{
+            lastError=error;
+            if(error.code!=='23505')break;
+          }
+        }
+        if(!saved)throw lastError||new Error('Could not submit request.');
+        message('depositMessage','Your deposit request has been submitted.');
+        $('depositReference').textContent='Tracking code: '+code+' · Amount: '+money(amount)+' · Status: Pending';
+        $('depositReference').classList.remove('hidden');
+        $('depositAmount').value='';
+      }catch(error){
+        message('depositMessage','Deposit failed: '+error.message,true);
+      }finally{btn.disabled=false;}
+    });
+
+    $('withdrawBtn').addEventListener('click',async()=>{
+      const btn=$('withdrawBtn');
+      const amount=Number($('withdrawAmount').value);
+      const bank=$('bankName').value;
+      const accountName=$('accountName').value.trim();
+      const accountNumber=$('accountNumber').value.trim();
+
+      if(!currentUser)return message('withdrawMessage','Please sign in again.',true);
+      if(!Number.isSafeInteger(amount)||amount<20000)
+        return message('withdrawMessage','Minimum withdrawal is ₦20,000.',true);
+      if(!bank||!accountName||!/^\d{10}$/.test(accountNumber))
+        return message('withdrawMessage','Select a provider and enter the account name and valid 10-digit account number.',true);
+
+      btn.disabled=true;
+      message('withdrawMessage','Submitting withdrawal request...');
+      try{
+        const {error}=await supabase.from('withdrawal_requests').insert({
+          user_id:currentUser.id,
+          amount,
+          bank_name:bank,
+          account_name:accountName,
+          account_number:accountNumber,
+          status:'pending'
+        });
+        if(error)throw error;
+        message('withdrawMessage','Your withdrawal request has been submitted and is pending review.');
+        $('withdrawAmount').value='';
+        $('bankName').value='';
+        $('accountName').value='';
+        $('accountNumber').value='';
+      }catch(error){
+        message('withdrawMessage','Withdrawal failed: '+error.message,true);
+      }finally{btn.disabled=false;}
+    });
+
+    message('authMessage','Ready. Sign in or create your account.');
+
+    const {data,error}=await supabase.auth.getSession();
+    if(error)throw error;
+    if(data.session?.user)await loadProfile(data.session.user);
+
+  }catch(error){
+    console.error('TRUSTBET startup error:',error);
+    message('authMessage','TRUSTBET could not connect: '+error.message+'. Check your internet connection and reload.',true);
+    $('loginBtn').disabled=true;
+    $('signupBtn').disabled=true;
+  }
+}
+
+startApp();
+</script>
+</body>
+</html>
