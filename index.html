@@ -1,404 +1,182 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#102d59">
-  <title>TRUSTBET | Business Dashboard</title>
+  <title>TRUSTBET | Virtual Naira</title>
   <style>
     :root {
-      --navy: #102d59;
-      --blue: #174b91;
-      --light: #f3f6fb;
-      --white: #ffffff;
-      --text: #172b4d;
-      --muted: #78869c;
-      --border: #e5eaf1;
-      --green: #12a875;
+      --navy:#102d59; --blue:#174b91; --light:#f3f6fb;
+      --white:#fff; --text:#172b4d; --muted:#78869c;
+      --border:#e5eaf1; --green:#12a875; --red:#c43d4b;
     }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      background: var(--light);
-      color: var(--text);
-      font-family: Arial, sans-serif;
-    }
-
-    button, input { font: inherit; }
-
-    header {
-      height: 68px;
-      background: var(--navy);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 5%;
-    }
-
-    .brand {
-      font-size: 24px;
-      font-weight: 900;
-      letter-spacing: 1px;
-    }
-
-    .brand span { color: #8fc2ff; }
-
-    .top-label {
-      font-size: 11px;
-      background: #244778;
-      padding: 8px 11px;
-      border-radius: 20px;
-    }
-
-    main {
-      max-width: 1100px;
-      margin: auto;
-      padding: 24px 18px 90px;
-    }
-
-    .welcome {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-
-    h1 { font-size: 23px; margin: 0 0 6px; }
-    h2 { font-size: 18px; margin: 0 0 17px; }
-    p { line-height: 1.5; }
-
-    .muted { color: var(--muted); font-size: 13px; }
-
-    .card {
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 20px;
-      margin-bottom: 18px;
-      box-shadow: 0 3px 12px rgba(16,45,89,.035);
-    }
-
-    .balance-card {
-      background: var(--navy);
-      color: white;
-      border-radius: 16px;
-      padding: 24px;
-      margin-bottom: 20px;
-    }
-
-    .balance-label {
-      color: #c5d6ef;
-      font-size: 13px;
-    }
-
-    .balance {
-      font-size: 34px;
-      font-weight: 800;
-      margin: 12px 0;
-    }
-
-    .demo-label {
-      display: inline-block;
-      background: #244778;
-      color: #d9eaff;
-      padding: 7px 10px;
-      font-size: 10px;
-      border-radius: 20px;
-    }
-
-    .actions {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 20px;
-    }
-
-    button {
-      border: 0;
-      background: var(--navy);
-      color: white;
-      padding: 12px 15px;
-      border-radius: 8px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    button.secondary {
-      background: #edf3fb;
-      color: var(--navy);
-    }
-
-    button:hover { opacity: .9; }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-
-    .stat {
-      background: white;
-      padding: 17px;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-    }
-
-    .stat strong {
-      display: block;
-      font-size: 19px;
-      margin-top: 8px;
-      color: var(--navy);
-    }
-
-    .games {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 13px;
-    }
-
-    .game {
-      padding: 17px;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: white;
-    }
-
-    .game-icon {
-      width: 43px;
-      height: 43px;
-      display: grid;
-      place-items: center;
-      background: #edf3fb;
-      color: var(--navy);
-      border-radius: 11px;
-      font-size: 22px;
-      margin-bottom: 12px;
-    }
-
-    .game h3 { margin: 0 0 6px; font-size: 15px; }
-    .game p { color: var(--muted); font-size: 12px; }
-
-    input {
-      width: 100%;
-      padding: 14px;
-      margin: 7px 0 13px;
-      border: 1px solid #dce3ed;
-      background: white;
-      border-radius: 8px;
-      outline: none;
-    }
-
-    input:focus { border-color: var(--blue); }
-
-    .notice {
-      padding: 13px;
-      background: #f0f5fc;
-      color: #405675;
-      border-radius: 8px;
-      font-size: 12px;
-      line-height: 1.6;
-    }
-
-    .message {
-      font-size: 13px;
-      color: var(--green);
-      line-height: 1.5;
-    }
-
-    .hidden { display: none !important; }
-
-    nav {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding: 4px 0 17px;
-    }
-
-    nav button {
-      white-space: nowrap;
-      background: white;
-      color: var(--navy);
-      border: 1px solid var(--border);
-    }
-
-    nav button.active {
-      background: var(--navy);
-      color: white;
-    }
-
-    #auth {
-      max-width: 440px;
-      margin: 55px auto;
-    }
-
-    footer {
-      text-align: center;
-      padding: 25px;
-      color: var(--muted);
-      font-size: 11px;
-    }
-
-    @media(max-width:600px) {
-      .stats { grid-template-columns: 1fr 1fr; }
-      .balance { font-size: 29px; }
-      .welcome { align-items: flex-start; }
-      .actions button { padding: 11px 5px; font-size: 12px; }
-      main { padding: 18px 13px 80px; }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--light);color:var(--text);font-family:Arial,sans-serif}
+    button,input,select{font:inherit}
+    header{min-height:68px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:14px 5%;gap:12px}
+    .brand{font-size:25px;font-weight:900;letter-spacing:1px}.brand span{color:#8fc2ff}
+    .top-label{font-size:11px;background:#244778;padding:9px 12px;border-radius:20px}
+    main{max-width:1100px;margin:auto;padding:24px 18px 80px}
+    .welcome{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px}
+    h1{font-size:25px;margin:0 0 6px}h2{font-size:19px;margin:0 0 15px}h3{margin:0 0 6px}
+    p{line-height:1.5}.muted{color:var(--muted);font-size:13px}
+    .card{background:#fff;border:1px solid var(--border);border-radius:15px;padding:20px;margin-bottom:18px;box-shadow:0 3px 12px rgba(16,45,89,.035)}
+    .balance-card{background:var(--navy);color:#fff;border-radius:17px;padding:24px;margin-bottom:20px}
+    .balance-label{color:#c5d6ef;font-size:13px;letter-spacing:.3px}
+    .balance{font-size:34px;font-weight:800;margin:12px 0}
+    .actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:22px}
+    button{border:0;background:var(--navy);color:#fff;padding:13px 15px;border-radius:9px;font-weight:700;cursor:pointer}
+    button.secondary{background:#edf3fb;color:var(--navy)}
+    button:hover{opacity:.91}button:disabled{opacity:.55;cursor:wait}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+    .stat{background:#fff;padding:17px;border:1px solid var(--border);border-radius:12px}
+    .stat strong{display:block;font-size:19px;margin-top:8px;color:var(--navy)}
+    nav{display:flex;gap:8px;overflow-x:auto;padding:4px 0 17px;scrollbar-width:thin}
+    nav button{white-space:nowrap;background:#fff;color:var(--navy);border:1px solid var(--border)}
+    nav button.active{background:var(--navy);color:#fff}
+    .games{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+    .game{padding:17px;border:1px solid var(--border);border-radius:12px;background:#fff}
+    .game-icon{width:43px;height:43px;display:grid;place-items:center;background:#edf3fb;color:var(--navy);border-radius:11px;font-size:22px;margin-bottom:12px}
+    .game p{color:var(--muted);font-size:12px}
+    label{display:block;font-size:13px;font-weight:700;margin-top:10px}
+    input,select{width:100%;padding:14px;margin:7px 0 13px;border:1px solid #dce3ed;background:#fff;border-radius:8px;outline:none;color:var(--text)}
+    input:focus,select:focus{border-color:var(--blue)}
+    .message{font-size:13px;color:var(--green);line-height:1.5;overflow-wrap:anywhere}
+    .error{color:var(--red)}.hidden{display:none!important}
+    .wide{width:100%}.button-row{display:flex;gap:10px;flex-wrap:wrap}
+    .button-row button{flex:1;min-width:120px}
+    .info-line{padding:13px;background:#f0f5fc;color:#405675;border-radius:8px;font-size:13px;line-height:1.5;margin:12px 0}
+    footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
+    #auth{max-width:440px;margin:55px auto}
+    @media(max-width:600px){
+      main{padding:18px 13px 70px}.stats{grid-template-columns:1fr 1fr}
+      .balance{font-size:30px}.welcome{align-items:flex-start}
+      .actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .games{grid-template-columns:1fr}header{padding:14px 16px}
+      .brand{font-size:23px}
     }
   </style>
 </head>
-
 <body>
 <header>
   <div class="brand">TRUST<span>BET</span></div>
-  <div class="top-label">VIRTUAL DEMO</div>
+  <div class="top-label">VIRTUAL NAIRA</div>
 </header>
 
 <main>
   <section id="auth" class="card">
     <h1>Welcome to TRUSTBET</h1>
-    <p class="muted">Sign in to access your dashboard.</p>
-
-    <input id="email" type="email" placeholder="Email address">
-    <input id="password" type="password" placeholder="Password">
-
-    <button id="loginBtn">Sign in</button>
-    <button id="signupBtn" class="secondary">Create account</button>
-    <p id="authMessage" class="message"></p>
+    <p class="muted">Sign in to access your account.</p>
+    <label for="email">Email address</label>
+    <input id="email" type="email" autocomplete="email" placeholder="Email address">
+    <label for="password">Password</label>
+    <input id="password" type="password" autocomplete="current-password" placeholder="Password">
+    <div class="button-row">
+      <button id="loginBtn">Sign in</button>
+      <button id="signupBtn" class="secondary">Create account</button>
+    </div>
+    <p id="authMessage" class="message" role="status"></p>
   </section>
 
   <div id="app" class="hidden">
     <div class="welcome">
-      <div>
-        <h1>Dashboard</h1>
-        <div class="muted" id="welcome">Welcome back</div>
-      </div>
+      <div><h1>Dashboard</h1><div class="muted" id="welcome">Welcome back</div></div>
       <button class="secondary" id="logoutBtn">Log out</button>
     </div>
 
-    <nav>
+    <nav aria-label="Main navigation">
       <button class="active" data-page="dashboard">Overview</button>
       <button data-page="games">Games</button>
+      <button data-page="deposit">Deposit</button>
       <button data-page="wallet">Wallet</button>
       <button data-page="withdraw">Withdraw</button>
     </nav>
 
-    <div id="dashboard">
+    <section id="dashboard">
       <div class="balance-card">
-        <div class="balance-label">AVAILABLE VIRTUAL BALANCE</div>
+        <div class="balance-label">AVAILABLE VIRTUAL NAIRA</div>
         <div class="balance" id="balance">₦0.00</div>
-        <span class="demo-label">DEMO ACCOUNT</span>
-
         <div class="actions">
           <button onclick="goTo('games')">Play games</button>
+          <button onclick="goTo('deposit')">Deposit</button>
           <button onclick="goTo('wallet')">My wallet</button>
           <button onclick="goTo('withdraw')">Withdraw</button>
         </div>
       </div>
-
       <div class="stats">
-        <div class="stat">
-          <span class="muted">Account status</span>
-          <strong>Active</strong>
-        </div>
-        <div class="stat">
-          <span class="muted">Currency</span>
-          <strong>NGN ₦</strong>
-        </div>
-        <div class="stat">
-          <span class="muted">Account type</span>
-          <strong>Demo</strong>
-        </div>
+        <div class="stat"><span class="muted">Account status</span><strong>Active</strong></div>
+        <div class="stat"><span class="muted">Currency</span><strong>NGN ₦</strong></div>
+        <div class="stat"><span class="muted">Account type</span><strong>Virtual Naira</strong></div>
       </div>
-
       <div class="card">
         <h2>Quick access</h2>
-        <p class="muted">Choose an area to explore.</p>
-        <button onclick="goTo('games')">Explore games</button>
-        <button class="secondary" onclick="goTo('wallet')">View wallet</button>
+        <p class="muted">Choose where you want to go.</p>
+        <div class="button-row">
+          <button onclick="goTo('deposit')">Deposit Virtual Naira</button>
+          <button class="secondary" onclick="goTo('games')">Explore games</button>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <div id="games" class="hidden">
+    <section id="deposit" class="hidden">
+      <div class="card">
+        <h2>Deposit Virtual Naira</h2>
+        <p class="muted">Enter the amount you want to deposit.</p>
+        <label for="depositAmount">Amount (minimum ₦200)</label>
+        <input id="depositAmount" type="number" min="200" step="1" inputmode="numeric" placeholder="Enter amount">
+        <button id="depositBtn" class="wide">Submit deposit request</button>
+        <p id="depositMessage" class="message" role="status"></p>
+        <div id="depositReference" class="info-line hidden"></div>
+      </div>
+    </section>
+
+    <section id="wallet" class="hidden">
+      <div class="card">
+        <h2>My Wallet</h2>
+        <p class="muted">Your Virtual Naira balance</p>
+        <div class="balance" id="walletBalance">₦0.00</div>
+        <div class="button-row">
+          <button onclick="goTo('deposit')">Deposit</button>
+          <button class="secondary" onclick="goTo('withdraw')">Withdraw</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="withdraw" class="hidden">
+      <div class="card">
+        <h2>Withdraw Virtual Naira</h2>
+        <p class="muted">Minimum withdrawal: ₦20,000</p>
+        <label for="withdrawAmount">Amount</label>
+        <input id="withdrawAmount" type="number" min="20000" step="1" inputmode="numeric" placeholder="Minimum ₦20,000">
+        <label for="bankName">Bank / financial provider</label>
+        <select id="bankName"><option value="">Loading bank list...</option></select>
+        <label for="accountName">Account name</label>
+        <input id="accountName" type="text" autocomplete="name" placeholder="Account name">
+        <label for="accountNumber">Account number</label>
+        <input id="accountNumber" type="text" inputmode="numeric" maxlength="10" placeholder="10-digit account number">
+        <button id="withdrawBtn" class="wide">Submit withdrawal request</button>
+        <p id="withdrawMessage" class="message" role="status"></p>
+      </div>
+    </section>
+
+    <section id="games" class="hidden">
       <div class="card">
         <h2>Games</h2>
-        <p class="muted">Select a game to explore the demo.</p>
-
+        <p class="muted">Choose a game.</p>
         <div class="games">
-          <div class="game">
-            <div class="game-icon">🎲</div>
-            <h3>Dice</h3>
-            <p>Dice game demo</p>
-            <button onclick="openGame('Dice')">Open game</button>
-          </div>
-
-          <div class="game">
-            <div class="game-icon">🪙</div>
-            <h3>Coin Flip</h3>
-            <p>Heads or tails demo</p>
-            <button onclick="openGame('Coin Flip')">Open game</button>
-          </div>
-
-          <div class="game">
-            <div class="game-icon">🎰</div>
-            <h3>Slots</h3>
-            <p>Slot machine demo</p>
-            <button onclick="openGame('Slots')">Open game</button>
-          </div>
-
-          <div class="game">
-            <div class="game-icon">🎡</div>
-            <h3>Roulette</h3>
-            <p>Roulette game demo</p>
-            <button onclick="openGame('Roulette')">Open game</button>
-          </div>
+          <div class="game"><div class="game-icon">🎲</div><h3>Dice</h3><p>Dice game</p><button onclick="openGame('Dice')">Open game</button></div>
+          <div class="game"><div class="game-icon">🪙</div><h3>Coin Flip</h3><p>Heads or tails</p><button onclick="openGame('Coin Flip')">Open game</button></div>
+          <div class="game"><div class="game-icon">🎰</div><h3>Slots</h3><p>Slot machine</p><button onclick="openGame('Slots')">Open game</button></div>
+          <div class="game"><div class="game-icon">🎡</div><h3>Roulette</h3><p>Roulette game</p><button onclick="openGame('Roulette')">Open game</button></div>
         </div>
         <p id="gameMessage" class="message"></p>
       </div>
-    </div>
-
-    <div id="wallet" class="hidden">
-      <div class="card">
-        <h2>My Wallet</h2>
-        <p class="muted">Your virtual account balance</p>
-        <div class="balance" id="walletBalance">₦0.00</div>
-        <div class="notice">
-          This balance is for demonstration only. No real funds are held or transferred.
-        </div>
-      </div>
-    </div>
-
-    <div id="withdraw" class="hidden">
-      <div class="card">
-        <h2>Withdrawal</h2>
-        <p class="muted">Demo withdrawal form</p>
-
-        <input id="withdrawAmount" type="number" min="1" placeholder="Amount in Naira">
-        <input id="bankName" placeholder="Bank name">
-        <input id="accountName" placeholder="Account name">
-        <input id="accountNumber" placeholder="Account number">
-
-        <div class="notice">
-          This is a demonstration form. No actual bank transfer or saved withdrawal request will occur.
-        </div>
-
-        <br>
-        <button onclick="previewWithdrawal()">Preview request</button>
-        <p id="withdrawMessage" class="message"></p>
-      </div>
-    </div>
+    </section>
   </div>
 </main>
 
-<footer>
-  TRUSTBET © 2026 · Virtual demo platform · No real-money transactions
-</footer>
+<footer>© 2026 TRUSTBET. All rights reserved.</footer>
 
 <script type="module">
   import { supabase } from './supabase.js';
@@ -406,141 +184,204 @@
   const authBox = document.getElementById('auth');
   const app = document.getElementById('app');
   const authMessage = document.getElementById('authMessage');
+  let currentUser = null;
 
   function formatMoney(value) {
     return '₦' + Number(value || 0).toLocaleString('en-NG', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
+      minimumFractionDigits: 2, maximumFractionDigits: 2
     });
+  }
+
+  function setMessage(id, text, isError = false) {
+    const el = document.getElementById(id);
+    el.textContent = text;
+    el.classList.toggle('error', isError);
   }
 
   function goTo(page) {
-    ['dashboard', 'games', 'wallet', 'withdraw'].forEach(id => {
-      document.getElementById(id).classList.add('hidden');
-    });
-
+    ['dashboard','games','deposit','wallet','withdraw'].forEach(id =>
+      document.getElementById(id).classList.add('hidden')
+    );
     document.getElementById(page).classList.remove('hidden');
-
-    document.querySelectorAll('nav button').forEach(button => {
-      button.classList.toggle('active', button.dataset.page === page);
-    });
+    document.querySelectorAll('nav button').forEach(button =>
+      button.classList.toggle('active', button.dataset.page === page)
+    );
+    window.scrollTo({top:0, behavior:'smooth'});
   }
-
   window.goTo = goTo;
 
-  document.querySelectorAll('nav button').forEach(button => {
-    button.addEventListener('click', () => goTo(button.dataset.page));
-  });
+  document.querySelectorAll('nav button').forEach(button =>
+    button.addEventListener('click', () => goTo(button.dataset.page))
+  );
 
   async function loadProfile(user) {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('email, virtual_balance')
-      .eq('id', user.id)
-      .single();
-
+    const {data,error} = await supabase.from('profiles')
+      .select('email,virtual_balance').eq('id',user.id).single();
     if (error) {
-      authMessage.textContent = 'Profile loading failed: ' + error.message;
+      setMessage('authMessage','Profile loading failed: ' + error.message,true);
       return;
     }
-
+    currentUser = user;
     const balance = formatMoney(data.virtual_balance);
-
     document.getElementById('balance').textContent = balance;
     document.getElementById('walletBalance').textContent = balance;
-    document.getElementById('welcome').textContent =
-      'Welcome, ' + (data.email || user.email);
-
+    document.getElementById('welcome').textContent = 'Welcome, ' + (data.email || user.email);
     authBox.classList.add('hidden');
     app.classList.remove('hidden');
     goTo('dashboard');
+    loadBanks();
+  }
+
+  async function refreshBalance() {
+    if (!currentUser) return;
+    const {data,error} = await supabase.from('profiles')
+      .select('virtual_balance').eq('id',currentUser.id).single();
+    if (error) return;
+    const balance = formatMoney(data.virtual_balance);
+    document.getElementById('balance').textContent = balance;
+    document.getElementById('walletBalance').textContent = balance;
   }
 
   document.getElementById('loginBtn').onclick = async () => {
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
-
-    authMessage.textContent = 'Signing in...';
-
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email, password
-    });
-
-    if (error) {
-      authMessage.textContent = error.message;
-      return;
-    }
-
+    setMessage('authMessage','Signing in...');
+    const {data,error} = await supabase.auth.signInWithPassword({email,password});
+    if (error) return setMessage('authMessage',error.message,true);
     await loadProfile(data.user);
   };
 
   document.getElementById('signupBtn').onclick = async () => {
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
-
-    if (password.length < 8) {
-      authMessage.textContent = 'Password must contain at least 8 characters.';
-      return;
-    }
-
-    authMessage.textContent = 'Creating your account...';
-
-    const { data, error } = await supabase.auth.signUp({
-      email, password
-    });
-
-    if (error) {
-      authMessage.textContent = error.message;
-      return;
-    }
-
-    if (data.session) {
-      await loadProfile(data.user);
-    } else {
-      authMessage.textContent =
-        'Account created. Confirm your email, then sign in.';
-    }
+    if (password.length < 8) return setMessage('authMessage','Password must contain at least 8 characters.',true);
+    setMessage('authMessage','Creating your account...');
+    const {data,error} = await supabase.auth.signUp({email,password});
+    if (error) return setMessage('authMessage',error.message,true);
+    if (data.session) await loadProfile(data.user);
+    else setMessage('authMessage','Account created. Confirm your email, then sign in.');
   };
 
   document.getElementById('logoutBtn').onclick = async () => {
-    const { error } = await supabase.auth.signOut();
-
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
+    const {error} = await supabase.auth.signOut();
+    if (error) return alert(error.message);
+    currentUser = null;
     app.classList.add('hidden');
     authBox.classList.remove('hidden');
   };
 
-  window.openGame = function(name) {
-    document.getElementById('gameMessage').textContent =
-      name + ' selected. Game functions will be added in the next development stage.';
+  function makeTrackingCode() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const bytes = new Uint8Array(7);
+    crypto.getRandomValues(bytes);
+    return Array.from(bytes, b => chars[b % chars.length]).join('');
+  }
+
+  document.getElementById('depositBtn').onclick = async () => {
+    const btn = document.getElementById('depositBtn');
+    const amount = Number(document.getElementById('depositAmount').value);
+    const ref = document.getElementById('depositReference');
+    ref.classList.add('hidden');
+    if (!currentUser) return setMessage('depositMessage','Please sign in again.',true);
+    if (!Number.isSafeInteger(amount) || amount < 200)
+      return setMessage('depositMessage','Minimum deposit is ₦200.',true);
+
+    btn.disabled = true;
+    setMessage('depositMessage','Submitting your request...');
+    try {
+      let saved = false;
+      let trackingCode = '';
+      let lastError = null;
+      for (let attempt = 0; attempt < 5 && !saved; attempt++) {
+        trackingCode = makeTrackingCode();
+        const {error} = await supabase.from('deposit_requests').insert({
+          user_id: currentUser.id,
+          tracking_code: trackingCode,
+          amount,
+          status: 'pending'
+        });
+        if (!error) saved = true;
+        else {
+          lastError = error;
+          if (error.code !== '23505') break;
+        }
+      }
+      if (!saved) throw lastError || new Error('Could not create the deposit request.');
+      setMessage('depositMessage','Your deposit request has been submitted.');
+      ref.textContent = 'Tracking code: ' + trackingCode + ' · Amount: ' + formatMoney(amount) + ' · Status: Pending';
+      ref.classList.remove('hidden');
+      document.getElementById('depositAmount').value = '';
+    } catch (error) {
+      setMessage('depositMessage',error.message || 'Deposit request failed. Please try again.',true);
+    } finally {
+      btn.disabled = false;
+    }
   };
 
-  window.previewWithdrawal = function() {
-    const amount = Number(document.getElementById('withdrawAmount').value);
-    const bank = document.getElementById('bankName').value.trim();
-    const name = document.getElementById('accountName').value.trim();
-    const account = document.getElementById('accountNumber').value.trim();
-    const message = document.getElementById('withdrawMessage');
-
-    if (!amount || amount <= 0 || !bank || !name || !account) {
-      message.textContent = 'Please complete all fields correctly.';
+  async function loadBanks() {
+    const select = document.getElementById('bankName');
+    const {data,error} = await supabase.from('bank_directory')
+      .select('bank_name,category').order('category').order('bank_name');
+    select.innerHTML = '<option value="">Select bank / provider</option>';
+    if (error || !data?.length) {
+      select.innerHTML = '<option value="">Bank list unavailable — try again later</option>';
       return;
     }
+    let currentCategory = '';
+    let group = null;
+    data.forEach(bank => {
+      if (bank.category !== currentCategory) {
+        currentCategory = bank.category;
+        group = document.createElement('optgroup');
+        group.label = currentCategory;
+        select.appendChild(group);
+      }
+      const option = document.createElement('option');
+      option.value = bank.bank_name;
+      option.textContent = bank.bank_name;
+      group.appendChild(option);
+    });
+  }
 
-    message.textContent =
-      'Preview complete. No withdrawal was submitted or saved.';
+  document.getElementById('withdrawBtn').onclick = async () => {
+    const btn = document.getElementById('withdrawBtn');
+    const amount = Number(document.getElementById('withdrawAmount').value);
+    const bank = document.getElementById('bankName').value;
+    const accountName = document.getElementById('accountName').value.trim();
+    const accountNumber = document.getElementById('accountNumber').value.trim();
+
+    if (!currentUser) return setMessage('withdrawMessage','Please sign in again.',true);
+    if (!Number.isSafeInteger(amount) || amount < 20000)
+      return setMessage('withdrawMessage','Minimum withdrawal is ₦20,000.',true);
+    if (!bank || !accountName || !/^\d{10}$/.test(accountNumber))
+      return setMessage('withdrawMessage','Select a provider and enter the account name and valid 10-digit account number.',true);
+
+    btn.disabled = true;
+    setMessage('withdrawMessage','Submitting your withdrawal request...');
+    const {error} = await supabase.from('withdrawal_requests').insert({
+      user_id: currentUser.id,
+      amount,
+      bank_name: bank,
+      account_name: accountName,
+      account_number: accountNumber,
+      status: 'pending'
+    });
+    btn.disabled = false;
+    if (error) return setMessage('withdrawMessage',error.message,true);
+    setMessage('withdrawMessage','Your withdrawal request has been submitted and is pending review.');
+    document.getElementById('withdrawAmount').value = '';
+    document.getElementById('bankName').value = '';
+    document.getElementById('accountName').value = '';
+    document.getElementById('accountNumber').value = '';
   };
 
-  const { data: sessionData } = await supabase.auth.getSession();
+  window.openGame = name => {
+    document.getElementById('gameMessage').textContent =
+      name + ' selected. Game play is the next development stage.';
+  };
 
-  if (sessionData.session?.user) {
-    await loadProfile(sessionData.session.user);
-  }
+  const {data:sessionData} = await supabase.auth.getSession();
+  if (sessionData.session?.user) await loadProfile(sessionData.session.user);
 </script>
 </body>
-      </html>
-  
+</html>
