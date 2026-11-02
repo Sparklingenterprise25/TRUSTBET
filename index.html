@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -56,8 +55,8 @@ nav button.active{background:linear-gradient(135deg,#102d59,#2475d0);color:#fff;
 .nigeria-flag span:nth-child(2){background:#fff}
 .home-wallet-details{min-width:0;flex:1}
 .home-wallet-value-row{display:flex;align-items:center;gap:15px;flex-wrap:wrap}
-#home .balance-card .balance{display:block;margin:0;color:#fff;font-size:clamp(38px,12vw,180px);line-height:1.02;letter-spacing:-5px;font-weight:1000;text-shadow:0 5px 18px #0004;overflow-wrap:anywhere}
-#homeBalanceValue{color:#fff}
+#home .balance-card .balance{display:block;margin:0;color:#fff;font-size:clamp(38px,12vw,180px);line-height:1.02;letter-spacing:-5px;font-weight:1000;text-shadow:0 2px 12px #0005;overflow-wrap:anywhere}
+#homeBalanceValue{color:#39ff88}
 .balance-visibility{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:#12a875;border:1px solid #50e0a8;color:#fff;border-radius:999px;padding:10px 16px;font-size:14px;font-weight:850;white-space:nowrap;box-shadow:0 5px 16px #001b1033}
 .balance-visibility:hover:not(:disabled){background:#0d9467}
 .balance-visibility-icon{font-size:18px;line-height:1}
@@ -92,9 +91,8 @@ nav button.active{background:linear-gradient(135deg,#102d59,#2475d0);color:#fff;
 .fav{background:#edf3fb!important;color:#174b88!important;border:1px solid #dce7f5!important;padding:7px 10px;box-shadow:none!important;width:auto!important}
 .play-balance{background:linear-gradient(110deg,#eff5fd,#e4eefb);border:1px solid #d2e1f4;border-radius:13px;padding:12px 15px;margin:12px 0 16px;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .play-balance span{font-size:11px;font-weight:800;letter-spacing:.6px;color:#55708f}
-.play-balance strong{font-size:20px;color:#174b88}
-.play-balance strong .balance-amount{color:#b77b13}
-.play-balance strong .balance-separator{color:#9b741e}
+.play-balance strong{font-size:20px;color:#39ff88}
+.play-balance strong .balance-amount,.play-balance strong .balance-separator{color:inherit}
 .odds-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin:12px 0}
 .odd-box{position:relative;background:linear-gradient(180deg,#fff,#f8fbff);color:#18365d;border:1px solid #d8e4f2;border-radius:13px;text-align:left;padding:14px;min-height:84px;box-shadow:0 3px 9px #102d5908;transition:transform .16s,border-color .16s,background .16s,box-shadow .16s}
 .odd-box:hover{transform:translateY(-2px);border-color:#8fb4e2;box-shadow:0 7px 15px #102d5912}
@@ -134,6 +132,10 @@ footer{text-align:center;padding:24px 24px 90px;color:var(--muted);font-size:12p
 .tx-date{font-size:11px;color:var(--muted);margin-top:3px}
 .tx-green{color:#16a34a!important}.tx-red{color:#dc2626!important}
 .tx-divider{height:1px;background:#e8edf5;margin:0;border:0}
+.tx-reference{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;font-size:11px;color:#536982}
+.tx-reference-code{font-weight:900;letter-spacing:.6px;color:#173d70;overflow-wrap:anywhere}
+.tx-copy{padding:5px 9px;font-size:10px;border-radius:8px;box-shadow:none}
+.tx-copy:disabled{opacity:.45}
 .empty-history{padding:18px 5px;color:var(--muted);font-size:13px}
 
 /* Smooth, duplicated payout ticker */
@@ -172,7 +174,8 @@ footer{text-align:center;padding:24px 24px 90px;color:var(--muted);font-size:12p
 .status-pill.approved{background:#e6f8f0;color:#087c50}
 .wallet-balance-card{background:linear-gradient(125deg,#0b2144,#102d59 58%,#2166ad);color:#fff;border:1px solid #2a609e;border-radius:17px;padding:18px;margin:0 0 13px;box-shadow:0 14px 32px #102d5925}
 .wallet-balance-card h2{color:#fff;margin:0 0 12px}
-.wallet-balance-card .balance{margin:0 0 15px}
+.wallet-balance-card .balance{margin:0 0 15px;color:#39ff88;font-weight:950}
+#gameBalance{color:#39ff88}
 .wallet-balance-card .row{position:relative;z-index:1}
 .wallet-balance-card .row button{min-width:110px}
 .wallet-balance-card .row button.secondary{background:#edf3fb;color:#173d70}
@@ -258,8 +261,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
 }
 
 </style>
-</head>
-<body>
+</head><body>
 <header>
  <div class="brand">TRUST<span>BET</span></div>
  <div class="header-right">
@@ -501,259 +503,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
 </main>
 <footer>© 2026 TRUSTBET. All rights reserved.</footer>
 
-<script type="module">
-import{supabase}from'./supabase.js';
-
-const $=id=>document.getElementById(id);
-let user=null,profile=null,days=0,conversation=null,channel=null,game=null;
-let selectedOdd=null,notificationChannel=null,activeCategory='All';
-let homeBalanceHidden=false;
-let favourites=JSON.parse(localStorage.getItem('trustbet_favourites')||'[]');
-let played=JSON.parse(localStorage.getItem('trustbet_played')||'{}');
-
-const providers=[
-'9 Payment Service Bank (9PSB)','Access Bank','Airtel Money','Branch','Carbon','Chipper Cash','Citibank Nigeria','Cowrywise','Ecobank Nigeria','FairMoney','Fidelity Bank','First Bank','First City Monument Bank (FCMB)','Flutterwave','Globus Bank','Guaranty Trust Bank (GTBank)','Jaiz Bank','Keystone Bank','Kuda','Lotus Bank','Moniepoint','MoMo PSB','MTN MoMo','Nova Commercial Bank','OPay','Optimus Bank','Paga','PalmPay','Parallex Bank','Paystack','PiggyVest','Polaris Bank','Premium Trust Bank','Providus Bank','Remita','Signature Bank','SmartCash PSB','Squad','Stanbic IBTC Bank','Standard Chartered Bank','Sterling Bank','SunTrust Bank','TAJBank','Titan Trust Bank','Union Bank','United Bank for Africa (UBA)','Unity Bank','VFD Microfinance Bank','Wema Bank','Zenith Bank'
-];
-
-const games=[
-{id:'dice',name:'Dice',icon:'🎲',cat:'Casino',count:2,odds:[['🔥 HIGH',8.2],['😌 LOW',2.0]]},
-{id:'coinflip',name:'Coin Flip',icon:'🪙',cat:'Trust Games',count:2,odds:[['🔥 HIGH',7.8],['😌 LOW',1.8]]},
-{id:'slots',name:'Slots',icon:'🎰',cat:'Casino',count:3,odds:[['🔥 HIGH',9.0],['😎 MEDIUM',4.0],['😌 LOW',2.2]]},
-{id:'roulette',name:'Roulette',icon:'🎡',cat:'Casino',count:3,odds:[['🔥 HIGH',10.2],['😎 MEDIUM',4.6],['😌 LOW',2.5]]},
-{id:'aviator',name:'Aviator',icon:'✈️',cat:'Top',count:3,odds:[['🔥 HIGH',11.5],['😎 MEDIUM',5.2],['😌 LOW',2.8]]},
-{id:'bottle_flip',name:'Flip the Bottle',icon:'🍾',cat:'Trust Games',count:4,odds:[['🔥 HIGH',12.8],['😎 MEDIUM',5.8],['😌 LOW',3.1],['🥹 OOPS',0.9]]},
-{id:'under_over',name:'Under or Over 7',icon:'🔢',cat:'Casino',count:4,odds:[['🔥 HIGH',14.0],['😎 MEDIUM',6.4],['😌 LOW',3.4],['🥹 OOPS',1.2]]},
-{id:'lucky_wheel',name:'Lucky Wheel',icon:'🎯',cat:'Trust Games',count:4,odds:[['🔥 HIGH',16.0],['😎 MEDIUM',7.2],['😌 LOW',3.9],['🥹 OOPS',1.8]]},
-{id:'number_prediction',name:'Number Prediction',icon:'🔮',cat:'Trust Games',count:5,odds:[['🔥 HIGH',18.0],['😎 MEDIUM',8.2],['😌 LOW',4.3],['🥹 OOPS',2.2],['💎 SPECIAL ODDS',100,true]]},
-{id:'penalty_shootout',name:'Penalty Shootout',icon:'⚽',cat:'Sports',count:5,odds:[['🔥 HIGH',20.5],['😎 MEDIUM',9.5],['😌 LOW',4.6],['🥹 OOPS',2.6],['💎 SPECIAL ODDS',100,true]]}
-];
-
-const money=n=>'₦'+Number(n||0).toLocaleString('en-NG',{maximumFractionDigits:0});
-
-function say(id,message,isError=false){
- $(id).textContent=message;
- $(id).classList.toggle('error',isError);
-}
-function first(email){
- return(String(email||'').split('@')[0].split(/[._+-]/)[0].replace(/\d+$/,'')||'there');
-}
-function banks(){
- ['depProvider','bank'].forEach(id=>{
-  const select=$(id);
-  select.innerHTML='<option value="">Select bank / provider</option>';
-  providers.forEach(name=>{
-   const option=document.createElement('option');
-   option.value=name;option.textContent=name;select.append(option);
-  });
- });
-}
-function maskEmail(email){
- const value=String(email||''),at=value.lastIndexOf('@');
- if(at<1)return value;
- const local=value.slice(0,at);
- if(local.length<=4)return '*'.repeat(local.length)+'@'+value.slice(at+1);
- return local.slice(0,Math.min(9,local.length-2))+'*****'+local.slice(-2)+'@'+value.slice(at+1);
-}
-function escapeHtml(value){
- return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-function tracking(){
- const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',bytes=new Uint8Array(7);
- crypto.getRandomValues(bytes);
- return[...bytes].map(x=>chars[x%chars.length]).join('');
-}
-function isAdmin(){return profile?.role==='admin';}
-function minimumStake(g){return ({2:100,3:200,4:300,5:500})[g?.odds?.length]||100;}
-function isSelfExcluded(){
- return !!(profile?.self_exclusion_until&&new Date(profile.self_exclusion_until)>new Date());
-}
-function isBettingLocked(){
- return profile?.betting_locked===true||profile?.is_betting_locked===true;
-}
-function balanceHTML(amount){
- return escapeHtml(money(amount));
-}
-function updateBalances(amount){
- const formatted=balanceHTML(amount);
- $('homeBalanceValue').textContent=homeBalanceHidden?'••••••':money(amount);
- $('walletBalance').innerHTML=formatted;
- $('gameBalance').innerHTML=formatted;
-}
-$('toggleHomeBalance').onclick=()=>{
- homeBalanceHidden=!homeBalanceHidden;
- $('homeBalanceValue').textContent=homeBalanceHidden?'••••••':money(profile?.virtual_balance||0);
- $('homeBalanceEye').textContent=homeBalanceHidden?'🙈':'👁';
- $('homeBalanceToggleText').textContent=homeBalanceHidden?'Show':'Hide';
- $('toggleHomeBalance').setAttribute('aria-pressed',String(homeBalanceHidden));
- $('toggleHomeBalance').setAttribute('aria-label',homeBalanceHidden?'Show wallet balance':'Hide wallet balance');
-};
-function updateLockNotice(){
- const locked=isBettingLocked();
- $('bettingLockNotice').classList.toggle('hidden',!locked);
- if(locked){
-  $('bettingLockNotice').textContent='BETTING LOCKED: Your account must submit a deposit request and wait for administrator approval before betting can resume.';
- }
- $('bet').disabled=locked||isSelfExcluded()||selectedOdd===null;
-}
-
-window.go=page=>{
- ['home','games','wallet','account','deposit','withdraw'].forEach(id=>$(id).classList.add('hidden'));
- $(page).classList.remove('hidden');
- const primary=(page==='deposit'||page==='withdraw')?'wallet':page;
- document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===primary));
- $('heading').textContent=primary[0].toUpperCase()+primary.slice(1);
- $('heading').classList.toggle('hidden',primary==='home');
- $('homeActivityHeading').classList.toggle('hidden',primary!=='home');
- if(primary==='wallet')loadWallet();
- if(page==='deposit'){loadBankDetails();if(isAdmin())$('adminBankEditor').classList.remove('hidden');}
- if(primary==='home')renderHome();
-};
-document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>go(b.dataset.page));
-
-function loadCashoutTicker(){
- const el=$('cashoutTicker');
- if(!el)return;
- const groups=[
- ['Ade*** Balogun','Olu*** Adeyemi','Tolu*** Adebayo','Fol*** Akinyemi','Bola*** Ogunleye','Keh*** Olatunji','Dap*** Oladipo','Fun*** Afolayan','Tai*** Ajayi','Bis*** Lawal'],
- ['Chi*** Okafor','Ngo*** Nwosu','Chi*** Eze','Ife*** Okeke','Obi*** Umeh','Ada*** Nnamdi','Chu*** Ezeani','Ama*** Ibe','Kele*** Anayo','Nne*** Onwudiwe'],
- ['Abd*** Musa','Ami*** Bello','Fat*** Abdullahi','Ibr*** Sani','Zai*** Ibrahim','Mus*** Garba','Ais*** Usman','Yus*** Adamu','Had*** Lawal','Hal*** Umar'],
- ['Ebi*** Timi','Tam*** Preye','Ogh*** Efe','Ese*** Oghene','Ini*** Etim','Eka*** Udo','Ima*** Akpan','Mfon*** Bassey','Ior*** Terna','Aon*** Terkimbi']
- ];
- const names=groups.flat();
- const items=names.map((name,i)=>{
-  const amount=50000+((i*13750)%450001);
-  return `<span class="cashout-item">${escapeHtml(name)} · <b>${escapeHtml(money(amount))}</b> · <span class="cashout-success">✓ SUCCESSFUL</span></span>`;
- }).join('');
- const track=document.createElement('div');
- track.className='cashout-track';
- track.innerHTML='<div class="cashout-group">'+items+'</div><div class="cashout-group" aria-hidden="true">'+items+'</div>';
- el.replaceChildren(track);
-}
-
-/* Profile data is read from the signed-in user's own profile row. */
-async function profileLoad(authUser){
- const{data,error}=await supabase.from('profiles')
-  .select('email,virtual_balance,role,self_exclusion_until,betting_locked,is_betting_locked,welcome_bonus_used,bonus_restricted')
-  .eq('id',authUser.id).single();
- if(error)return say('authMsg',error.message,true);
- user=authUser;profile=data;
- updateBalances(data.virtual_balance);
- $('welcome').textContent='WELCOME';
- $('accountEmail').textContent=maskEmail(data.email||authUser.email||'');
- $('auth').classList.add('hidden');
- $('app').classList.remove('hidden');
- $('notificationBell').classList.remove('hidden');
- $('adminArea').classList.toggle('hidden',!isAdmin());
- $('adminBankEditor').classList.toggle('hidden',!isAdmin());
- banks();render();renderHome();exStatus();updateLockNotice();
- go('home');
- await loadBankDetails();
- if(isAdmin()){await adminDeposits();await adminWithdrawals();}
- await adminInbox();
- await loadNotifications();
- subscribeNotifications();
- await loadWallet();
- loadCashoutTicker();
-}
-
-$('login').onclick=async()=>{
- const{data,error}=await supabase.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
- if(error)return say('authMsg',error.message,true);
- await profileLoad(data.user);
-};
-$('signup').onclick=async()=>{
- const email=$('email').value.trim(),password=$('password').value;
- if(password.length<8)return say('authMsg','Password must contain at least 8 characters.',true);
- const{error}=await supabase.auth.signUp({email,password});
- if(error)return say('authMsg',error.message,true);
- $('otpBox').classList.remove('hidden');
- say('authMsg','Enter the six-digit code sent to your email.');
-};
-$('verify').onclick=async()=>{
- const{data,error}=await supabase.auth.verifyOtp({email:$('email').value.trim(),token:$('otp').value.trim(),type:'signup'});
- if(error)return say('authMsg',error.message,true);
- await profileLoad(data.user);
-};
-$('resend').onclick=async()=>{
- const{error}=await supabase.auth.resend({type:'signup',email:$('email').value.trim()});
- say('authMsg',error?error.message:'A new code has been requested.',!!error);
-};
-$('logout').onclick=async()=>{
- await supabase.auth.signOut();
- location.reload();
-};
-
-/* Daily totals include pending requests. Enforce the same caps in Supabase as well. */
-async function dailyRequestTotal(table){
- const now=new Date();
- const start=new Date(now.getFullYear(),now.getMonth(),now.getDate()).toISOString();
- const end=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1).toISOString();
- const{data,error}=await supabase.from(table).select('amount,created_at')
-  .eq('user_id',user.id).gte('created_at',start).lt('created_at',end);
- if(error)throw error;
- return(data||[]).reduce((sum,row)=>sum+Number(row.amount||0),0);
-}
-
-/* Deposit request: creates a pending request only; it never credits the wallet. */
-$('depositBtn').onclick=async()=>{
- const amount=Number($('depAmount').value),provider_name=$('depProvider').value;
- if(!provider_name)return say('depMsg','Select a bank or payment provider.',true);
- if(!Number.isSafeInteger(amount)||amount<500)return say('depMsg','Minimum deposit is ₦500.',true);
- if(amount>500000)return say('depMsg','Maximum deposit per day is ₦500,000.',true);
- let total;
- try{total=await dailyRequestTotal('deposit_requests');}
- catch(e){return say('depMsg','Could not verify today’s deposit total. Please try again.',true);}
- if(total+amount>500000)return say('depMsg','Daily deposit limit is ₦500,000. Remaining today: '+money(Math.max(0,500000-total)),true);
- let result,code;
- for(let i=0;i<5;i++){
-  code=tracking();
-  result=await supabase.from('deposit_requests').insert({
-   user_id:user.id,tracking_code:code,amount,provider_name,status:'pending'
-  });
-  if(!result.error||result.error.code!=='23505')break;
- }
- if(result.error)return say('depMsg',result.error.message,true);
- say('depMsg','Deposit request submitted and awaiting administrator review. Tracking code: '+code);
- $('depAmount').value='';
- await loadWallet();
- if(isAdmin())await adminDeposits();
-};
-
-/* Platform bank details: assumed table platform_bank_details, one row with id=1. */
-async function loadBankDetails(){
- const{data,error}=await supabase.from('platform_bank_details')
-  .select('bank_name,account_name,account_number').eq('id',1).maybeSingle();
- if(error){
-  $('platformBankName').textContent='';
-  $('platformAccountName').textContent='';
-  $('platformAccountNumber').textContent='';
-  return;
- }
- $('platformBankName').textContent=data?.bank_name||'';
- $('platformAccountNumber').textContent=data?.account_number||'';
- $('platformAccountName').textContent=data?.account_name||'';
- if(data){
-  $('editBankName').value=data.bank_name||'';
-  $('editAccountName').value=data.account_name||'';
-  $('editAccountNumber').value=data.account_number||'';
- }
-}
-$('saveBankDetails').onclick=async()=>{
- if(!isAdmin())return say('bankDetailsMsg','Administrator access required.',true);
- const bank_name=$('editBankName').value.trim();
- const account_name=$('editAccountName').value.trim();
- const account_number=$('editAccountNumber').value.trim();
- if(!bank_name||!account_name||!/^\d{10}$/.test(account_number))
-  return say('bankDetailsMsg','Enter the bank name, account name and valid 10-digit account number.',true);
- const{error}=await supabase.from('platform_bank_details').upsert({
-  id:1,bank_name,account_name,account_number,updated_at:new Date().toISOString()
- },{onConflict:'id'});
- if(error)return say('bankDetailsMsg',error.message,true);
- say('bankDetailsMsg','Bank details saved.');
- await loadBankDetails();
-};
-
-/* Withdrawal requests */
+<script type="module">/* Withdrawal requests */
 $('withdrawBtn').onclick=async()=>{
  const amount=Number($('wdAmount').value),bank_name=$('bank').value;
  const account_name=$('accName').value.trim(),account_number=$('accNo').value.trim();
@@ -765,11 +515,16 @@ $('withdrawBtn').onclick=async()=>{
  if(total+amount>1000000)return say('wdMsg','Daily withdrawal limit is ₦1,000,000. Remaining today: '+money(Math.max(0,1000000-total)),true);
  if(!bank_name||!account_name||!/^\d{10}$/.test(account_number))
   return say('wdMsg','Enter all bank details and a valid 10-digit account number.',true);
- const{error}=await supabase.from('withdrawal_requests').insert({
-  user_id:user.id,amount,bank_name,account_name,account_number,status:'pending'
- });
- if(error)return say('wdMsg',error.message,true);
- say('wdMsg','Withdrawal request submitted and pending review.');
+ let result,code;
+ for(let i=0;i<5;i++){
+  code=tracking();
+  result=await supabase.from('withdrawal_requests').insert({
+   user_id:user.id,tracking_code:code,amount,bank_name,account_name,account_number,status:'pending'
+  });
+  if(!result.error||result.error.code!=='23505')break;
+ }
+ if(result.error)return say('wdMsg',result.error.message,true);
+ say('wdMsg','Withdrawal request submitted and pending review. Tracking code: '+code);
  $('wdAmount').value='';$('accName').value='';$('accNo').value='';
  await loadWallet();
 };
@@ -911,8 +666,176 @@ $('stake').oninput=()=>{
 };
 $('cats').querySelector('[data-cat="All"]').classList.add('active');
 
-/* Admin deposit review. RPC functions must be created and permission-checked in Supabase. */
-async function adminDeposits(){
+/* Admin deposit review. RPC functions must be created and permission-checked in Supabase. */async function adminDeposits(){
+ if(!isAdmin())return;
+ const{data,error}=await supabase.from('deposit_requests')
+  .select('id,user_id,tracking_code,amount,provider_name,status,created_at')
+  .order('created_at',{ascending:false}).limit(100);
+ if(error)return say('adminMsg',error.message,true);
+ $('adminDeposits').innerHTML='';
+ (data||[]).forEach(x=>{
+  const d=document.createElement('div');d.className='admin-request';
+  d.innerHTML='<b>'+escapeHtml(money(x.amount))+'</b> · '+escapeHtml(x.status)+'<br><small>'+escapeHtml(x.provider_name||'')+' · '+escapeHtml(x.tracking_code||'')+'</small>';
+  $('adminDeposits').append(d);
+ });
+}
+async function adminWithdrawals(){
+ if(!isAdmin())return;
+ const{data,error}=await supabase.from('withdrawal_requests')
+  .select('id,user_id,tracking_code,amount,bank_name,account_name,account_number,status,created_at')
+  .order('created_at',{ascending:false}).limit(100);
+ if(error)return say('adminMsg',error.message,true);
+ $('adminWithdrawals').innerHTML='';
+ (data||[]).forEach(x=>{
+  const d=document.createElement('div');d.className='admin-request';
+  d.innerHTML='<b>'+escapeHtml(money(x.amount))+'</b> · '+escapeHtml(x.status)+'<br><small>'+escapeHtml(x.bank_name||'')+' · '+escapeHtml(x.account_name||'')+' · '+escapeHtml(x.account_number||'')+' · '+escapeHtml(x.tracking_code||'')+'</small>';
+  $('adminWithdrawals').append(d);
+ });
+}
+async function adminInbox(){
+ if(!isAdmin())return;
+ const{data,error}=await supabase.from('support_messages')
+  .select('*').order('created_at',{ascending:false}).limit(50);
+ if(error)return;
+ $('adminInbox').innerHTML=(data||[]).map(x=>'<div class="admin-request">'+escapeHtml(x.message||'')+'</div>').join('');
+}
+
+async function loadNotifications(){
+ if(!user)return;
+ const{data,error}=await supabase.from('notifications')
+  .select('*').eq('user_id',user.id).order('created_at',{ascending:false}).limit(30);
+ if(error)return;
+ const unread=(data||[]).filter(x=>!x.read_at);
+ $('unreadBadge').textContent=unread.length;
+ $('unreadBadge').classList.toggle('hidden',unread.length===0);
+ $('notificationList').innerHTML=(data||[]).map(x=>`
+  <div class="notification-item ${x.read_at?'':'unread'}">
+   <b>${escapeHtml(x.title||'Notification')}</b>
+   <div>${escapeHtml(x.message||'')}</div>
+   <small>${x.created_at?new Date(x.created_at).toLocaleString('en-NG'):''}</small>
+  </div>`).join('')||'No notifications yet.';
+}
+function subscribeNotifications(){
+ if(!user)return;
+ if(notificationChannel)supabase.removeChannel(notificationChannel);
+ notificationChannel=supabase.channel('notifications-'+user.id)
+  .on('postgres_changes',{event:'*',schema:'public',table:'notifications',filter:'user_id=eq.'+user.id},loadNotifications)
+  .subscribe();
+}
+$('notificationBell').onclick=()=>{
+ $('notificationPanel').classList.toggle('hidden');
+};
+$('closeNotifications').onclick=()=>$('notificationPanel').classList.add('hidden');
+
+$('chatOpen').onclick=e=>{
+ e.preventDefault();$('chatPanel').classList.toggle('hidden');
+ loadChat();
+};
+async function loadChat(){
+ if(!user)return;
+ const{data,error}=await supabase.from('support_messages')
+  .select('*').eq('user_id',user.id).order('created_at',{ascending:true}).limit(100);
+ if(error)return say('chatMsg',error.message,true);
+ $('chatMessages').innerHTML=(data||[]).map(x=>`
+  <div class="bubble ${x.sender_id===user.id?'mine':''}">
+   ${escapeHtml(x.message||'')}
+   <small>${x.created_at?new Date(x.created_at).toLocaleString('en-NG'):''}</small>
+  </div>`).join('');
+ $('chatMessages').scrollTop=$('chatMessages').scrollHeight;
+}
+$('sendChat').onclick=async()=>{
+ const message=$('chatInput').value.trim();
+ if(!message)return;
+ const{error}=await supabase.from('support_messages').insert({
+  user_id:user.id,sender_id:user.id,message
+ });
+ if(error)return say('chatMsg',error.message,true);
+ $('chatInput').value='';say('chatMsg','Message sent.');
+ await loadChat();
+};
+
+document.querySelectorAll('#exclusion button').forEach(b=>b.onclick=()=>{
+ days=Number(b.dataset.days);
+ document.querySelectorAll('#exclusion button').forEach(x=>x.classList.toggle('selected',x===b));
+ say('exMsg','Selected '+days+' days.');
+});
+$('activate').onclick=async()=>{
+ if(!days)return say('exMsg','Select a self-exclusion period first.',true);
+ if(!confirm('Activate self-exclusion for '+days+' days? This cannot be reversed early.'))return;
+ const until=new Date(Date.now()+days*86400000).toISOString();
+ const{error}=await supabase.from('profiles').update({self_exclusion_until:until}).eq('id',user.id);
+ if(error)return say('exMsg',error.message,true);
+ profile.self_exclusion_until=until;
+ exStatus();updateLockNotice();
+ say('exMsg','Self-exclusion activated until '+new Date(until).toLocaleDateString('en-NG')+'.');
+};
+function exStatus(){
+ const until=profile?.self_exclusion_until;
+ if(until&&new Date(until)>new Date()){
+  $('exState').textContent='Self-exclusion active until '+new Date(until).toLocaleString('en-NG');
+ }else{
+  $('exState').textContent='No active self-exclusion is shown on your account.';
+ }
+}
+
+async function loadWallet(){
+ if(!user)return;
+ const tx=$('tx');
+ tx.innerHTML='<div class="empty-history">Loading transactions…</div>';
+ const results=await Promise.all([
+  supabase.from('deposit_requests').select('amount,status,tracking_code,provider_name,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50),
+  supabase.from('withdrawal_requests').select('amount,status,tracking_code,bank_name,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50),
+  supabase.from('demo_bets').select('game_id,bet_amount,outcome,payout,tracking_code,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50),
+  supabase.from('wallet_transactions').select('transaction_type,amount,balance_before,balance_after,tracking_code,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50)
+ ]);
+ const [deposits,withdrawals,bets,ledger]=results;
+ if(results.some(x=>x.error)){
+  tx.innerHTML='<div class="empty-history">Could not load transactions. Please refresh.</div>';
+  return;
+ }
+ const items=[];
+ (deposits.data||[]).forEach(x=>items.push({
+  title:'DEPOSIT · '+String(x.status||'').toUpperCase(),
+  description:x.provider_name||'Deposit request',
+  amount:x.amount,credit:true,tracking_code:x.tracking_code,created_at:x.created_at
+ }));
+ (withdrawals.data||[]).forEach(x=>items.push({
+  title:'WITHDRAWAL · '+String(x.status||'').toUpperCase(),
+  description:x.bank_name||'Withdrawal request',
+  amount:x.amount,credit:false,tracking_code:x.tracking_code,created_at:x.created_at
+ }));
+ (bets.data||[]).forEach(x=>{
+  const outcome=String(x.outcome||'').toUpperCase();
+  const payout=Number(x.payout||0);
+  const won=outcome.startsWith('WIN');
+  const partial=!won&&payout>0;
+  items.push({
+   title:won?'BET WINNING':partial?'BET PARTIAL RETURN':'BET LOSS',
+   description=String(x.game_id||'Game')+' · '+(x.outcome||''),
+   amount:won||partial?payout:x.bet_amount,
+   credit:won||partial,tracking_code:x.tracking_code,created_at:x.created_at
+  });
+ });
+ const known=['deposit','withdrawal','bet','win','payout'];
+ (ledger.data||[]).forEach(x=>{
+  const type=String(x.transaction_type||'').toLowerCase();
+  if(known.some(k=>type.includes(k)))return;
+  const credit=Number(x.amount||0)>=0;
+  items.push({
+   title:type.replace(/[_-]/g,' ').toUpperCase()||'WALLET TRANSACTION',
+   description:'Wallet transaction',
+   amount:Math.abs(Number(x.amount||0)),credit,
+   tracking_code:x.tracking_code,created_at:x.created_at
+  });
+ });
+ items.sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
+ tx.innerHTML='';
+ if(!items.length){
+  tx.innerHTML='<div class="empty-history">No transactions yet.</div>';
+  return;
+ }
+ items.forEach(addWalletItem);
+}async function adminDeposits(){
  if(!isAdmin())return;
  const area=$('adminDeposits');
  area.textContent='Loading deposit requests...';
@@ -959,7 +882,7 @@ async function adminWithdrawals(){
  const area=$('adminWithdrawals');
  area.textContent='Loading withdrawal requests...';
  const{data,error}=await supabase.from('withdrawal_requests')
-  .select('id,user_id,amount,bank_name,account_name,account_number,status,created_at')
+  .select('id,user_id,tracking_code,amount,bank_name,account_name,account_number,status,created_at')
   .eq('status','pending').order('created_at',{ascending:true}).limit(100);
  if(error){area.textContent='Unable to load requests: '+error.message;return;}
  area.innerHTML='';
@@ -969,6 +892,7 @@ async function adminWithdrawals(){
   const info=document.createElement('div');
   info.innerHTML='<b>'+escapeHtml(money(item.amount))+'</b> · '+escapeHtml(item.bank_name||'Bank')+
    '<br><small>'+escapeHtml(item.account_name||'')+' · '+escapeHtml(item.account_number||'')+
+   '<br>Tracking: '+escapeHtml(item.tracking_code||'Unavailable')+
    '<br>User: '+escapeHtml(item.user_id)+'</small>';
   const status=document.createElement('span');status.className='status-pill';status.textContent='PENDING';
   const actions=document.createElement('div');actions.className='row';
@@ -1051,62 +975,98 @@ function statusFor(kind,status){
  }
  return null;
 }
+async function copyTrackingCode(code,button){
+ if(!code)return;
+ const original=button.textContent;
+ try{
+  if(navigator.clipboard&&window.isSecureContext){
+   await navigator.clipboard.writeText(code);
+  }else{
+   const field=document.createElement('textarea');
+   field.value=code;field.setAttribute('readonly','');
+   field.style.position='fixed';field.style.opacity='0';
+   document.body.append(field);field.select();
+   const copied=document.execCommand('copy');field.remove();
+   if(!copied)throw new Error('Copy unavailable');
+  }
+  button.textContent='Copied';button.disabled=true;
+  setTimeout(()=>{button.textContent=original;button.disabled=false;},1200);
+ }catch(error){
+  button.textContent='Copy failed';
+  setTimeout(()=>{button.textContent=original;},1600);
+ }
+}
 function addWalletItem(container,item){
  const row=document.createElement('div');row.className='tx-item';
  const main=document.createElement('div');main.className='tx-main';
  const amount=document.createElement('span');
  amount.className='tx-amount '+(item.color==='green'?'tx-green':'tx-red');
  amount.textContent=(item.symbol||'')+money(item.amount);
- const label=document.createElement('span');
+ const desc=document.createElement('div');
+ desc.className='tx-description';
+ desc.textContent=item.description||'';
+ const label=document.createElement('div');
  label.className='tx-label '+(item.color==='green'?'tx-green':'tx-red');
- label.textContent=item.label;
- main.append(amount,label);
- const desc=document.createElement('div');desc.className='tx-description';
- desc.textContent=item.description||'Transaction';
- const date=document.createElement('div');date.className='tx-date';date.textContent=dateText(item.created_at);
- row.append(main,desc);if(item.created_at)row.append(date);
+ label.textContent=item.label||'TRANSACTION';
+ main.append(amount,label);row.append(main,desc);
+ if(item.created_at){
+  const date=document.createElement('div');date.className='tx-date';
+  date.textContent=dateText(item.created_at);row.append(date);
+ }
+ const reference=document.createElement('div');reference.className='tx-reference';
+ const codeLabel=document.createElement('span');codeLabel.textContent='TRACKING CODE:';
+ const code=document.createElement('span');code.className='tx-reference-code';
+ code.textContent=item.tracking_code||'Unavailable';
+ const copy=document.createElement('button');copy.type='button';
+ copy.className='tx-copy secondary';copy.textContent='Copy';
+ copy.disabled=!item.tracking_code;
+ copy.setAttribute('aria-label',item.tracking_code?'Copy tracking code':'Tracking code unavailable');
+ copy.onclick=()=>copyTrackingCode(item.tracking_code,copy);
+ reference.append(codeLabel,code,copy);row.append(reference);
  const divider=document.createElement('hr');divider.className='tx-divider';
  container.append(row,divider);
-}
-async function loadWallet(){
+}async function loadWallet(){
  if(!user)return;
  const container=$('tx');container.innerHTML='<div class="empty-history">Loading transactions...</div>';
  const [deposits,withdrawals,bets,ledger]=await Promise.all([
   supabase.from('deposit_requests').select('amount,status,tracking_code,provider_name,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50),
-  supabase.from('withdrawal_requests').select('amount,status,bank_name,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50),
-  supabase.from('demo_bets').select('game_id,bet_amount,outcome,payout,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50),
-  supabase.from('wallet_transactions').select('transaction_type,amount,balance_after,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50)
+  supabase.from('withdrawal_requests').select('amount,status,tracking_code,bank_name,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50),
+  supabase.from('demo_bets').select('game_id,bet_amount,outcome,payout,tracking_code,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50),
+  supabase.from('wallet_transactions').select('transaction_type,amount,balance_before,balance_after,tracking_code,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50)
  ]);
  const items=[],errors=[deposits,withdrawals,bets,ledger].filter(x=>x.error);
  if(!deposits.error)(deposits.data||[]).forEach(x=>{
   const st=statusFor('deposit',x.status);
-  items.push({amount:x.amount,symbol:x.status==='approved'?'+':'',label:st.label,color:st.color,
-   description:'Deposit through '+(x.provider_name||'selected provider')+(x.tracking_code?' · Ref: '+x.tracking_code:''),created_at:x.created_at});
+  items.push({amount:x.amount,symbol:'+',label:st.label,color:'green',
+   description:'Deposit through '+(x.provider_name||'selected provider'),
+   tracking_code:x.tracking_code,created_at:x.created_at});
  });
  if(!withdrawals.error)(withdrawals.data||[]).forEach(x=>{
   const st=statusFor('withdrawal',x.status);
-  const approved=String(x.status||'').toLowerCase()==='approved';
-  items.push({
-   amount:x.amount,
-   symbol:approved?'+':'',
-   label:approved?'WITHDRAWAL APPROVED · WITHDRAWN':st.label,
-   color:approved?'green':'red',
+  items.push({amount:x.amount,symbol:'−',label:st.label,color:'red',
    description:'Withdrawal to '+(x.bank_name||'selected provider'),
-   created_at:x.created_at
-  });
+   tracking_code:x.tracking_code,created_at:x.created_at});
  });
  if(!bets.error)(bets.data||[]).forEach(x=>{
-  const outcome=String(x.outcome||'').toLowerCase(),won=outcome==='won'||outcome==='win';
-  items.push({amount:won?(Number(x.payout)||0):(Number(x.bet_amount)||0),symbol:won?'+':'−',
-   label:won?'WON':'LOST',color:won?'green':'red',
-   description:(x.game_id||'Bet')+(won?' · Winnings':' · Stake lost'),created_at:x.created_at});
+  const outcome=String(x.outcome||'').trim().toUpperCase();
+  const won=/^WIN(?:\b|:)/.test(outcome);
+  const partial=Number(x.payout)>0&&!won;
+  const credit=won||partial;
+  items.push({amount:credit?Number(x.payout):Number(x.bet_amount),
+   symbol:credit?'+':'−',label:won?'WON':partial?'PARTIAL RETURN':'LOST',
+   color:credit?'green':'red',
+   description:(x.game_id||'Bet')+(won?' · Winnings':partial?' · Partial return':' · Stake lost'),
+   tracking_code:x.tracking_code,created_at:x.created_at});
  });
  if(!ledger.error)(ledger.data||[]).forEach(x=>{
   const type=String(x.transaction_type||'').toLowerCase();
-  if(type.includes('deposit')||type.includes('withdraw')||type.includes('bet')||type.includes('win')||type.includes('loss'))return;
-  const credit=type.includes('credit')||type.includes('won');
-  items.push({amount:x.amount,symbol:credit?'+':'−',label:credit?'WALLET CREDIT':'WALLET DEBIT',
-   color:credit?'green':'red',description:x.transaction_type||'Wallet transaction',created_at:x.created_at});
+  if(['deposit','withdrawal','bet','win','payout'].includes(type)||type.includes('loss'))return;
+  const credit=['bonus','credit'].some(t=>type.includes(t))||
+   (type==='adjustment'&&Number(x.balance_after)>=Number(x.balance_before));
+  items.push({amount:x.amount,symbol:credit?'+':'−',
+   label:credit?'WALLET CREDIT':'WALLET DEBIT',color:credit?'green':'red',
+   description:x.transaction_type||'Wallet transaction',
+   tracking_code:x.tracking_code,created_at:x.created_at});
  });
  items.sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
  container.innerHTML='';
