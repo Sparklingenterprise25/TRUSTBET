@@ -7,47 +7,324 @@
 <title>TRUSTBET | Virtual Naira</title>
 <style>
 :root{--navy:#102d59;--blue:#2475d0;--pale:#edf3fb;--bg:#f3f6fb;--ink:#172b4d;--muted:#78869c;--line:#e3e9f2;--red:#c43d4b;--green:#12a875;--gold:#c7a34b}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px Arial,sans-serif}header{background:var(--navy);color:#fff;padding:14px 5%;display:flex;align-items:center;justify-content:space-between;gap:14px;position:sticky;top:0;z-index:20}.brand{font-size:24px;font-weight:900;letter-spacing:.3px}.brand span{color:#8fc2ff}.tag{background:#244778;padding:8px 12px;border-radius:9px;font-size:11px;font-weight:bold;white-space:nowrap}.header-right{display:flex;align-items:center;gap:10px}.bell{position:relative;width:43px;height:43px;border-radius:50%;background:#173b70;border:2px solid #3290ff;color:#fff;font-size:21px;display:grid;place-items:center;padding:0}.badge-count{position:absolute;right:-5px;top:-5px;background:#e53948;color:white;border:2px solid var(--navy);border-radius:20px;min-width:19px;height:19px;padding:0 4px;font-size:10px;display:grid;place-items:center}
-main{max-width:1100px;margin:auto;padding:20px 14px 90px}h1{font-size:24px;margin:8px 0}h2{font-size:19px;margin:5px 0 13px}h3{font-size:16px}.card{background:white;border:1px solid var(--line);border-radius:16px;padding:18px;margin:0 0 15px;box-shadow:0 4px 16px #102d5908}button{border:0;border-radius:10px;padding:12px 15px;background:var(--navy);color:#fff;font-weight:bold;cursor:pointer}button.secondary{background:var(--pale);color:var(--navy)}button.danger{background:var(--red)}button:disabled{opacity:.5;cursor:not-allowed}.wide{width:100%}.row{display:flex;gap:9px;flex-wrap:wrap}.row>*{flex:1;min-width:110px}input,select,textarea{width:100%;padding:13px;border:1px solid #dce3ed;border-radius:9px;margin:6px 0 12px;font:inherit}label{font-size:13px;font-weight:bold}nav{position:fixed;left:0;right:0;bottom:0;z-index:50;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:9px max(12px,env(safe-area-inset-right)) calc(9px + env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));background:#fff;border-top:1px solid var(--line);box-shadow:0 -5px 22px #102d5912}nav button{white-space:nowrap;background:#f3f6fb;color:var(--navy);border:1px solid var(--line);padding:10px 5px;min-height:48px;font-size:12px}nav button.active{background:var(--navy);color:white}main{padding-bottom:105px}footer{padding-bottom:85px}
-.balance-card{background:linear-gradient(135deg,#102d59,#1d5598);color:#fff;padding:23px;border-radius:18px;margin-bottom:15px;box-shadow:0 10px 26px #102d5926}.balance{font-size:34px;font-weight:900;margin:12px 0}.balance-card small{letter-spacing:1px;font-weight:bold;color:#c9ddf7}.balance-card button{background:#fff;color:var(--navy);min-width:130px}.hidden{display:none!important}.quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.quick{background:#fff;border:1px solid var(--line);border-radius:13px;padding:15px 8px;text-align:center;color:var(--navy);font-weight:bold}.quick b{display:block;font-size:23px;margin-bottom:7px}.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.categories{display:flex;gap:8px;overflow:auto;padding:5px 0 15px}.categories button{white-space:nowrap;background:white;color:var(--navy);border:1px solid var(--line)}.categories button.active{background:var(--navy);color:white}
-.games{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.game{background:white;border:1px solid var(--line);border-radius:14px;padding:15px}.game-icon{font-size:28px}.game p,.muted{line-height:1.5;color:var(--muted);font-size:13px}.game button{width:100%}.game-top{display:flex;justify-content:space-between;align-items:center}.fav{background:var(--pale);color:var(--navy);padding:7px 10px}.play-balance{background:#eaf2ff;border:1px solid #cbdcf5;border-radius:12px;padding:12px 15px;margin:12px 0 16px;display:flex;justify-content:space-between;align-items:center;gap:8px}.play-balance strong{font-size:20px;color:var(--navy)}
-.odds-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}.odd-box{position:relative;background:#fff;color:var(--navy);border:1.5px solid var(--navy);border-radius:12px;text-align:left;padding:14px;min-height:82px}.odd-box .odd-name{font-size:12px;font-weight:800;display:block;letter-spacing:.4px}.odd-box .odd-value{font-size:21px;font-weight:900;display:block;margin-top:7px}.odd-box.selected{border:2px solid #2475d0;background:#edf4ff;box-shadow:0 0 0 2px #2475d022}.lock{position:absolute;right:9px;top:7px;font-size:17px}.special-odd{background:linear-gradient(145deg,#f9fafb,#c8cdd3,#fff,#aeb5bd);border:2px solid #8d969f;color:#263342;box-shadow:inset 0 1px 4px #fff,0 4px 12px #64748b30}.special-odd .odd-value{color:#263342}.result-panel{padding:18px;border-radius:15px;margin:14px 0;color:white;text-align:center;font-weight:900;letter-spacing:.7px}.won{background:linear-gradient(120deg,#087c50,#19c889,#08764c);box-shadow:0 0 20px #12a87565,inset 0 1px 9px #ffffff60}.lost{background:linear-gradient(120deg,#851c2b,#d33e50,#811b2a);box-shadow:0 0 20px #c43d4b55,inset 0 1px 9px #ffffff50}.result-panel strong{font-size:25px;display:block;margin:5px}.result-detail{font-size:13px;font-weight:normal;letter-spacing:0}
-.support-link{display:flex;gap:12px;align-items:center;border:1px solid var(--line);border-radius:11px;padding:13px;margin:8px 0;text-decoration:none;color:var(--ink)}.support-link .emoji{font-size:23px}.support-link small{display:block;color:var(--muted)}.info{background:var(--pale);padding:12px;border-radius:9px;font-size:13px}.msg{font-size:13px;color:var(--green)}.error{color:var(--red)}.chat-list{max-height:300px;overflow:auto;border:1px solid var(--line);border-radius:9px;padding:10px}.bubble{padding:10px;border-radius:10px;background:var(--pale);margin:7px;max-width:88%;font-size:13px}.mine{margin-left:auto;background:#dceaff}.bubble small{display:block;color:var(--muted)}.conversation{padding:12px;border:1px solid var(--line);border-radius:9px;margin:7px 0;cursor:pointer}.notification-panel{position:absolute;right:5%;top:66px;width:min(390px,90vw);max-height:70vh;overflow:auto;background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:15px;box-shadow:0 12px 35px #102d5930;padding:15px;z-index:30}.notification-item{padding:12px 4px;border-bottom:1px solid var(--line)}.notification-item.unread{background:#f0f6ff;padding:12px;border-radius:9px}.notification-item small{display:block;color:var(--muted);margin-top:5px}.info{background:var(--pale);padding:12px;border-radius:9px;font-size:13px}.chat-list{max-height:300px;overflow:auto;border:1px solid var(--line);border-radius:9px;padding:10px}.bubble{padding:10px;border-radius:10px;background:var(--pale);margin:7px;max-width:88%;font-size:13px}.mine{margin-left:auto;background:#dceaff}.bubble small{display:block;color:var(--muted)}.conversation{padding:12px;border:1px solid var(--line);border-radius:9px;margin:7px 0;cursor:pointer}.notification-panel{position:absolute;right:5%;top:66px;width:min(390px,90vw);max-height:70vh;overflow:auto;background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:15px;box-shadow:0 12px 35px #102d5930;padding:15px;z-index:30}.notification-item{padding:12px 4px;border-bottom:1px solid var(--line)}.notification-item.unread{background:#f0f6ff;padding:12px;border-radius:9px}.notification-item small{display:block;color:var(--muted);margin-top:5px}footer{text-align:center;padding:24px;color:var(--muted);font-size:12px}#auth{max-width:440px;margin:45px auto}.history-shortcut{cursor:pointer}
-@media(max-width:700px){.games{grid-template-columns:repeat(2,minmax(0,1fr))}.quick-grid{grid-template-columns:repeat(2,1fr)}main{padding:14px 12px 90px}.balance{font-size:30px}header{padding:12px 4%}nav{top:auto}}
-@media(max-width:420px){.games{grid-template-columns:1fr}.odds-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.brand{font-size:21px}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px Arial,sans-serif}
+header{background:var(--navy);color:#fff;padding:14px 5%;display:flex;align-items:center;justify-content:space-between;gap:14px;position:sticky;top:0;z-index:20}
+.brand{font-size:24px;font-weight:900;letter-spacing:.3px}
+.brand span{color:#8fc2ff}
+.tag{background:#244778;padding:8px 12px;border-radius:9px;font-size:11px;font-weight:bold;white-space:nowrap}
+.header-right{display:flex;align-items:center;gap:10px}
+.bell{position:relative;width:43px;height:43px;border-radius:50%;background:#173b70;border:2px solid #3290ff;color:#fff;font-size:21px;display:grid;place-items:center;padding:0}
+.badge-count{position:absolute;right:-5px;top:-5px;background:#e53948;color:white;border:2px solid var(--navy);border-radius:20px;min-width:19px;height:19px;padding:0 4px;font-size:10px;display:grid;place-items:center}
+main{max-width:1100px;margin:auto;padding:20px 14px 105px}
+h1{font-size:24px;margin:8px 0}
+h2{font-size:19px;margin:5px 0 13px}
+h3{font-size:16px}
+.card{background:white;border:1px solid var(--line);border-radius:16px;padding:18px;margin:0 0 15px;box-shadow:0 4px 16px #102d5908}
+button{border:0;border-radius:10px;padding:12px 15px;background:var(--navy);color:#fff;font-weight:bold;cursor:pointer}
+button.secondary{background:var(--pale);color:var(--navy)}
+button.danger{background:var(--red)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.wide{width:100%}
+.row{display:flex;gap:9px;flex-wrap:wrap}
+.row>*{flex:1;min-width:110px}
+input,select,textarea{width:100%;padding:13px;border:1px solid #dce3ed;border-radius:9px;margin:6px 0 12px;font:inherit}
+label{font-size:13px;font-weight:bold}
+nav{position:fixed;left:0;right:0;bottom:0;z-index:50;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:9px max(12px,env(safe-area-inset-right)) calc(9px + env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));background:#fff;border-top:1px solid var(--line);box-shadow:0 -5px 22px #102d5912}
+nav button{white-space:nowrap;background:#f3f6fb;color:var(--navy);border:1px solid var(--line);padding:10px 5px;min-height:48px;font-size:12px}
+nav button.active{background:var(--navy);color:white}
+.balance-card{background:linear-gradient(135deg,#102d59,#1d5598);color:#fff;padding:23px;border-radius:18px;margin-bottom:15px;box-shadow:0 10px 26px #102d5926}
+.balance{font-size:34px;font-weight:900;margin:12px 0}
+.balance-card small{letter-spacing:1px;font-weight:bold;color:#c9ddf7}
+.balance-card button{background:#fff;color:var(--navy);min-width:130px}
+.hidden{display:none!important}
+.quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.quick{background:#fff;border:1px solid var(--line);border-radius:13px;padding:15px 8px;text-align:center;color:var(--navy);font-weight:bold}
+.quick b{display:block;font-size:23px;margin-bottom:7px}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.categories{display:flex;gap:8px;overflow:auto;padding:5px 0 15px}
+.categories button{white-space:nowrap;background:white;color:var(--navy);border:1px solid var(--line)}
+.categories button.active{background:var(--navy);color:white}
+.games{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.game{background:white;border:1px solid var(--line);border-radius:14px;padding:15px}
+.game-icon{font-size:28px}
+.game p,.muted{line-height:1.5;color:var(--muted);font-size:13px}
+.game button{width:100%}
+.game-top{display:flex;justify-content:space-between;align-items:center}
+.fav{background:var(--pale);color:var(--navy);padding:7px 10px}
+.play-balance{background:#eaf2ff;border:1px solid #cbdcf5;border-radius:12px;padding:12px 15px;margin:12px 0 16px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.play-balance strong{font-size:20px;color:var(--navy)}
+.odds-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}
+.odd-box{position:relative;background:#fff;color:var(--navy);border:1.5px solid var(--navy);border-radius:12px;text-align:left;padding:14px;min-height:82px}
+.odd-box .odd-name{font-size:12px;font-weight:800;display:block;letter-spacing:.4px}
+.odd-box .odd-value{font-size:21px;font-weight:900;display:block;margin-top:7px}
+.odd-box.selected{border:2px solid #2475d0;background:#edf4ff;box-shadow:0 0 0 2px #2475d022}
+.lock{position:absolute;right:9px;top:7px;font-size:17px}
+.special-odd{background:linear-gradient(145deg,#f9fafb,#c8cdd3,#fff,#aeb5bd);border:2px solid #8d969f;color:#263342;box-shadow:inset 0 1px 4px #fff,0 4px 12px #64748b30}
+.special-odd .odd-value{color:#263342}
+.result-panel{padding:18px;border-radius:15px;margin:14px 0;color:white;text-align:center;font-weight:900;letter-spacing:.7px}
+.won{background:linear-gradient(120deg,#087c50,#19c889,#08764c);box-shadow:0 0 20px #12a87565,inset 0 1px 9px #ffffff60}
+.lost{background:linear-gradient(120deg,#851c2b,#d33e50,#811b2a);box-shadow:0 0 20px #c43d4b55,inset 0 1px 9px #ffffff50}
+.result-panel strong{font-size:25px;display:block;margin:5px}
+.result-detail{font-size:13px;font-weight:normal;letter-spacing:0}
+.support-link{display:flex;gap:12px;align-items:center;border:1px solid var(--line);border-radius:11px;padding:13px;margin:8px 0;text-decoration:none;color:var(--ink)}
+.support-link .emoji{font-size:23px}
+.support-link small{display:block;color:var(--muted)}
+.info{background:var(--pale);padding:12px;border-radius:9px;font-size:13px}
+.msg{font-size:13px;color:var(--green)}
+.error{color:var(--red)}
+.chat-list{max-height:300px;overflow:auto;border:1px solid var(--line);border-radius:9px;padding:10px}
+.bubble{padding:10px;border-radius:10px;background:var(--pale);margin:7px;max-width:88%;font-size:13px}
+.mine{margin-left:auto;background:#dceaff}
+.bubble small{display:block;color:var(--muted)}
+.conversation{padding:12px;border:1px solid var(--line);border-radius:9px;margin:7px 0;cursor:pointer}
+.notification-panel{position:absolute;right:5%;top:66px;width:min(390px,90vw);max-height:70vh;overflow:auto;background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:15px;box-shadow:0 12px 35px #102d5930;padding:15px;z-index:30}
+.notification-item{padding:12px 4px;border-bottom:1px solid var(--line)}
+.notification-item.unread{background:#f0f6ff;padding:12px;border-radius:9px}
+.notification-item small{display:block;color:var(--muted);margin-top:5px}
+footer{text-align:center;padding:24px 24px 90px;color:var(--muted);font-size:12px}
+#auth{max-width:440px;margin:45px auto}
+.history-shortcut{cursor:pointer}
+
+/* Wallet transaction history */
+.wallet-history{max-height:560px;overflow-y:auto;overscroll-behavior:contain;border:1px solid var(--line);border-radius:12px;padding:4px 13px;background:#fff}
+.tx-item{padding:13px 2px 11px}
+.tx-main{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.tx-amount{font-size:16px;font-weight:900;white-space:nowrap}
+.tx-label{font-size:12px;font-weight:900;text-align:right;letter-spacing:.25px}
+.tx-description{font-size:12px;color:var(--muted);margin-top:7px;line-height:1.5}
+.tx-date{font-size:11px;color:var(--muted);margin-top:3px}
+.tx-green{color:#16a34a!important}
+.tx-red{color:#dc2626!important}
+.tx-divider{height:1px;background:#e3e9f2;margin:0;border:0}
+.empty-history{padding:18px 5px;color:var(--muted);font-size:13px}
+@media(max-width:700px){
+ .games{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .quick-grid{grid-template-columns:repeat(2,1fr)}
+ main{padding:14px 12px 105px}
+ .balance{font-size:30px}
+ header{padding:12px 4%}
+ nav{top:auto}
+}
+@media(max-width:420px){
+ .games{grid-template-columns:1fr}
+ .odds-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .brand{font-size:21px}
+ .tx-amount{font-size:14px}
+ .tx-label{font-size:11px}
+}
 </style>
 </head>
 <body>
 <header>
  <div class="brand">TRUST<span>BET</span></div>
- <div class="header-right"><div class="tag">VIRTUAL NAIRA</div><button id="notificationBell" class="bell hidden" aria-label="Notifications">♧<span id="unreadBadge" class="badge-count hidden">0</span></button></div>
- <div id="notificationPanel" class="notification-panel hidden"><div class="section-head"><h2>Notifications</h2><button id="closeNotifications" class="secondary">Close</button></div><div id="notificationList" class="muted">No notifications yet.</div></div>
+ <div class="header-right">
+  <div class="tag">VIRTUAL NAIRA</div>
+  <button id="notificationBell" class="bell hidden" aria-label="Notifications">🔔<span id="unreadBadge" class="badge-count hidden">0</span></button>
+ </div>
+ <div id="notificationPanel" class="notification-panel hidden">
+  <div class="section-head"><h2>Notifications</h2><button id="closeNotifications" class="secondary">Close</button></div>
+  <div id="notificationList" class="muted">No notifications yet.</div>
+ </div>
 </header>
+
 <main>
-<section id="auth" class="card"><h1>Welcome to TRUSTBET</h1><p class="muted">Sign in or create your account.</p><label>Email address</label><input id="email" type="email"><label>Password</label><input id="password" type="password" autocomplete="current-password"><div class="row"><button id="login">Sign in</button><button id="signup" class="secondary">Create account</button></div><div id="otpBox" class="hidden"><label>Six-digit email code</label><input id="otp" inputmode="numeric" maxlength="6"><div class="row"><button id="verify">Verify email</button><button id="resend" class="secondary">Resend code</button></div></div><p id="authMsg" class="msg"></p></section>
+<section id="auth" class="card">
+ <h1>Welcome to TRUSTBET</h1>
+ <p class="muted">Sign in or create your account.</p>
+ <label>Email address</label><input id="email" type="email">
+ <label>Password</label><input id="password" type="password" autocomplete="current-password">
+ <div class="row"><button id="login">Sign in</button><button id="signup" class="secondary">Create account</button></div>
+ <div id="otpBox" class="hidden">
+  <label>Six-digit email code</label><input id="otp" inputmode="numeric" maxlength="6">
+  <div class="row"><button id="verify">Verify email</button><button id="resend" class="secondary">Resend code</button></div>
+ </div>
+ <p id="authMsg" class="msg"></p>
+</section>
+
 <div id="app" class="hidden">
- <div class="row" style="align-items:center"><div style="flex:3"><h1 id="heading">Home</h1><p id="welcome"></p></div><button id="logout" class="danger">Log out</button></div>
- <nav><button class="active" data-page="home">⌂<br>Home</button><button data-page="games">🎮<br>Games</button><button data-page="wallet">▣<br>Wallet</button><button data-page="account">👤<br>Account</button></nav>
+ <div class="row" style="align-items:center">
+  <div style="flex:3"><h1 id="heading">Home</h1><p id="welcome"></p></div>
+  <button id="logout" class="danger">Log out</button>
+ </div>
+
+ <nav>
+  <button class="active" data-page="home">⌂<br>Home</button>
+  <button data-page="games">🎮<br>Games</button>
+  <button data-page="wallet">▣<br>Wallet</button>
+  <button data-page="account">👤<br>Account</button>
+ </nav>
+
  <section id="home">
-  <div class="balance-card"><small>AVAILABLE VIRTUAL NAIRA</small><div class="balance" id="balance">₦0.00</div><button onclick="go('deposit')">＋ Deposit</button></div>
-  <div class="card"><h2>Quick access</h2><div class="quick-grid"><button class="quick" onclick="go('games')"><b>🎮</b>All Games</button><button class="quick" onclick="showFavourites()"><b>❤️</b>Favourites</button><button class="quick" onclick="showHistory()"><b>📜</b>History</button><button class="quick" onclick="showFrequently()"><b>🔥</b>Frequently Played</button></div></div>
+  <div class="balance-card">
+   <small>AVAILABLE VIRTUAL NAIRA</small>
+   <div class="balance" id="balance">₦0.00</div>
+   <button onclick="go('deposit')">＋ Deposit</button>
+  </div>
+  <div class="card">
+   <h2>Quick access</h2>
+   <div class="quick-grid">
+    <button class="quick" onclick="go('games')"><b>🎮</b>All Games</button>
+    <button class="quick" onclick="showFavourites()"><b>❤️</b>Favourites</button>
+    <button class="quick" onclick="showHistory()"><b>📜</b>History</button>
+    <button class="quick" onclick="showFrequently()"><b>🔥</b>Frequently Played</button>
+   </div>
+  </div>
   <div class="card"><div class="section-head"><h2>Frequently Played</h2><button class="secondary" onclick="go('games')">See all</button></div><div id="frequentGames" class="games"></div></div>
   <div class="card"><div class="section-head"><h2>Favourites</h2><button class="secondary" onclick="go('games')">Manage</button></div><div id="homeFavourites" class="games muted">Add games to your favourites.</div></div>
  </section>
- <section id="games" class="hidden"><div class="card"><div class="section-head"><h2>All Games</h2><input id="gameSearch" placeholder="Search games..." style="max-width:190px"></div><div class="categories" id="cats"><button class="active" data-cat="All">All</button><button data-cat="Top">Top</button><button data-cat="Sports">Sports</button><button data-cat="Esports">Esports</button><button data-cat="Casino">Casino</button><button data-cat="Trust Games">Trust Games</button></div><div id="gameGrid" class="games"></div></div>
-  <div id="play" class="card hidden"><div class="section-head"><h2 id="gameTitle">Game</h2><button id="closeGame" class="secondary">Close</button></div><div class="play-balance"><span>YOUR AVAILABLE BALANCE</span><strong id="gameBalance">₦0.00</strong></div><label>Stake (minimum ₦100)</label><input id="stake" type="number" min="100" step="1" placeholder="Enter stake"><p class="muted">Choose your odds. Only your selected box will display 🔒.</p><div id="oddsGrid" class="odds-grid"></div><button id="bet" class="wide" disabled>Place bet</button><div id="resultArea"></div><p id="betMsg" class="msg"></p></div>
+
+ <section id="games" class="hidden">
+  <div class="card">
+   <div class="section-head"><h2>All Games</h2><input id="gameSearch" placeholder="Search games..." style="max-width:190px"></div>
+   <div class="categories" id="cats">
+    <button class="active" data-cat="All">All</button><button data-cat="Top">Top</button><button data-cat="Sports">Sports</button><button data-cat="Esports">Esports</button><button data-cat="Casino">Casino</button><button data-cat="Trust Games">Trust Games</button>
+   </div>
+   <div id="gameGrid" class="games"></div>
+  </div>
+  <div id="play" class="card hidden">
+   <div class="section-head"><h2 id="gameTitle">Game</h2><button id="closeGame" class="secondary">Close</button></div>
+   <div class="play-balance"><span>YOUR AVAILABLE BALANCE</span><strong id="gameBalance">₦0.00</strong></div>
+   <label>Stake (minimum ₦100)</label><input id="stake" type="number" min="100" step="1" placeholder="Enter stake">
+   <p class="muted">Choose your odds. Only your selected box will display 🔒.</p>
+   <div id="oddsGrid" class="odds-grid"></div>
+   <button id="bet" class="wide" disabled>Place bet</button>
+   <div id="resultArea"></div><p id="betMsg" class="msg"></p>
+  </div>
  </section>
- <section id="wallet" class="hidden"><div class="card"><h2>My Wallet</h2><div id="walletBalance" class="balance">₦0.00</div><div class="row"><button onclick="go('deposit')">Deposit</button><button class="secondary" onclick="go('withdraw')">Withdraw</button></div><h3>Recent transactions</h3><div id="tx" class="muted"></div><h3>Bet history</h3><div id="betHistory" class="muted"></div><h3>Deposit history</h3><div id="depositHistory" class="muted"></div><h3>Withdrawal history</h3><div id="withdrawHistory" class="muted"></div></div></section>
- <section id="deposit" class="hidden"><div class="card"><h2>Deposit Virtual Naira</h2><label>Amount (minimum ₦200)</label><input id="depAmount" type="number" min="200"><button id="depositBtn" class="wide">Submit deposit request</button><p id="depMsg" class="msg"></p></div></section>
- <section id="withdraw" class="hidden"><div class="card"><h2>Withdraw Virtual Naira</h2><p class="muted">Minimum withdrawal: ₦20,000</p><label>Amount</label><input id="wdAmount" type="number" min="20000"><label>Bank / financial provider</label><select id="bank"><option>Select bank</option></select><label>Account name</label><input id="accName"><label>Account number</label><input id="accNo" inputmode="numeric" maxlength="10"><button id="withdrawBtn" class="wide">Submit withdrawal request</button><p id="wdMsg" class="msg"></p></div></section>
- <section id="account" class="hidden"><div class="card"><h2>👤 Account</h2><p id="accountEmail"></p><div id="adminArea" class="hidden"><h3>🛠️ Admin Support Inbox</h3><div id="adminInbox"></div></div></div>
- <div class="card"><h2>🎧 Customer Support</h2><p><b style="color:var(--green)">🟢 ACTIVE 24/7</b></p><a class="support-link" href="#" id="chatOpen"><span class="emoji">💬</span><span><b>Live Chat</b><small>Private chat with support</small></span></a><a class="support-link" href="https://wa.me/2347063593605"><span class="emoji">📱</span><span><b>WhatsApp</b><small>Chat with our team</small></span></a><a class="support-link" href="mailto:superhybridservices@gmail.com"><span class="emoji">📧</span><span><b>Email</b><small>superhybridservices@gmail.com</small></span></a></div>
- <div class="card hidden" id="chatPanel"><h2>💬 Live Chat</h2><div id="chatMessages" class="chat-list"></div><textarea id="chatInput" maxlength="5000" placeholder="Write your message"></textarea><button id="sendChat" class="wide">Send message</button><p id="chatMsg" class="msg"></p></div> <div class="card"><h2>🔒 Privacy Policy</h2><details><summary>Information we use</summary><p>TRUSTBET processes account email and profile information, Virtual Naira balances, deposit and withdrawal requests, bank/provider details supplied for withdrawals, transaction records, game activity and support messages to operate the service.</p></details><details><summary>How information is used</summary><p>Information supports authentication, account and wallet management, transaction processing, gameplay, support and service protection.</p></details><details><summary>Security and contact</summary><p>Database permissions and account authentication control access. Never share your password or email codes. Privacy questions: superhybridservices@gmail.com.</p></details></div>
- <div class="card"><h2>🛑 Self-Exclusion</h2><p>Choose a period to pause access to games and betting.</p><div class="odds-grid" id="exclusion"><button class="odd-box" data-days="30">30 days</button><button class="odd-box" data-days="60">60 days</button><button class="odd-box" data-days="90">90 days</button><button class="odd-box" data-days="120">120 days</button></div><p id="exState" class="info">No active self-exclusion is shown on your account.</p><button id="activate" class="wide">Activate self-exclusion</button><p id="exMsg" class="msg"></p><p class="muted">Once activated, exclusion cannot be cancelled or shortened. Access returns after expiry.</p></div></section>
-</div></main><footer>© 2026 TRUSTBET. All rights reserved.</footer>
+
+ <section id="wallet" class="hidden">
+  <div class="card">
+   <h2>My Wallet</h2>
+   <div id="walletBalance" class="balance">₦0.00</div>
+   <div class="row"><button onclick="go('deposit')">Deposit</button><button class="secondary" onclick="go('withdraw')">Withdraw</button></div>
+   <h3>Recent transactions</h3>
+   <div id="tx" class="wallet-history"><div class="empty-history">Your transactions will appear here.</div></div>
+  </div>
+ </section>
+
+ <section id="deposit" class="hidden">
+  <div class="card">
+   <h2>Deposit Virtual Naira</h2>
+   <label>Bank / financial provider</label>
+   <select id="depProvider"><option value="">Select bank / provider</option></select>
+   <label>Amount (minimum ₦200)</label>
+   <input id="depAmount" type="number" min="200" step="1" placeholder="Enter deposit amount">
+   <button id="depositBtn" class="wide">Submit deposit request</button>
+   <p id="depMsg" class="msg"></p>
+  </div>
+ </section>
+
+ <section id="withdraw" class="hidden">
+  <div class="card">
+   <h2>Withdraw Virtual Naira</h2>
+   <p class="muted">Minimum withdrawal: ₦20,000</p>
+   <label>Amount</label><input id="wdAmount" type="number" min="20000" step="1" placeholder="Enter withdrawal amount">
+   <label>Bank / financial provider</label><select id="bank"><option value="">Select bank / provider</option></select>
+   <label>Account name</label><input id="accName" placeholder="Enter account name">
+   <label>Account number</label><input id="accNo" inputmode="numeric" maxlength="10" placeholder="10-digit account number">
+   <button id="withdrawBtn" class="wide">Submit withdrawal request</button>
+   <p id="wdMsg" class="msg"></p>
+  </div>
+ </section>
+
+ <section id="account" class="hidden">
+  <div class="card">
+   <h2>👤 Account</h2><p id="accountEmail"></p>
+   <div id="adminArea" class="hidden"><h3>🛠️ Admin Support Inbox</h3><div id="adminInbox"></div></div>
+  </div>
+  <div class="card">
+   <h2>🎧 Customer Support</h2><p><b style="color:var(--green)">🟢 ACTIVE 24/7</b></p>
+   <a class="support-link" href="#" id="chatOpen"><span class="emoji">💬</span><span><b>Live Chat</b><small>Private chat with support</small></span></a>
+   <a class="support-link" href="https://wa.me/2347063593605"><span class="emoji">📱</span><span><b>WhatsApp</b><small>Chat with our team</small></span></a>
+   <a class="support-link" href="mailto:superhybridservices@gmail.com"><span class="emoji">📧</span><span><b>Email</b><small>superhybridservices@gmail.com</small></span></a>
+  </div>
+  <div class="card hidden" id="chatPanel">
+   <h2>💬 Live Chat</h2><div id="chatMessages" class="chat-list"></div>
+   <textarea id="chatInput" maxlength="5000" placeholder="Write your message"></textarea>
+   <button id="sendChat" class="wide">Send message</button><p id="chatMsg" class="msg"></p>
+  </div>
+  <div class="card">
+   <h2>🔒 Privacy Policy</h2>
+   <details><summary>Information we use</summary><p>TRUSTBET processes account email and profile information, Virtual Naira balances, deposit and withdrawal requests, bank/provider details supplied for withdrawals, transaction records, game activity and support messages to operate the service.</p></details>
+   <details><summary>How information is used</summary><p>Information supports authentication, account and wallet management, transaction processing, gameplay, support and service protection.</p></details>
+   <details><summary>Security and contact</summary><p>Database permissions and account authentication control access. Never share your password or email codes. Privacy questions: superhybridservices@gmail.com.</p></details>
+  </div>
+  <div class="card">
+   <h2>🛑 Self-Exclusion</h2><p>Choose a period to pause access to games and betting.</p>
+   <div class="odds-grid" id="exclusion">
+    <button class="odd-box" data-days="30">30 days</button><button class="odd-box" data-days="60">60 days</button><button class="odd-box" data-days="90">90 days</button><button class="odd-box" data-days="120">120 days</button>
+   </div>
+   <p id="exState" class="info">No active self-exclusion is shown on your account.</p>
+   <button id="activate" class="wide">Activate self-exclusion</button><p id="exMsg" class="msg"></p>
+   <p class="muted">Once activated, exclusion cannot be cancelled or shortened. Access returns after expiry.</p>
+  </div>
+ </section>
+</div>
+</main>
+<footer>© 2026 TRUSTBET. All rights reserved.</footer>
+
 <script type="module">
 import{supabase}from'./supabase.js';
-const $=x=>document.getElementById(x);let user=null,profile=null,days=0,conversation=null,channel=null,game=null,selectedOdd=null,notificationChannel=null,activeCategory='All',favourites=JSON.parse(localStorage.getItem('trustbet_favourites')||'[]'),played=JSON.parse(localStorage.getItem('trustbet_played')||'{}');
+
+const $=x=>document.getElementById(x);
+let user=null,profile=null,days=0,conversation=null,channel=null,game=null,selectedOdd=null,notificationChannel=null,activeCategory='All';
+let favourites=JSON.parse(localStorage.getItem('trustbet_favourites')||'[]');
+let played=JSON.parse(localStorage.getItem('trustbet_played')||'{}');
+
+const providers=[
+'9 Payment Service Bank (9PSB)',
+'Access Bank',
+'Airtel Money',
+'Branch',
+'Carbon',
+'Chipper Cash',
+'Citibank Nigeria',
+'Cowrywise',
+'Ecobank Nigeria',
+'FairMoney',
+'Fidelity Bank',
+'First Bank',
+'First City Monument Bank (FCMB)',
+'Flutterwave',
+'Globus Bank',
+'Guaranty Trust Bank (GTBank)',
+'Jaiz Bank',
+'Keystone Bank',
+'Kuda',
+'Lotus Bank',
+'Moniepoint',
+'MoMo PSB',
+'MTN MoMo',
+'Nova Commercial Bank',
+'OPay',
+'Optimus Bank',
+'Paga',
+'PalmPay',
+'Parallex Bank',
+'Paystack',
+'PiggyVest',
+'Polaris Bank',
+'Premium Trust Bank',
+'Providus Bank',
+'Remita',
+'Signature Bank',
+'SmartCash PSB',
+'Squad',
+'Stanbic IBTC Bank',
+'Standard Chartered Bank',
+'Sterling Bank',
+'SunTrust Bank',
+'TAJBank',
+'Titan Trust Bank',
+'Union Bank',
+'United Bank for Africa (UBA)',
+'Unity Bank',
+'VFD Microfinance Bank',
+'Wema Bank',
+'Zenith Bank'
+];
+
 const games=[
 {id:'dice',name:'Dice',icon:'🎲',cat:'Casino',count:2,odds:[['🔥 HIGH',8.2],['😌 LOW',2.0]]},
 {id:'coinflip',name:'Coin Flip',icon:'🪙',cat:'Trust Games',count:2,odds:[['🔥 HIGH',7.8],['😌 LOW',1.8]]},
@@ -60,33 +337,237 @@ const games=[
 {id:'number_prediction',name:'Number Prediction',icon:'🔮',cat:'Trust Games',count:5,odds:[['🔥 HIGH',18.0],['😎 MEDIUM',8.2],['😌 LOW',4.3],['🥹 OOPS',2.2],['💎 SPECIAL ODDS',1000,true]]},
 {id:'penalty_shootout',name:'Penalty Shootout',icon:'⚽',cat:'Sports',count:5,odds:[['🔥 HIGH',20.5],['😎 MEDIUM',9.5],['😌 LOW',4.6],['🥹 OOPS',2.6],['💎 SPECIAL ODDS',1000,true]]}
 ];
+
 const money=n=>'₦'+Number(n||0).toLocaleString('en-NG',{minimumFractionDigits:2,maximumFractionDigits:2});
-function say(id,t,err=false){$(id).textContent=t;$(id).classList.toggle('error',err)}
-function first(e){return(e||'').split('@')[0].split(/[._+-]/)[0].replace(/\d+$/,'')||(e||'').split('@')[0]||'there'}
-window.go=p=>{['home','games','wallet','account','deposit','withdraw'].forEach(x=>$(x).classList.add('hidden'));$(p).classList.remove('hidden');let primary=(p==='deposit'||p==='withdraw')?'wallet':p;document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===primary));$('heading').textContent=primary[0].toUpperCase()+primary.slice(1);if(primary==='wallet')loadWallet();if(primary==='home')renderHome()};
+
+function say(id,t,err=false){
+ $(id).textContent=t;
+ $(id).classList.toggle('error',err);
+}
+function first(e){
+ return(e||'').split('@')[0].split(/[._+-]/)[0].replace(/\d+$/,'')||(e||'').split('@')[0]||'there';
+}
+function banks(){
+ ['depProvider','bank'].forEach(id=>{
+  const select=$(id);
+  select.innerHTML='<option value="">Select bank / provider</option>';
+  providers.forEach(name=>{
+   const option=document.createElement('option');
+   option.value=name;
+   option.textContent=name;
+   select.append(option);
+  });
+ });
+}
+
+window.go=p=>{
+ ['home','games','wallet','account','deposit','withdraw'].forEach(x=>$(x).classList.add('hidden'));
+ $(p).classList.remove('hidden');
+ let primary=(p==='deposit'||p==='withdraw')?'wallet':p;
+ document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===primary));
+ $('heading').textContent=primary[0].toUpperCase()+primary.slice(1);
+ if(primary==='wallet')loadWallet();
+ if(primary==='home')renderHome();
+};
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>go(b.dataset.page));
-async function profileLoad(u){let{data,error}=await supabase.from('profiles').select('email,virtual_balance,role,self_exclusion_until').eq('id',u.id).single();if(error)return say('authMsg',error.message,true);user=u;profile=data;updateBalances(data.virtual_balance);$('welcome').textContent='Welcome back, '+first(data.email||u.email);$('accountEmail').textContent=data.email||u.email;$('auth').classList.add('hidden');$('app').classList.remove('hidden');$('notificationBell').classList.remove('hidden');$('adminArea').classList.toggle('hidden',data.role!=='admin');go('home');banks();render();renderHome();exStatus();if(data.role==='admin')adminInbox();await loadNotifications();subscribeNotifications();await loadWallet()}
-function updateBalances(n){$('balance').textContent=$('walletBalance').textContent=$('gameBalance').textContent=money(n)}
-$('login').onclick=async()=>{let{data,error}=await supabase.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error)return say('authMsg',error.message,true);profileLoad(data.user)};
-$('signup').onclick=async()=>{let email=$('email').value.trim(),password=$('password').value;if(password.length<8)return say('authMsg','Password must contain at least 8 characters.',true);let{error}=await supabase.auth.signUp({email,password});if(error)return say('authMsg',error.message,true);$('otpBox').classList.remove('hidden');say('authMsg','Enter the six-digit code sent to your email.')};
-$('verify').onclick=async()=>{let{data,error}=await supabase.auth.verifyOtp({email:$('email').value.trim(),token:$('otp').value.trim(),type:'signup'});if(error)return say('authMsg',error.message,true);profileLoad(data.user)};
-$('resend').onclick=async()=>{let{error}=await supabase.auth.resend({type:'signup',email:$('email').value.trim()});say('authMsg',error?error.message:'A new code has been requested.',!!error)};
-$('logout').onclick=async()=>{await supabase.auth.signOut();location.reload()};
-function tracking(){let a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',b=new Uint8Array(7);crypto.getRandomValues(b);return[...b].map(x=>a[x%a.length]).join('')}
-$('depositBtn').onclick=async()=>{let amount=Number($('depAmount').value);if(!Number.isSafeInteger(amount)||amount<200)return say('depMsg','Minimum deposit is ₦200.',true);let r,code;for(let i=0;i<5;i++){code=tracking();r=await supabase.from('deposit_requests').insert({user_id:user.id,tracking_code:code,amount,status:'pending'});if(!r.error||r.error.code!=='23505')break}if(r.error)return say('depMsg',r.error.message,true);say('depMsg','Deposit request submitted. Tracking code: '+code);loadWallet()};
-async function banks(){let{data,error}=await supabase.from('bank_directory').select('bank_name,category').order('category').order('bank_name');$('bank').innerHTML='<option value="">Select bank / provider</option>';if(error||!data)return;let group,cat='';data.forEach(x=>{if(x.category!==cat){cat=x.category;group=document.createElement('optgroup');group.label=cat;$('bank').append(group)}let o=document.createElement('option');o.value=o.textContent=x.bank_name;group.append(o)})}
-$('withdrawBtn').onclick=async()=>{let amount=Number($('wdAmount').value),bank_name=$('bank').value,account_name=$('accName').value.trim(),account_number=$('accNo').value.trim();if(!Number.isSafeInteger(amount)||amount<20000)return say('wdMsg','Minimum withdrawal is ₦20,000.',true);if(!bank_name||!account_name||!/^\d{10}$/.test(account_number))return say('wdMsg','Enter all bank details and a valid 10-digit account number.',true);let{error}=await supabase.from('withdrawal_requests').insert({user_id:user.id,amount,bank_name,account_name,account_number,status:'pending'});say('wdMsg',error?error.message:'Withdrawal request submitted and pending review.',!!error);loadWallet()};function gameCard(g){let d=document.createElement('div');d.className='game';let top=document.createElement('div');top.className='game-top';let icon=document.createElement('span');icon.className='game-icon';icon.textContent=g.icon;let fav=document.createElement('button');fav.className='fav';fav.textContent=favourites.includes(g.id)?'❤️':'♡';fav.title='Favourite';fav.onclick=()=>toggleFavourite(g.id);top.append(icon,fav);let h=document.createElement('h3');h.textContent=g.name;let p=document.createElement('p');p.textContent=g.cat+' · '+g.count+' ordinary odds';let b=document.createElement('button');b.textContent='Open game';b.onclick=()=>openGame(g);d.append(top,h,p,b);return d}
-function render(cat=activeCategory){activeCategory=cat;$('gameGrid').innerHTML='';let q=($('gameSearch').value||'').toLowerCase();games.filter(g=>(cat==='All'||g.cat===cat)&&g.name.toLowerCase().includes(q)).forEach(g=>$('gameGrid').append(gameCard(g)))}
-function renderHome(){if(!$('frequentGames'))return;$('frequentGames').innerHTML='';let sorted=games.slice().sort((a,b)=>(played[b.id]||0)-(played[a.id]||0)).slice(0,3);sorted.forEach(g=>$('frequentGames').append(gameCard(g)));$('homeFavourites').innerHTML='';let favs=games.filter(g=>favourites.includes(g.id));if(!favs.length)$('homeFavourites').textContent='Add games to your favourites.';else favs.forEach(g=>$('homeFavourites').append(gameCard(g)))}
-function toggleFavourite(id){favourites=favourites.includes(id)?favourites.filter(x=>x!==id):[...favourites,id];localStorage.setItem('trustbet_favourites',JSON.stringify(favourites));render();renderHome()}
-window.showFavourites=()=>{go('games');$('gameSearch').value='';$('gameGrid').innerHTML='';games.filter(g=>favourites.includes(g.id)).forEach(g=>$('gameGrid').append(gameCard(g)))};
-window.showFrequently=()=>{go('games');$('gameSearch').value='';$('gameGrid').innerHTML='';games.slice().sort((a,b)=>(played[b.id]||0)-(played[a.id]||0)).slice(0,5).forEach(g=>$('gameGrid').append(gameCard(g)))};
+
+async function profileLoad(u){
+ let{data,error}=await supabase.from('profiles').select('email,virtual_balance,role,self_exclusion_until').eq('id',u.id).single();
+ if(error)return say('authMsg',error.message,true);
+ user=u;profile=data;
+ updateBalances(data.virtual_balance);
+ $('welcome').textContent='Welcome back, '+first(data.email||u.email);
+ $('accountEmail').textContent=data.email||u.email;
+ $('auth').classList.add('hidden');
+ $('app').classList.remove('hidden');
+ $('notificationBell').classList.remove('hidden');
+ $('adminArea').classList.toggle('hidden',data.role!=='admin');
+ go('home');
+ banks();
+ render();
+ renderHome();
+ exStatus();
+ if(data.role==='admin')adminInbox();
+ await loadNotifications();
+ subscribeNotifications();
+ await loadWallet();
+}
+
+function updateBalances(n){
+ $('balance').textContent=$('walletBalance').textContent=$('gameBalance').textContent=money(n);
+}
+
+$('login').onclick=async()=>{
+ let{data,error}=await supabase.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
+ if(error)return say('authMsg',error.message,true);
+ profileLoad(data.user);
+};
+$('signup').onclick=async()=>{
+ let email=$('email').value.trim(),password=$('password').value;
+ if(password.length<8)return say('authMsg','Password must contain at least 8 characters.',true);
+ let{error}=await supabase.auth.signUp({email,password});
+ if(error)return say('authMsg',error.message,true);
+ $('otpBox').classList.remove('hidden');
+ say('authMsg','Enter the six-digit code sent to your email.');
+};
+$('verify').onclick=async()=>{
+ let{data,error}=await supabase.auth.verifyOtp({email:$('email').value.trim(),token:$('otp').value.trim(),type:'signup'});
+ if(error)return say('authMsg',error.message,true);
+ profileLoad(data.user);
+};
+$('resend').onclick=async()=>{
+ let{error}=await supabase.auth.resend({type:'signup',email:$('email').value.trim()});
+ say('authMsg',error?error.message:'A new code has been requested.',!!error);
+};
+$('logout').onclick=async()=>{
+ await supabase.auth.signOut();
+ location.reload();
+};
+
+function tracking(){
+ let a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',b=new Uint8Array(7);
+ crypto.getRandomValues(b);
+ return[...b].map(x=>a[x%a.length]).join('');
+}
+
+/* Deposit request */
+$('depositBtn').onclick=async()=>{
+ const amount=Number($('depAmount').value);
+ const provider_name=$('depProvider').value;
+ if(!provider_name)return say('depMsg','Select a bank or payment provider.',true);
+ if(!Number.isSafeInteger(amount)||amount<200)return say('depMsg','Minimum deposit is ₦200.',true);
+
+ let r,code;
+ for(let i=0;i<5;i++){
+  code=tracking();
+  r=await supabase.from('deposit_requests').insert({
+   user_id:user.id,
+   tracking_code:code,
+   amount,
+   provider_name,
+   status:'pending'
+  });
+  if(!r.error||r.error.code!=='23505')break;
+ }
+ if(r.error)return say('depMsg',r.error.message,true);
+ say('depMsg','Deposit request submitted. Tracking code: '+code);
+ $('depAmount').value='';
+ await loadWallet();
+};
+
+/* Withdrawal request */
+$('withdrawBtn').onclick=async()=>{
+ const amount=Number($('wdAmount').value);
+ const bank_name=$('bank').value;
+ const account_name=$('accName').value.trim();
+ const account_number=$('accNo').value.trim();
+
+ if(!Number.isSafeInteger(amount)||amount<20000)return say('wdMsg','Minimum withdrawal is ₦20,000.',true);
+ if(!bank_name||!account_name||!/^\d{10}$/.test(account_number))return say('wdMsg','Enter all bank details and a valid 10-digit account number.',true);
+
+ const{error}=await supabase.from('withdrawal_requests').insert({
+  user_id:user.id,
+  amount,
+  bank_name,
+  account_name,
+  account_number,
+  status:'pending'
+ });
+ if(error)return say('wdMsg',error.message,true);
+
+ say('wdMsg','Withdrawal request submitted and pending review.');
+ $('wdAmount').value='';
+ $('accName').value='';
+ $('accNo').value='';
+ await loadWallet();
+};
+
+function gameCard(g){
+ let d=document.createElement('div');d.className='game';
+ let top=document.createElement('div');top.className='game-top';
+ let icon=document.createElement('span');icon.className='game-icon';icon.textContent=g.icon;
+ let fav=document.createElement('button');fav.className='fav';fav.textContent=favourites.includes(g.id)?'❤️':'♡';fav.title='Favourite';
+ fav.onclick=()=>toggleFavourite(g.id);
+ top.append(icon,fav);
+ let h=document.createElement('h3');h.textContent=g.name;
+ let p=document.createElement('p');p.textContent=g.cat+' · '+g.count+' ordinary odds';
+ let b=document.createElement('button');b.textContent='Open game';b.onclick=()=>openGame(g);
+ d.append(top,h,p,b);
+ return d;
+}
+function render(cat=activeCategory){
+ activeCategory=cat;
+ $('gameGrid').innerHTML='';
+ let q=($('gameSearch').value||'').toLowerCase();
+ games.filter(g=>(cat==='All'||g.cat===cat)&&g.name.toLowerCase().includes(q)).forEach(g=>$('gameGrid').append(gameCard(g)));
+}
+function renderHome(){
+ if(!$('frequentGames'))return;
+ $('frequentGames').innerHTML='';
+ let sorted=games.slice().sort((a,b)=>(played[b.id]||0)-(played[a.id]||0)).slice(0,3);
+ sorted.forEach(g=>$('frequentGames').append(gameCard(g)));
+ $('homeFavourites').innerHTML='';
+ let favs=games.filter(g=>favourites.includes(g.id));
+ if(!favs.length)$('homeFavourites').textContent='Add games to your favourites.';
+ else favs.forEach(g=>$('homeFavourites').append(gameCard(g)));
+}
+function toggleFavourite(id){
+ favourites=favourites.includes(id)?favourites.filter(x=>x!==id):[...favourites,id];
+ localStorage.setItem('trustbet_favourites',JSON.stringify(favourites));
+ render();renderHome();
+}
+window.showFavourites=()=>{
+ go('games');$('gameSearch').value='';$('gameGrid').innerHTML='';
+ games.filter(g=>favourites.includes(g.id)).forEach(g=>$('gameGrid').append(gameCard(g)));
+};
+window.showFrequently=()=>{
+ go('games');$('gameSearch').value='';$('gameGrid').innerHTML='';
+ games.slice().sort((a,b)=>(played[b.id]||0)-(played[a.id]||0)).slice(0,5).forEach(g=>$('gameGrid').append(gameCard(g)));
+};
 window.showHistory=()=>go('wallet');
-document.querySelectorAll('#cats button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#cats button').forEach(x=>x.classList.toggle('active',x===b));render(b.dataset.cat)});
+
+document.querySelectorAll('#cats button').forEach(b=>b.onclick=()=>{
+ document.querySelectorAll('#cats button').forEach(x=>x.classList.toggle('active',x===b));
+ render(b.dataset.cat);
+});
 $('gameSearch').oninput=()=>render(activeCategory);
-function openGame(g){if(profile.self_exclusion_until&&new Date(profile.self_exclusion_until)>new Date())return alert('Self-exclusion is active.');game=g;selectedOdd=null;$('play').classList.remove('hidden');$('gameTitle').textContent=g.icon+' '+g.name;$('stake').value='';$('resultArea').innerHTML='';say('betMsg','');drawOdds();$('bet').disabled=true;$('gameBalance').textContent=money(profile.virtual_balance);$('play').scrollIntoView({behavior:'smooth'})}
-function drawOdds(){let grid=$('oddsGrid');grid.innerHTML='';game.odds.forEach((o,i)=>{let b=document.createElement('button');b.className='odd-box'+(o[2]?' special-odd':'');b.innerHTML=`<span class="odd-name"></span><span class="odd-value"></span><span class="lock"></span>`;b.querySelector('.odd-name').textContent=o[0];b.querySelector('.odd-value').textContent=o[1]+'x';b.onclick=()=>{selectedOdd=i;grid.querySelectorAll('.odd-box').forEach(x=>{x.classList.remove('selected');x.querySelector('.lock').textContent=''});b.classList.add('selected');b.querySelector('.lock').textContent='🔒';$('bet').disabled=false;$('resultArea').innerHTML='';say('betMsg','Selected '+o[0]+' at '+o[1]+'x.');};grid.append(b)})}
-$('closeGame').onclick=()=>{$('play').classList.add('hidden');game=null;selectedOdd=null};
+
+function openGame(g){
+ if(profile.self_exclusion_until&&new Date(profile.self_exclusion_until)>new Date())return alert('Self-exclusion is active.');
+ game=g;selectedOdd=null;
+ $('play').classList.remove('hidden');
+ $('gameTitle').textContent=g.icon+' '+g.name;
+ $('stake').value='';
+ $('resultArea').innerHTML='';
+ say('betMsg','');
+ drawOdds();
+ $('bet').disabled=true;
+ $('gameBalance').textContent=money(profile.virtual_balance);
+ $('play').scrollIntoView({behavior:'smooth'});
+}
+function drawOdds(){
+ let grid=$('oddsGrid');grid.innerHTML='';
+ game.odds.forEach((o,i)=>{
+  let b=document.createElement('button');
+  b.className='odd-box'+(o[2]?' special-odd':'');
+  b.innerHTML=`<span class="odd-name"></span><span class="odd-value"></span><span class="lock"></span>`;
+  b.querySelector('.odd-name').textContent=o[0];
+  b.querySelector('.odd-value').textContent=o[1]+'x';
+  b.onclick=()=>{
+   selectedOdd=i;
+   grid.querySelectorAll('.odd-box').forEach(x=>{x.classList.remove('selected');x.querySelector('.lock').textContent=''});
+   b.classList.add('selected');
+   b.querySelector('.lock').textContent='🔒';
+   $('bet').disabled=false;
+   $('resultArea').innerHTML='';
+   say('betMsg','Selected '+o[0]+' at '+o[1]+'x.');
+  };
+  grid.append(b);
+ });
+}
+$('closeGame').onclick=()=>{
+ $('play').classList.add('hidden');game=null;selectedOdd=null;
+};
 $('bet').onclick=async()=>{
  let stake=Number($('stake').value);
  if(!Number.isSafeInteger(stake)||stake<100)return say('betMsg','Minimum stake is ₦100.',true);
@@ -97,26 +578,271 @@ $('bet').onclick=async()=>{
  const title=document.createElement('strong');title.textContent=won?'YOU WON!':'YOU LOST!';
  const detail=document.createElement('div');detail.className='result-detail';
  detail.textContent=(isSpecial?(won?'💯':'🚫'):(chosen[0].split(' ')[0]+' '+(won?'🗝️':'🚫')))+' · '+(won?'Total payout: '+money(payout):'Stake lost: '+money(stake));
- panel.append(title,detail);$('resultArea').replaceChildren(panel);
+ panel.append(title,detail);
+ $('resultArea').replaceChildren(panel);
  say('betMsg','Visual preview only. No money has been deducted or paid.');
 };
 $('stake').oninput=()=>{$('bet').disabled=selectedOdd===null||Number($('stake').value)<100};
 $('cats').querySelector('[data-cat="All"]').classList.add('active');
+
+/* Notifications */
 $('closeNotifications').onclick=()=>$('notificationPanel').classList.add('hidden');
-$('notificationBell').onclick=async()=>{$('notificationPanel').classList.toggle('hidden');if(!$('notificationPanel').classList.contains('hidden')){await loadNotifications();let ids=Array.from(document.querySelectorAll('.notification-item.unread')).map(x=>x.dataset.id);if(ids.length){await supabase.from('user_notifications').update({is_read:true}).in('id',ids);await loadNotifications()}}};
-function renderNotifications(items){let unread=items.filter(x=>!x.is_read).length;$('unreadBadge').textContent=unread;$('unreadBadge').classList.toggle('hidden',!unread);$('notificationList').innerHTML='';if(!items.length){$('notificationList').textContent='No notifications yet.';return}items.forEach(n=>{let d=document.createElement('div');d.className='notification-item'+(!n.is_read?' unread':'');d.dataset.id=n.id;let b=document.createElement('b');b.textContent=n.title||'Notification';let p=document.createElement('p');p.textContent=n.message||'';let s=document.createElement('small');s.textContent=new Date(n.created_at).toLocaleString();d.append(b,p,s);$('notificationList').append(d)})}
-async function loadNotifications(){let{data,error}=await supabase.from('user_notifications').select('id,title,message,notification_type,is_read,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50);if(error){$('notificationList').textContent='Unable to load notifications: '+error.message;return}renderNotifications(data||[])}
-function subscribeNotifications(){if(notificationChannel)supabase.removeChannel(notificationChannel);notificationChannel=supabase.channel('trustbet-notifications-'+user.id).on('postgres_changes',{event:'*',schema:'public',table:'user_notifications',filter:'user_id=eq.'+user.id},loadNotifications).subscribe()}
-async function refresh(){let{data,error}=await supabase.from('profiles').select('virtual_balance,self_exclusion_until').eq('id',user.id).single();if(!error&&data){profile={...profile,...data};updateBalances(data.virtual_balance);exStatus()}}
-async function loadWallet(){if(!user)return;let{data,error}=await supabase.from('wallet_transactions').select('transaction_type,amount,balance_after,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(30);$('tx').textContent=error?error.message:(data||[]).map(x=>`${new Date(x.created_at).toLocaleString()} · ${x.transaction_type} · ${money(x.amount)} · ${money(x.balance_after)}`).join('\n')||'No transactions yet.';let b=await supabase.from('demo_bets').select('game_id,bet_amount,outcome,payout,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(20);$('betHistory').textContent=b.error?b.error.message:(b.data||[]).map(x=>`${x.game_id} · stake ${money(x.bet_amount)} · payout ${money(x.payout)} · ${new Date(x.created_at).toLocaleString()}`).join('\n')||'No bets yet.';let d=await supabase.from('deposit_requests').select('amount,status,tracking_code,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(15);$('depositHistory').textContent=d.error?d.error.message:(d.data||[]).map(x=>`${money(x.amount)} · ${x.status} · ${x.tracking_code||''}`).join('\n')||'No deposits yet.';let w=await supabase.from('withdrawal_requests').select('amount,status,bank_name,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(15);$('withdrawHistory').textContent=w.error?w.error.message:(w.data||[]).map(x=>`${money(x.amount)} · ${x.status} · ${x.bank_name}`).join('\n')||'No withdrawals yet.'}
-async function transactions(){return loadWallet()}
-function exStatus(){let until=profile?.self_exclusion_until;if(until&&new Date(until)>new Date()){$('exState').textContent='Self-exclusion active until '+new Date(until).toLocaleString();$('activate').disabled=true}else{$('exState').textContent='No active self-exclusion is shown on your account.';$('activate').disabled=false}}
-document.querySelectorAll('#exclusion button').forEach(b=>b.onclick=()=>{days=Number(b.dataset.days);document.querySelectorAll('#exclusion button').forEach(x=>x.classList.toggle('selected',x===b))});
-$('activate').onclick=async()=>{if(!days)return say('exMsg','Select an exclusion period first.',true);if(!confirm('Activate self-exclusion for '+days+' days? This cannot be reversed early.'))return;let{error}=await supabase.rpc('activate_self_exclusion',{p_days:days});if(error)return say('exMsg',error.message,true);say('exMsg','Self-exclusion activated.');await refresh()};
-$('chatOpen').onclick=async e=>{e.preventDefault();$('chatPanel').classList.remove('hidden');try{await conversationOpen()}catch(x){say('chatMsg',x.message,true)}};
-async function conversationOpen(){let{data,error}=await supabase.from('support_conversations').select('*').eq('user_id',user.id).eq('status','open').order('created_at',{ascending:false}).limit(1).maybeSingle();if(error)throw error;if(!data){let r=await supabase.from('support_conversations').insert({user_id:user.id,subject:'Customer Support',status:'open'}).select().single();if(r.error)throw r.error;data=r.data}conversation=data;await chatLoad();if(channel)await supabase.removeChannel(channel);channel=supabase.channel('trustbet-'+data.id).on('postgres_changes',{event:'*',schema:'public',table:'support_messages',filter:'conversation_id=eq.'+data.id},chatLoad).subscribe()}
-async function chatLoad(){if(!conversation)return;let{data,error}=await supabase.from('support_messages').select('sender_id,message,created_at,read_at').eq('conversation_id',conversation.id).order('created_at');if(error)return say('chatMsg',error.message,true);$('chatMessages').innerHTML='';(data||[]).forEach(m=>{let d=document.createElement('div');d.className='bubble '+(m.sender_id===user.id?'mine':'');d.textContent=m.message;let s=document.createElement('small');s.textContent=new Date(m.created_at).toLocaleString()+(m.sender_id===user.id?(m.read_at?' · Read':' · Sent'):'');d.append(s);$('chatMessages').append(d)});$('chatMessages').scrollTop=$('chatMessages').scrollHeight}
-$('sendChat').onclick=async()=>{let message=$('chatInput').value.trim();if(!message||!conversation)return;let{error}=await supabase.from('support_messages').insert({conversation_id:conversation.id,sender_id:user.id,sender_role:profile.role==='admin'?'admin':'user',message});if(error)return say('chatMsg',error.message,true);$('chatInput').value='';say('chatMsg','Message sent.');chatLoad()};
-async function adminInbox(){if(profile.role!=='admin')return;let{data,error}=await supabase.from('support_conversations').select('id,subject,status,admin_unread_count,last_message_at').order('last_message_at',{ascending:false});if(error)return $('adminInbox').textContent=error.message;$('adminInbox').innerHTML='';(data||[]).forEach(c=>{let d=document.createElement('div');d.className='conversation';d.textContent=`${c.subject} · ${c.status} · Unread ${c.admin_unread_count||0}`;d.onclick=async()=>{conversation=c;$('chatPanel').classList.remove('hidden');await chatLoad()};$('adminInbox').append(d)})}
-let{data:{session}}=await supabase.auth.getSession();if(session?.user)await profileLoad(session.user);
-</script></body></html>
+$('notificationBell').onclick=async()=>{
+ $('notificationPanel').classList.toggle('hidden');
+ if(!$('notificationPanel').classList.contains('hidden')){
+  await loadNotifications();
+  let ids=Array.from(document.querySelectorAll('.notification-item.unread')).map(x=>x.dataset.id);
+  if(ids.length){
+   await supabase.from('user_notifications').update({is_read:true}).in('id',ids);
+   await loadNotifications();
+  }
+ }
+};
+function renderNotifications(items){
+ let unread=items.filter(x=>!x.is_read).length;
+ $('unreadBadge').textContent=unread;
+ $('unreadBadge').classList.toggle('hidden',!unread);
+ $('notificationList').innerHTML='';
+ if(!items.length){$('notificationList').textContent='No notifications yet.';return;}
+ items.forEach(n=>{
+  let d=document.createElement('div');d.className='notification-item'+(!n.is_read?' unread':'');d.dataset.id=n.id;
+  let b=document.createElement('b');b.textContent=n.title||'Notification';
+  let p=document.createElement('p');p.textContent=n.message||'';
+  let s=document.createElement('small');s.textContent=new Date(n.created_at).toLocaleString();
+  d.append(b,p,s);$('notificationList').append(d);
+ });
+}
+async function loadNotifications(){
+ let{data,error}=await supabase.from('user_notifications').select('id,title,message,notification_type,is_read,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50);
+ if(error){$('notificationList').textContent='Unable to load notifications: '+error.message;return;}
+ renderNotifications(data||[]);
+}
+function subscribeNotifications(){
+ if(notificationChannel)supabase.removeChannel(notificationChannel);
+ notificationChannel=supabase.channel('trustbet-notifications-'+user.id).on('postgres_changes',{event:'*',schema:'public',table:'user_notifications',filter:'user_id=eq.'+user.id},loadNotifications).subscribe();
+}
+
+/* Wallet transaction display */
+function dateText(value){
+ return value?new Date(value).toLocaleString():'';
+}
+function statusFor(kind,status){
+ const s=String(status||'pending').toLowerCase();
+ if(kind==='deposit'){
+  if(s==='approved')return{label:'DEPOSIT APPROVED',color:'green'};
+  if(s==='rejected')return{label:'DEPOSIT REJECTED',color:'red'};
+  return{label:'DEPOSIT PENDING',color:'red'};
+ }
+ if(kind==='withdrawal'){
+  if(s==='approved')return{label:'WITHDRAWAL APPROVED',color:'green'};
+  if(s==='rejected')return{label:'WITHDRAWAL REJECTED',color:'red'};
+  return{label:'WITHDRAWAL PENDING',color:'red'};
+ }
+ return null;
+}
+function addWalletItem(container,item){
+ const row=document.createElement('div');
+ row.className='tx-item';
+
+ const main=document.createElement('div');
+ main.className='tx-main';
+
+ const amount=document.createElement('span');
+ amount.className='tx-amount '+(item.color==='green'?'tx-green':'tx-red');
+ amount.textContent=item.symbol+money(item.amount);
+
+ const label=document.createElement('span');
+ label.className='tx-label '+(item.color==='green'?'tx-green':'tx-red');
+ label.textContent=item.label;
+
+ main.append(amount,label);
+
+ const desc=document.createElement('div');
+ desc.className='tx-description';
+ desc.textContent=item.description||'Transaction';
+
+ const date=document.createElement('div');
+ date.className='tx-date';
+ date.textContent=dateText(item.created_at);
+
+ row.append(main,desc);
+ if(item.created_at)row.append(date);
+
+ const divider=document.createElement('hr');
+ divider.className='tx-divider';
+ container.append(row,divider);
+}
+
+async function loadWallet(){
+ if(!user)return;
+ const container=$('tx');
+ container.innerHTML='<div class="empty-history">Loading transactions...</div>';
+
+ const [deposits,withdrawals,bets,ledger]=await Promise.all([
+  supabase.from('deposit_requests').select('amount,status,tracking_code,provider_name,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50),
+  supabase.from('withdrawal_requests').select('amount,status,bank_name,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50),
+  supabase.from('demo_bets').select('game_id,bet_amount,outcome,payout,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50),
+  supabase.from('wallet_transactions').select('transaction_type,amount,balance_after,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50)
+ ]);
+
+ const items=[];
+
+ if(!deposits.error){
+  (deposits.data||[]).forEach(x=>{
+   const st=statusFor('deposit',x.status);
+   items.push({
+    kind:'deposit',amount:x.amount,symbol:'+🪙',label:st.label,color:st.color,
+    description:'Deposit through '+(x.provider_name||'selected provider')+(x.tracking_code?' · Ref: '+x.tracking_code:''),
+    created_at:x.created_at
+   });
+  });
+ }
+ if(!withdrawals.error){
+  (withdrawals.data||[]).forEach(x=>{
+   const st=statusFor('withdrawal',x.status);
+   items.push({
+    kind:'withdrawal',amount:x.amount,symbol:'🏦',label:st.label,color:st.color,
+    description:'Withdrawal to '+(x.bank_name||'selected provider'),
+    created_at:x.created_at
+   });
+  });
+ }
+ if(!bets.error){
+  (bets.data||[]).forEach(x=>{
+   const outcome=String(x.outcome||'').toLowerCase();
+   const won=outcome==='won'||outcome==='win';
+   const amount=won?(Number(x.payout)||0):(Number(x.bet_amount)||0);
+   items.push({
+    kind:'bet',amount,symbol:won?'🟢':'🔴',label:won?'WON':'LOST',
+    color:won?'green':'red',
+    description:(x.game_id||'Bet')+(won?' · Winnings':' · Stake lost'),
+    created_at:x.created_at
+   });
+  });
+ }
+
+ /* Include other ledger entries without duplicating deposit/withdrawal request rows. */
+ if(!ledger.error){
+  (ledger.data||[]).forEach(x=>{
+   const type=String(x.transaction_type||'').toLowerCase();
+   if(type.includes('deposit')||type.includes('withdraw')||type.includes('bet')||type.includes('win')||type.includes('loss'))return;
+   const isCredit=type.includes('credit')||type.includes('won');
+   items.push({
+    kind:'ledger',amount:x.amount,symbol:isCredit?'+🪙':'🏦',
+    label:isCredit?'DEPOSIT':'WITHDRAWAL',
+    color:isCredit?'green':'red',
+    description:x.transaction_type||'Wallet transaction',
+    created_at:x.created_at
+   });
+  });
+ }
+
+ items.sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
+ container.innerHTML='';
+ if(!items.length){
+  container.innerHTML='<div class="empty-history">No transactions yet.</div>';
+  return;
+ }
+ items.forEach(item=>addWalletItem(container,item));
+}
+
+async function refresh(){
+ let{data,error}=await supabase.from('profiles').select('virtual_balance,self_exclusion_until').eq('id',user.id).single();
+ if(!error&&data){
+  profile={...profile,...data};
+  updateBalances(data.virtual_balance);
+  exStatus();
+ }
+}
+function exStatus(){
+ let until=profile?.self_exclusion_until;
+ if(until&&new Date(until)>new Date()){
+  $('exState').textContent='Self-exclusion active until '+new Date(until).toLocaleString();
+  $('activate').disabled=true;
+ }else{
+  $('exState').textContent='No active self-exclusion is shown on your account.';
+  $('activate').disabled=false;
+ }
+}
+document.querySelectorAll('#exclusion button').forEach(b=>b.onclick=()=>{
+ days=Number(b.dataset.days);
+ document.querySelectorAll('#exclusion button').forEach(x=>x.classList.toggle('selected',x===b));
+});
+$('activate').onclick=async()=>{
+ if(!days)return say('exMsg','Select an exclusion period first.',true);
+ if(!confirm('Activate self-exclusion for '+days+' days? This cannot be reversed early.'))return;
+ let{error}=await supabase.rpc('activate_self_exclusion',{p_days:days});
+ if(error)return say('exMsg',error.message,true);
+ say('exMsg','Self-exclusion activated.');
+ await refresh();
+};
+
+/* Customer support chat */
+$('chatOpen').onclick=async e=>{
+ e.preventDefault();
+ $('chatPanel').classList.remove('hidden');
+ try{await conversationOpen()}catch(x){say('chatMsg',x.message,true);}
+};
+async function conversationOpen(){
+ let{data,error}=await supabase.from('support_conversations').select('*').eq('user_id',user.id).eq('status','open').order('created_at',{ascending:false}).limit(1).maybeSingle();
+ if(error)throw error;
+ if(!data){
+  let r=await supabase.from('support_conversations').insert({user_id:user.id,subject:'Customer Support',status:'open'}).select().single();
+  if(r.error)throw r.error;
+  data=r.data;
+ }
+ conversation=data;
+ await chatLoad();
+ if(channel)await supabase.removeChannel(channel);
+ channel=supabase.channel('trustbet-'+data.id).on('postgres_changes',{event:'*',schema:'public',table:'support_messages',filter:'conversation_id=eq.'+data.id},chatLoad).subscribe();
+}
+async function chatLoad(){
+ if(!conversation)return;
+ let{data,error}=await supabase.from('support_messages').select('sender_id,message,created_at,read_at').eq('conversation_id',conversation.id).order('created_at');
+ if(error)return say('chatMsg',error.message,true);
+ $('chatMessages').innerHTML='';
+ (data||[]).forEach(m=>{
+  let d=document.createElement('div');d.className='bubble '+(m.sender_id===user.id?'mine':'');
+  d.textContent=m.message;
+  let s=document.createElement('small');
+  s.textContent=new Date(m.created_at).toLocaleString()+(m.sender_id===user.id?(m.read_at?' · Read':' · Sent'):'');
+  d.append(s);$('chatMessages').append(d);
+ });
+ $('chatMessages').scrollTop=$('chatMessages').scrollHeight;
+}
+$('sendChat').onclick=async()=>{
+ let message=$('chatInput').value.trim();
+ if(!message||!conversation)return;
+ let{error}=await supabase.from('support_messages').insert({
+  conversation_id:conversation.id,
+  sender_id:user.id,
+  sender_role:profile.role==='admin'?'admin':'user',
+  message
+ });
+ if(error)return say('chatMsg',error.message,true);
+ $('chatInput').value='';
+ say('chatMsg','Message sent.');
+ chatLoad();
+};
+async function adminInbox(){
+ if(profile.role!=='admin')return;
+ let{data,error}=await supabase.from('support_conversations').select('id,subject,status,admin_unread_count,last_message_at').order('last_message_at',{ascending:false});
+ if(error)return $('adminInbox').textContent=error.message;
+ $('adminInbox').innerHTML='';
+ (data||[]).forEach(c=>{
+  let d=document.createElement('div');d.className='conversation';
+  d.textContent=`${c.subject} · ${c.status} · Unread ${c.admin_unread_count||0}`;
+  d.onclick=async()=>{
+   conversation=c;
+   $('chatPanel').classList.remove('hidden');
+   await chatLoad();
+  };
+  $('adminInbox').append(d);
+ });
+}
+
+let{data:{session}}=await supabase.auth.getSession();
+if(session?.user)await profileLoad(session.user);
+</script>
+</body>
+</html>
