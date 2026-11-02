@@ -83,10 +83,7 @@ nav button.active{background:var(--navy);color:white}
 .notification-item.unread{background:#f0f6ff;padding:12px;border-radius:9px}
 .notification-item small{display:block;color:var(--muted);margin-top:5px}
 footer{text-align:center;padding:24px 24px 90px;color:var(--muted);font-size:12px}
-#auth{max-width:440px;margin:45px auto}
 .history-shortcut{cursor:pointer}
-
-/* Wallet transaction history */
 .wallet-history{max-height:560px;overflow-y:auto;overscroll-behavior:contain;border:1px solid var(--line);border-radius:12px;padding:4px 13px;background:#fff}
 .tx-item{padding:13px 2px 11px}
 .tx-main{display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -113,6 +110,96 @@ footer{text-align:center;padding:24px 24px 90px;color:var(--muted);font-size:12p
  .tx-amount{font-size:14px}
  .tx-label{font-size:11px}
 }
+
+/* TRUSTBET premium sportsbook visual refresh — preserves the existing page layout */
+:root{
+ --navy:#101d35;--blue:#167a55;--pale:#eaf5ef;--bg:#f4f7f5;--ink:#14251f;
+ --muted:#718078;--line:#dfe9e3;--red:#d34452;--green:#119765;--gold:#d7ad55;
+ --surface:#fff;--shadow:0 10px 30px rgba(16,45,35,.07);
+}
+html{scroll-behavior:smooth}
+body{background:radial-gradient(ellipse at 10% 0%,#e7f3eb 0,transparent 34%),var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;letter-spacing:.05px}
+header{background:linear-gradient(115deg,#0d1c30 0%,#123b30 62%,#145b40 100%);padding:14px max(5%,calc((100% - 1100px)/2));box-shadow:0 8px 24px #0b241c2b;border-bottom:1px solid #ffffff18}
+.brand{font-size:25px;letter-spacing:1.2px;text-shadow:0 2px 12px #0005}
+.brand span{color:#9be2b9}
+.tag{background:#ffffff14;border:1px solid #ffffff25;color:#dff8e9;border-radius:999px;letter-spacing:1.2px;padding:8px 14px}
+.bell{background:#ffffff14;border:1px solid #ffffff45;transition:transform .2s,background .2s}
+.bell:hover{background:#ffffff28;transform:translateY(-2px)}
+main{max-width:1100px;padding-top:24px}
+h1,h2,h3{color:#172b23;letter-spacing:-.35px}
+h1{font-size:26px;font-weight:850}
+h2{font-size:19px;font-weight:800}
+.card{background:linear-gradient(180deg,#fff 0%,#fcfefd 100%);border:1px solid #e2ebe5;border-radius:18px;padding:20px;margin-bottom:17px;box-shadow:var(--shadow);transition:box-shadow .2s,border-color .2s}
+.card:hover{border-color:#d3e4d9;box-shadow:0 13px 34px rgba(16,45,35,.09)}
+button{background:linear-gradient(135deg,#176d4b,#119765);border:1px solid #0e754e;border-radius:11px;padding:12px 17px;font-weight:750;letter-spacing:.12px;box-shadow:0 4px 10px #0f80501c;transition:transform .16s,filter .16s,box-shadow .16s}
+button:hover:not(:disabled){filter:brightness(1.06);transform:translateY(-1px);box-shadow:0 7px 16px #0f80502a}
+button:active:not(:disabled){transform:translateY(0)}
+button.secondary{background:#edf5f0;color:#17583e;border:1px solid #d8e9de;box-shadow:none}
+button.danger{background:linear-gradient(135deg,#b93443,#d94d5b);border-color:#b93443}
+input,select,textarea{background:#fbfdfb;border:1px solid #d8e4dc;border-radius:11px;padding:13px 14px;color:#172b23;outline:none;transition:border-color .18s,box-shadow .18s,background .18s}
+input:focus,select:focus,textarea:focus{background:#fff;border-color:#239568;box-shadow:0 0 0 3px #2395681b}
+input::placeholder,textarea::placeholder{color:#9aa8a0}
+label{color:#33483d;font-size:12px;letter-spacing:.25px;text-transform:uppercase}
+nav{background:#fffffff2;backdrop-filter:blur(14px);border-top:1px solid #dce8e0;box-shadow:0 -8px 28px #102d5910;padding-top:10px}
+nav button{background:#f1f6f2;color:#496357;border:1px solid #e0eae3;border-radius:12px;box-shadow:none;font-weight:750}
+nav button.active{background:linear-gradient(135deg,#102b23,#176d4b);color:#fff;border-color:#176d4b;box-shadow:0 5px 13px #176d4b2b}
+.balance-card{position:relative;overflow:hidden;background:linear-gradient(125deg,#10291f 0%,#14563c 58%,#168457 100%);border:1px solid #277c59;border-radius:21px;padding:25px;box-shadow:0 14px 32px #123f2b30}
+.balance-card:after{content:"";position:absolute;width:210px;height:210px;border:1px solid #ffffff20;border-radius:50%;right:-70px;top:-100px;box-shadow:0 0 0 24px #ffffff08,0 0 0 50px #ffffff06;pointer-events:none}
+.balance-card small{color:#c9efda;letter-spacing:1.5px}
+.balance{font-size:36px;letter-spacing:-1px;text-shadow:0 2px 12px #0002}
+.balance-card button{position:relative;z-index:1;background:#f4fff7;color:#14583d;border:0;box-shadow:0 5px 15px #001b1033}
+.quick-grid{gap:11px}
+.quick{border:1px solid #e0ebe4;border-radius:15px;background:linear-gradient(180deg,#fff,#f8fcf9);box-shadow:0 4px 12px #173c2b08;transition:transform .18s,border-color .18s,box-shadow .18s}
+.quick:hover{transform:translateY(-3px);border-color:#b9d9c7;box-shadow:0 9px 20px #173c2b12}
+.quick b{font-size:25px}
+.categories{scrollbar-width:thin;scrollbar-color:#bfd7c8 transparent}
+.categories button{border-radius:999px;background:#f7faf8;border-color:#e0eae3;color:#486255;padding:10px 15px}
+.categories button.active{background:#153f2e;color:white;border-color:#153f2e;box-shadow:0 4px 10px #153f2e20}
+.games{gap:13px}
+.game{position:relative;overflow:hidden;background:linear-gradient(160deg,#fff 0%,#f8fcf9 100%);border:1px solid #e0eae3;border-radius:16px;padding:16px;box-shadow:0 5px 15px #173c2b08;transition:transform .18s,border-color .18s,box-shadow .18s}
+.game:hover{transform:translateY(-3px);border-color:#bdd9c8;box-shadow:0 12px 23px #173c2b13}
+.game-icon{display:grid;place-items:center;width:48px;height:48px;border-radius:14px;background:linear-gradient(145deg,#e8f5ed,#d9eee2);font-size:26px}
+.game h3{margin:13px 0 5px;font-size:16px}
+.game p{min-height:20px;margin:0 0 13px;color:#788980}
+.game button{width:100%;padding:10px 12px}
+.fav{width:auto!important;background:#edf5f0!important;color:#176d4b!important;border:1px solid #dcebe1!important;box-shadow:none!important}
+.play-balance{background:linear-gradient(110deg,#eff8f2,#e4f3e9);border:1px solid #d2e8da;border-radius:13px}
+.play-balance span{font-size:11px;font-weight:800;letter-spacing:.6px;color:#557265}
+.play-balance strong{color:#145b3d}
+.odds-grid{gap:11px}
+.odd-box{background:linear-gradient(180deg,#fff,#f8fbf9);color:#183c2d;border:1px solid #d8e6dd;border-radius:13px;padding:14px;min-height:84px;box-shadow:0 3px 9px #173c2b08;transition:transform .16s,border-color .16s,background .16s,box-shadow .16s}
+.odd-box:hover{transform:translateY(-2px);border-color:#8fc6a5;box-shadow:0 7px 15px #173c2b12}
+.odd-box .odd-name{color:#718078;font-size:11px;letter-spacing:.65px}
+.odd-box .odd-value{color:#176d4b;font-size:23px;letter-spacing:-.4px}
+.odd-box.selected{border:2px solid #169463;background:linear-gradient(145deg,#effaf3,#e1f4e8);box-shadow:0 0 0 3px #16946318,0 7px 16px #16946314}
+.special-odd{background:linear-gradient(145deg,#fff8e6,#f2d995 52%,#fff3d0);border:1px solid #d6b45f;color:#5b4515;box-shadow:inset 0 1px 3px #fff9,0 5px 13px #b58b3425}
+.special-odd .odd-value{color:#795713}
+.result-panel{border-radius:16px}
+.support-link{background:#fbfdfb;border-color:#e0eae3;border-radius:13px;transition:background .16s,border-color .16s,transform .16s}
+.support-link:hover{background:#f1f8f3;border-color:#c6dfcf;transform:translateX(2px)}
+.info{background:#eff7f1;border:1px solid #dcebe0;color:#486456;line-height:1.55}
+.chat-list,.wallet-history{border-color:#e0eae3;border-radius:13px;background:#fcfefd}
+.bubble{background:#eef6f0;border:1px solid #e0ece3}
+.mine{background:#e4f2e9}
+.conversation{border-color:#e0eae3;background:#fcfefd}
+.notification-panel{border:1px solid #dce8e0;border-radius:17px;box-shadow:0 18px 45px #102d5928}
+.notification-item.unread{background:#eff7f1}
+.tx-item{padding:15px 3px 13px}
+.tx-divider{background:#e8efea}
+footer{color:#87958d}
+details{border:1px solid #e2ebe5;border-radius:12px;padding:13px 14px;margin:9px 0;background:#fbfdfb}
+details[open]{background:#f5faf6}
+summary{font-weight:750;color:#315b46;cursor:pointer}
+::selection{background:#ccebd7;color:#123b29}
+:focus-visible{outline:3px solid #5bb887;outline-offset:2px}
+@media(max-width:700px){
+ header{padding:12px 4%}
+ main{padding-top:17px}
+ .card{padding:16px;border-radius:16px}
+ .balance-card{padding:22px;border-radius:18px}
+ .balance{font-size:32px}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
@@ -208,8 +295,8 @@ footer{text-align:center;padding:24px 24px 90px;color:var(--muted);font-size:12p
    <h2>Deposit Naira</h2>
    <label>Bank / financial provider</label>
    <select id="depProvider"><option value="">Select bank / provider</option></select>
-   <label>Amount (minimum ₦200)</label>
-   <input id="depAmount" type="number" min="200" step="1" placeholder="Enter deposit amount">
+   <label>Amount (₦500–₦500,000 daily limit)</label>
+   <input id="depAmount" type="number" min="500" max="500000" step="1" placeholder="Enter deposit amount">
    <button id="depositBtn" class="wide">Submit deposit request</button>
    <p id="depMsg" class="msg"></p>
   </div>
@@ -218,8 +305,8 @@ footer{text-align:center;padding:24px 24px 90px;color:var(--muted);font-size:12p
  <section id="withdraw" class="hidden">
   <div class="card">
    <h2>Withdraw Naira</h2>
-   <p class="muted">Minimum withdrawal: ₦20,000</p>
-   <label>Amount</label><input id="wdAmount" type="number" min="20000" step="1" placeholder="Enter withdrawal amount">
+   <p class="muted">Minimum withdrawal: ₦50,000 · Maximum per day: ₦1,000,000</p>
+   <label>Amount (₦50,000–₦1,000,000 daily limit)</label><input id="wdAmount" type="number" min="50000" max="1000000" step="1" placeholder="Enter withdrawal amount">
    <label>Bank / financial provider</label><select id="bank"><option value="">Select bank / provider</option></select>
    <label>Account name</label><input id="accName" placeholder="Enter account name">
    <label>Account number</label><input id="accNo" inputmode="numeric" maxlength="10" placeholder="10-digit account number">
@@ -246,18 +333,51 @@ footer{text-align:center;padding:24px 24px 90px;color:var(--muted);font-size:12p
   </div>
   <div class="card">
    <h2>🔒 Privacy Policy</h2>
-   <details><summary>Information we use</summary><p>TRUSTBET processes account email and profile information, Naira balances, deposit and withdrawal requests, bank/provider details supplied for withdrawals, transaction records, game activity and support messages to operate the service.</p></details>
-   <details><summary>How information is used</summary><p>Information supports authentication, account and wallet management, transaction processing, gameplay, support and service protection.</p></details>
-   <details><summary>Security and contact</summary><p>Database permissions and account authentication control access. Never share your password or email codes. Privacy questions: superhybridservices@gmail.com.</p></details>
+   <details>
+    <summary>Information We Collect and Use</summary>
+    <p>TRUSTBET collects and processes information necessary to provide and improve our services. This may include your name, email address, account details, verification information, device information, IP address, transaction history, Naira wallet activity, deposit and withdrawal details, betting activity, and customer support communications.</p>
+    <p>We may also collect information about how you access and interact with our website to help maintain service quality, prevent fraud, and protect your account.</p>
+   </details>
+   <details>
+    <summary>How We Use Your Information</summary>
+    <p>TRUSTBET uses your information to:</p>
+    <ul>
+     <li>Create, manage, and maintain your account.</li>
+     <li>Verify your identity and help prevent unauthorized access.</li>
+     <li>Process and manage deposit and withdrawal requests.</li>
+     <li>Maintain accurate wallet balances and transaction records.</li>
+     <li>Provide betting and gaming services and display account activity.</li>
+     <li>Respond to enquiries and provide customer support.</li>
+     <li>Detect suspicious activities, prevent fraud, and enforce our platform rules.</li>
+     <li>Send important account updates, security alerts, and service notifications.</li>
+     <li>Improve our website, platform performance, and user experience.</li>
+    </ul>
+    <p>We only use personal information for legitimate operational, security, legal, and service-related purposes.</p>
+   </details>
+   <details>
+    <summary>Security and Contact</summary>
+    <p>TRUSTBET takes reasonable technical and organizational measures to protect your personal information and account records against unauthorized access, alteration, disclosure, or loss.</p>
+    <p>Access to account information is restricted to authorized personnel and systems where necessary. Users are responsible for keeping their passwords, verification codes, and login details confidential. TRUSTBET will never ask you to disclose your password or one-time verification code through an unsolicited message.</p>
+    <p>Although we work to protect your information, no online platform can guarantee absolute security. We encourage users to report suspicious account activity immediately.</p>
+    <p>For privacy enquiries, account assistance, or security concerns, contact our support team:</p>
+    <p><b>Email:</b> superhybridservices@gmail.com</p>
+    <p><b>WhatsApp:</b> +234 706 359 3605</p>
+    <p><b>Platform:</b> TRUSTBET</p>
+   </details>
   </div>
   <div class="card">
-   <h2>🛑 Self-Exclusion</h2><p>Choose a period to pause access to games and betting.</p>
+   <h2>🛑 Self-Exclusion</h2>
+   <p>Take a break from betting by temporarily restricting access to games for a period you choose.</p>
    <div class="odds-grid" id="exclusion">
-    <button class="odd-box" data-days="30">30 days</button><button class="odd-box" data-days="60">60 days</button><button class="odd-box" data-days="90">90 days</button><button class="odd-box" data-days="120">120 days</button>
+    <button class="odd-box" data-days="30">30 days</button>
+    <button class="odd-box" data-days="60">60 days</button>
+    <button class="odd-box" data-days="90">90 days</button>
+    <button class="odd-box" data-days="120">120 days</button>
    </div>
    <p id="exState" class="info">No active self-exclusion is shown on your account.</p>
-   <button id="activate" class="wide">Activate self-exclusion</button><p id="exMsg" class="msg"></p>
-   <p class="muted">Once activated, exclusion cannot be cancelled or shortened. Access returns after expiry.</p>
+   <button id="activate" class="wide">Activate self-exclusion</button>
+   <p id="exMsg" class="msg"></p>
+   <p class="muted">Once activated, your selected exclusion period cannot be cancelled, reversed, or shortened. You will regain access when the period expires. If you need assistance, contact TRUSTBET support.</p>
   </div>
  </section>
 </div>
@@ -273,56 +393,7 @@ let favourites=JSON.parse(localStorage.getItem('trustbet_favourites')||'[]');
 let played=JSON.parse(localStorage.getItem('trustbet_played')||'{}');
 
 const providers=[
-'9 Payment Service Bank (9PSB)',
-'Access Bank',
-'Airtel Money',
-'Branch',
-'Carbon',
-'Chipper Cash',
-'Citibank Nigeria',
-'Cowrywise',
-'Ecobank Nigeria',
-'FairMoney',
-'Fidelity Bank',
-'First Bank',
-'First City Monument Bank (FCMB)',
-'Flutterwave',
-'Globus Bank',
-'Guaranty Trust Bank (GTBank)',
-'Jaiz Bank',
-'Keystone Bank',
-'Kuda',
-'Lotus Bank',
-'Moniepoint',
-'MoMo PSB',
-'MTN MoMo',
-'Nova Commercial Bank',
-'OPay',
-'Optimus Bank',
-'Paga',
-'PalmPay',
-'Parallex Bank',
-'Paystack',
-'PiggyVest',
-'Polaris Bank',
-'Premium Trust Bank',
-'Providus Bank',
-'Remita',
-'Signature Bank',
-'SmartCash PSB',
-'Squad',
-'Stanbic IBTC Bank',
-'Standard Chartered Bank',
-'Sterling Bank',
-'SunTrust Bank',
-'TAJBank',
-'Titan Trust Bank',
-'Union Bank',
-'United Bank for Africa (UBA)',
-'Unity Bank',
-'VFD Microfinance Bank',
-'Wema Bank',
-'Zenith Bank'
+'9 Payment Service Bank (9PSB)','Access Bank','Airtel Money','Branch','Carbon','Chipper Cash','Citibank Nigeria','Cowrywise','Ecobank Nigeria','FairMoney','Fidelity Bank','First Bank','First City Monument Bank (FCMB)','Flutterwave','Globus Bank','Guaranty Trust Bank (GTBank)','Jaiz Bank','Keystone Bank','Kuda','Lotus Bank','Moniepoint','MoMo PSB','MTN MoMo','Nova Commercial Bank','OPay','Optimus Bank','Paga','PalmPay','Parallex Bank','Paystack','PiggyVest','Polaris Bank','Premium Trust Bank','Providus Bank','Remita','Signature Bank','SmartCash PSB','Squad','Stanbic IBTC Bank','Standard Chartered Bank','Sterling Bank','SunTrust Bank','TAJBank','Titan Trust Bank','Union Bank','United Bank for Africa (UBA)','Unity Bank','VFD Microfinance Bank','Wema Bank','Zenith Bank'
 ];
 
 const games=[
@@ -430,12 +501,27 @@ function tracking(){
  return[...b].map(x=>a[x%a.length]).join('');
 }
 
+// Daily request totals use the user's local calendar day. All requests, including pending ones, count toward the daily cap.
+async function dailyRequestTotal(table){
+ const now=new Date();
+ const start=new Date(now.getFullYear(),now.getMonth(),now.getDate()).toISOString();
+ const end=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1).toISOString();
+ const{data,error}=await supabase.from(table).select('amount,created_at').eq('user_id',user.id).gte('created_at',start).lt('created_at',end);
+ if(error)throw error;
+ return(data||[]).reduce((sum,row)=>sum+Number(row.amount||0),0);
+}
+
 /* Deposit request */
 $('depositBtn').onclick=async()=>{
  const amount=Number($('depAmount').value);
  const provider_name=$('depProvider').value;
  if(!provider_name)return say('depMsg','Select a bank or payment provider.',true);
- if(!Number.isSafeInteger(amount)||amount<200)return say('depMsg','Minimum deposit is ₦200.',true);
+ if(!Number.isSafeInteger(amount)||amount<500)return say('depMsg','Minimum deposit is ₦500.',true);
+ if(amount>500000)return say('depMsg','Maximum deposit per day is ₦500,000.',true);
+ let depositedToday;
+ try{depositedToday=await dailyRequestTotal('deposit_requests');}
+ catch(e){return say('depMsg','Could not verify today’s deposit total. Please try again.',true);}
+ if(depositedToday+amount>500000)return say('depMsg','Daily deposit limit is ₦500,000. You have ₦'+Math.max(0,500000-depositedToday).toLocaleString('en-NG')+' remaining today.',true);
 
  let r,code;
  for(let i=0;i<5;i++){
@@ -462,7 +548,12 @@ $('withdrawBtn').onclick=async()=>{
  const account_name=$('accName').value.trim();
  const account_number=$('accNo').value.trim();
 
- if(!Number.isSafeInteger(amount)||amount<20000)return say('wdMsg','Minimum withdrawal is ₦20,000.',true);
+ if(!Number.isSafeInteger(amount)||amount<50000)return say('wdMsg','Minimum withdrawal is ₦50,000.',true);
+ if(amount>1000000)return say('wdMsg','Maximum withdrawal per day is ₦1,000,000.',true);
+ let withdrawnToday;
+ try{withdrawnToday=await dailyRequestTotal('withdrawal_requests');}
+ catch(e){return say('wdMsg','Could not verify today’s withdrawal total. Please try again.',true);}
+ if(withdrawnToday+amount>1000000)return say('wdMsg','Daily withdrawal limit is ₦1,000,000. You have ₦'+Math.max(0,1000000-withdrawnToday).toLocaleString('en-NG')+' remaining today.',true);
  if(!bank_name||!account_name||!/^\d{10}$/.test(account_number))return say('wdMsg','Enter all bank details and a valid 10-digit account number.',true);
 
  const{error}=await supabase.from('withdrawal_requests').insert({
@@ -643,31 +734,23 @@ function statusFor(kind,status){
 function addWalletItem(container,item){
  const row=document.createElement('div');
  row.className='tx-item';
-
  const main=document.createElement('div');
  main.className='tx-main';
-
  const amount=document.createElement('span');
  amount.className='tx-amount '+(item.color==='green'?'tx-green':'tx-red');
  amount.textContent=item.symbol+money(item.amount);
-
  const label=document.createElement('span');
  label.className='tx-label '+(item.color==='green'?'tx-green':'tx-red');
  label.textContent=item.label;
-
  main.append(amount,label);
-
  const desc=document.createElement('div');
  desc.className='tx-description';
  desc.textContent=item.description||'Transaction';
-
  const date=document.createElement('div');
  date.className='tx-date';
  date.textContent=dateText(item.created_at);
-
  row.append(main,desc);
  if(item.created_at)row.append(date);
-
  const divider=document.createElement('hr');
  divider.className='tx-divider';
  container.append(row,divider);
@@ -677,35 +760,24 @@ async function loadWallet(){
  if(!user)return;
  const container=$('tx');
  container.innerHTML='<div class="empty-history">Loading transactions...</div>';
-
  const [deposits,withdrawals,bets,ledger]=await Promise.all([
   supabase.from('deposit_requests').select('amount,status,tracking_code,provider_name,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50),
   supabase.from('withdrawal_requests').select('amount,status,bank_name,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50),
   supabase.from('demo_bets').select('game_id,bet_amount,outcome,payout,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50),
   supabase.from('wallet_transactions').select('transaction_type,amount,balance_after,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50)
  ]);
-
  const items=[];
  const errors=[deposits,withdrawals,bets,ledger].filter(r=>r.error);
-
  if(!deposits.error){
   (deposits.data||[]).forEach(x=>{
    const st=statusFor('deposit',x.status);
-   items.push({
-    kind:'deposit',amount:x.amount,symbol:'+🪙',label:st.label,color:st.color,
-    description:'Deposit through '+(x.provider_name||'selected provider')+(x.tracking_code?' · Ref: '+x.tracking_code:''),
-    created_at:x.created_at
-   });
+   items.push({kind:'deposit',amount:x.amount,symbol:'+🪙',label:st.label,color:st.color,description:'Deposit through '+(x.provider_name||'selected provider')+(x.tracking_code?' · Ref: '+x.tracking_code:''),created_at:x.created_at});
   });
  }
  if(!withdrawals.error){
   (withdrawals.data||[]).forEach(x=>{
    const st=statusFor('withdrawal',x.status);
-   items.push({
-    kind:'withdrawal',amount:x.amount,symbol:'🏦',label:st.label,color:st.color,
-    description:'Withdrawal to '+(x.bank_name||'selected provider'),
-    created_at:x.created_at
-   });
+   items.push({kind:'withdrawal',amount:x.amount,symbol:'🏦',label:st.label,color:st.color,description:'Withdrawal to '+(x.bank_name||'selected provider'),created_at:x.created_at});
   });
  }
  if(!bets.error){
@@ -713,31 +785,17 @@ async function loadWallet(){
    const outcome=String(x.outcome||'').toLowerCase();
    const won=outcome==='won'||outcome==='win';
    const amount=won?(Number(x.payout)||0):(Number(x.bet_amount)||0);
-   items.push({
-    kind:'bet',amount,symbol:won?'🟢':'🔴',label:won?'🟢 WON':'🔴 LOST',
-    color:won?'green':'red',
-    description:(x.game_id||'Bet')+(won?' · Winnings':' · Stake lost'),
-    created_at:x.created_at
-   });
+   items.push({kind:'bet',amount,symbol:won?'🟢':'🔴',label:won?'🟢 WON':'🔴 LOST',color:won?'green':'red',description:(x.game_id||'Bet')+(won?' · Winnings':' · Stake lost'),created_at:x.created_at});
   });
  }
-
- /* Include other ledger entries without duplicating deposit/withdrawal request rows. */
  if(!ledger.error){
   (ledger.data||[]).forEach(x=>{
    const type=String(x.transaction_type||'').toLowerCase();
    if(type.includes('deposit')||type.includes('withdraw')||type.includes('bet')||type.includes('win')||type.includes('loss'))return;
    const isCredit=type.includes('credit')||type.includes('won');
-   items.push({
-    kind:'ledger',amount:x.amount,symbol:isCredit?'+🪙':'🏦',
-    label:isCredit?'🪙 DEPOSIT APPROVED':'🏦 WITHDRAWAL',
-    color:isCredit?'green':'red',
-    description:x.transaction_type||'Wallet transaction',
-    created_at:x.created_at
-   });
+   items.push({kind:'ledger',amount:x.amount,symbol:isCredit?'+🪙':'🏦',label:isCredit?'🪙 DEPOSIT APPROVED':'🏦 WITHDRAWAL',color:isCredit?'green':'red',description:x.transaction_type||'Wallet transaction',created_at:x.created_at});
   });
  }
-
  items.sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
  container.innerHTML='';
  if(!items.length){
@@ -745,6 +803,12 @@ async function loadWallet(){
   return;
  }
  items.forEach(item=>addWalletItem(container,item));
+ if(errors.length){
+  const warning=document.createElement('div');
+  warning.className='empty-history error';
+  warning.textContent='Some transaction sources could not be loaded.';
+  container.append(warning);
+ }
 }
 
 async function refresh(){
@@ -766,10 +830,12 @@ function exStatus(){
  }
 }
 document.querySelectorAll('#exclusion button').forEach(b=>b.onclick=()=>{
+ if(profile?.self_exclusion_until&&new Date(profile.self_exclusion_until)>new Date())return;
  days=Number(b.dataset.days);
  document.querySelectorAll('#exclusion button').forEach(x=>x.classList.toggle('selected',x===b));
 });
 $('activate').onclick=async()=>{
+ if(profile?.self_exclusion_until&&new Date(profile.self_exclusion_until)>new Date())return say('exMsg','Self-exclusion is already active and cannot be changed.',true);
  if(!days)return say('exMsg','Select an exclusion period first.',true);
  if(!confirm('Activate self-exclusion for '+days+' days? This cannot be reversed early.'))return;
  let{error}=await supabase.rpc('activate_self_exclusion',{p_days:days});
@@ -814,12 +880,7 @@ async function chatLoad(){
 $('sendChat').onclick=async()=>{
  let message=$('chatInput').value.trim();
  if(!message||!conversation)return;
- let{error}=await supabase.from('support_messages').insert({
-  conversation_id:conversation.id,
-  sender_id:user.id,
-  sender_role:profile.role==='admin'?'admin':'user',
-  message
- });
+ let{error}=await supabase.from('support_messages').insert({conversation_id:conversation.id,sender_id:user.id,sender_role:profile.role==='admin'?'admin':'user',message});
  if(error)return say('chatMsg',error.message,true);
  $('chatInput').value='';
  say('chatMsg','Message sent.');
