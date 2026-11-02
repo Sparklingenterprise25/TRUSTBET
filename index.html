@@ -29,6 +29,28 @@ details{border:1px solid #e2e9f2;border-radius:12px;padding:13px 14px;margin:9px
 @media(max-width:700px){.games{grid-template-columns:repeat(2,minmax(0,1fr))}.quick-grid{grid-template-columns:repeat(2,1fr)}main{padding:17px 12px 105px}header{padding:12px 4%}nav{top:auto}.card{padding:16px;border-radius:16px}.balance-card{padding:22px;border-radius:18px}.balance{font-size:32px}.home-promo{margin-top:17px}.home-promo h2{font-size:21px}.welcome-line{font-size:17px}}
 @media(max-width:420px){.games{grid-template-columns:1fr}.odds-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.brand{font-size:21px}.tx-amount{font-size:14px}.tx-label{font-size:11px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+/* Compact home header and balance panel for smaller phone screens */
+.page-heading{min-width:0}
+.home-activity-slot{display:block;width:100%;height:34px;max-width:100%;overflow:hidden;margin:0 0 10px}
+.home-activity-slot .cashout-ticker{width:100%;height:34px;padding:0 10px;border:1px solid #dce7f5;border-radius:10px;background:#f7faff;display:flex;align-items:center;overflow:hidden}
+.home-activity-slot .cashout-track{align-items:center;gap:24px;animation-duration:900s;animation-timing-function:linear;animation-iteration-count:infinite;will-change:transform}
+.home-activity-slot .cashout-item{font-size:11px;line-height:32px;letter-spacing:.25px;color:#173d70;font-weight:850}
+.home-activity-slot .cashout-item b{color:#13845d}
+.balance-card{padding:13px 17px 14px;margin-bottom:12px;border-radius:17px}
+.balance-card:after{width:125px;height:125px;right:-48px;top:-70px;box-shadow:0 0 0 15px #ffffff08,0 0 0 30px #ffffff06}
+.balance-main{display:flex;align-items:center;justify-content:space-between;gap:12px;position:relative;z-index:1}
+.balance-summary{min-width:0}
+.balance{font-size:27px;line-height:1.05;margin:5px 0 0;letter-spacing:-.7px}
+.balance-card> .balance-main>button{min-width:105px;padding:9px 13px;font-size:12px;white-space:nowrap}
+.home-promo{max-width:none;margin-top:10px;padding-top:9px;border-top:1px solid #ffffff35}
+.home-promo h2{font-size:16px;line-height:1.2;margin:0 0 5px;letter-spacing:-.25px}
+.home-promo p{max-width:100%;font-size:11px;line-height:1.4;margin:0 0 7px}
+.home-promo .promo-cta{padding:7px 12px;font-size:11px}
+.welcome-copy{margin-bottom:15px}
+@media(max-width:700px){.balance-card{padding:12px 14px 13px}.balance{font-size:25px}.home-promo{margin-top:8px;padding-top:8px}.home-promo h2{font-size:15px}.home-promo p{font-size:10.5px;line-height:1.35}.home-promo .promo-cta{padding:7px 11px}.home-activity-slot{height:34px;margin:0 0 9px}.home-activity-slot .cashout-ticker{height:34px;padding:0 8px}.app-heading-row{gap:8px}.welcome-line{font-size:16px;line-height:1.2}.welcome-copy{font-size:11px;line-height:1.4}}
+@media(max-width:380px){.balance-card{padding:11px 12px}.balance{font-size:23px}.balance-card> .balance-main>button{min-width:92px;padding:8px 10px}.home-promo h2{font-size:14px}.home-promo p{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.home-activity-slot .cashout-track{animation:none}}
 </style>
 </head>
 <body>
@@ -59,8 +81,11 @@ details{border:1px solid #e2e9f2;border-radius:12px;padding:13px 14px;margin:9px
 </section>
 
 <div id="app" class="hidden">
- <div class="row" style="align-items:center">
-  <div style="flex:3"><h1 id="heading">Home</h1><p id="welcome" class="welcome-line"></p><p class="welcome-copy">Welcome to TRUSTBET. Explore the platform, manage your wallet, and view your account activity in one place.</p></div>
+ <div id="homeActivityHeading" class="home-activity-slot hidden" aria-label="Virtual Naira Activity">
+  <div id="cashoutTicker" class="cashout-ticker"><div class="cashout-item">VIRTUAL NAIRA ACTIVITY</div></div>
+ </div>
+ <div class="row app-heading-row" style="align-items:center">
+  <div class="page-heading" style="flex:3"><h1 id="heading"></h1><p id="welcome" class="welcome-line">WELCOME, SPARKLING ENTERPRISE</p><p class="welcome-copy">Welcome to TRUSTBET. Explore the platform, manage your wallet, and view your account activity in one place.</p></div>
   <button id="logout" class="danger">Log out</button>
  </div>
 
@@ -73,9 +98,10 @@ details{border:1px solid #e2e9f2;border-radius:12px;padding:13px 14px;margin:9px
 
  <section id="home">
   <div class="balance-card">
-   <small>AVAILABLE NAIRA</small>
-   <div class="balance" id="balance">₦0.00</div>
-   <button onclick="go('deposit')">＋ Deposit</button>
+   <div class="balance-main">
+    <div class="balance-summary"><small>AVAILABLE NAIRA</small><div class="balance" id="balance">₦0.00</div></div>
+    <button onclick="go('deposit')">＋ Deposit</button>
+   </div>
    <div class="home-promo">
     <h2>BUILT AROUND TRUST. DESIGNED FOR YOU.</h2>
     <p>A platform where transparency comes first. TRUSTBET brings together accessible gaming features, convenient wallet management, and dedicated customer support in one organised digital experience.</p>
@@ -93,7 +119,6 @@ details{border:1px solid #e2e9f2;border-radius:12px;padding:13px 14px;margin:9px
   </div>
   <div class="card"><div class="section-head"><h2>Frequently Played</h2><button class="secondary" onclick="go('games')">See all</button></div><div id="frequentGames" class="games"></div></div>
   <div class="card"><div class="section-head"><h2>Favourites</h2><button class="secondary" onclick="go('games')">Manage</button></div><div id="homeFavourites" class="games muted">Add games to your favourites.</div></div>
-  <div class="card"><h2>Virtual Cash-Out Activity</h2><div id="cashoutTicker" class="cashout-ticker" aria-live="polite"><div class="cashout-item" style="padding:0 14px">Loading virtual activity…</div></div><p class="muted">Illustrative sample activity only. These are not real customer withdrawals or payment records.</p></div>
  </section>
 
  <section id="games" class="hidden">
@@ -272,6 +297,8 @@ window.go=p=>{
  let primary=(p==='deposit'||p==='withdraw')?'wallet':p;
  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===primary));
  $('heading').textContent=primary[0].toUpperCase()+primary.slice(1);
+ $('heading').classList.toggle('hidden',primary==='home');
+ $('homeActivityHeading').classList.toggle('hidden',primary!=='home');
  if(primary==='wallet')loadWallet();
  if(primary==='home')renderHome();
 };
@@ -289,7 +316,7 @@ function maskEmail(email){
 function loadCashoutTicker(){
  const el=$('cashoutTicker');
  if(!el)return;
- // Illustrative names and amounts only. This ticker does not represent real transactions.
+ // Masked sample names and amounts for the virtual Naira activity ticker.
  const nameGroups=[
   // Yoruba names (20)
   ['Ade*** Balogun','Olu*** Adeyemi','Tolu*** Adebayo','Fol*** Akinyemi','Bola*** Ogunleye','Keh*** Olatunji','Dap*** Oladipo','Fun*** Afolayan','Tai*** Ajayi','Bis*** Lawal','Seg*** Alabi','Yet*** Ojo','Kun*** Fasanya','Ron*** Bakare','Tay*** Akinola','Mor*** Salami','Lan*** Oyeniyi','Tem*** Olumide','Wol*** Adesina','Fey*** Akande'],
@@ -303,7 +330,7 @@ function loadCashoutTicker(){
  const names=nameGroups.flat();
  const items=names.map((name,i)=>{
   const amount=50000+((i*13750)%450001);
-  return `<span class="cashout-item">${escapeHtml(name)} · virtual cash-out <b>${escapeHtml(money(amount))}</b></span>`;
+  return `<span class="cashout-item">VIRTUAL NAIRA ACTIVITY · ${escapeHtml(name)} · <b>${escapeHtml(money(amount))}</b></span>`;
  });
  const track=document.createElement('div');
  track.className='cashout-track';
@@ -317,7 +344,7 @@ async function profileLoad(u){
  if(error)return say('authMsg',error.message,true);
  user=u;profile=data;
  updateBalances(data.virtual_balance);
- $('welcome').textContent='Welcome, Sparkling Enterprise';
+ $('welcome').textContent='WELCOME, SPARKLING ENTERPRISE';
  $('accountEmail').textContent=maskEmail(data.email||u.email||'');
  $('auth').classList.add('hidden');
  $('app').classList.remove('hidden');
