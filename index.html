@@ -638,7 +638,7 @@ async function profileLoad(authUser){
  if(error)return say('authMsg',error.message,true);
  user=authUser;profile=data;
  updateBalances(data.virtual_balance);
- $('welcome').textContent='WELCOME, SPARKING ENTERPRISE';
+ $('welcome').textContent='WELCOME';
  $('accountEmail').textContent=maskEmail(data.email||authUser.email||'');
  $('auth').classList.add('hidden');
  $('app').classList.remove('hidden');
@@ -714,7 +714,6 @@ $('depositBtn').onclick=async()=>{
  }
  if(result.error)return say('depMsg',result.error.message,true);
  say('depMsg','Deposit request submitted and awaiting administrator review. Tracking code: '+code);
- setTimeout(() => go('wallet'), 5000);
  $('depAmount').value='';
  await loadWallet();
  if(isAdmin())await adminDeposits();
