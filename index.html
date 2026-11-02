@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -62,7 +61,7 @@ nav button.active{background:linear-gradient(135deg,#102d59,#2475d0);color:#fff;
 .balance-visibility:hover:not(:disabled){background:#0d9467}
 .balance-visibility-icon{font-size:18px;line-height:1}
 .available-pill{display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:9px 16px;background:#12a875;border:1px solid #50e0a8;border-radius:999px;color:#fff;font-size:14px;font-weight:900;letter-spacing:.2px}
-.home-deposit-btn{flex:0 0 auto;align-self:center;padding:13px 19px;background:linear-gradient(135deg,#fff,#dceaff);color:#00245f;border:1px solid #b9d7ff;font-size:14px;white-space:nowrap;box-shadow:0 6px 18px #001b1040}
+.home-deposit-btn{flex:0 0 auto;align-self:center;padding:13px 19px;background:#8fc2ff;color:#102d59;border:1px solid #8fc2ff;font-size:14px;font-weight:900;white-space:nowrap;box-shadow:0 6px 18px #001b1040}
 .hidden{display:none!important}
 .welcome-line{font-size:20px;font-weight:900;letter-spacing:-.25px;color:var(--navy);margin:5px 0 4px}
 .welcome-copy{font-size:13px;line-height:1.6;color:var(--muted);margin:0 0 15px;max-width:620px}
@@ -231,6 +230,32 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
  *,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
  .cashout-track{animation:none}
 }
+
+/* Compact home balance panel: preserve content while reducing vertical height */
+@media(max-width:700px){
+ #home .balance-card{padding:13px 14px 12px;border-radius:26px}
+ #home .home-wallet-heading{gap:9px;margin-bottom:10px}
+ #home .home-wallet-icon{font-size:30px}
+ #home .home-wallet-heading strong{font-size:23px;letter-spacing:-.7px}
+ #home .home-wallet-main{gap:9px;align-items:center}
+ #home .nigeria-flag{width:62px;height:62px;border-width:3px}
+ #home .balance-card .balance{font-size:clamp(34px,9vw,43px);letter-spacing:-1.5px;line-height:1}
+ #home .home-wallet-value-row{gap:7px}
+ #home .balance-visibility{padding:7px 9px;font-size:12px}
+ #home .available-pill{margin-top:7px;padding:6px 10px;font-size:11px}
+ #home .home-deposit-btn{width:100%;margin-top:7px;padding:8px 12px;font-size:14px;min-height:38px}
+ #home .home-promo{margin-top:11px;padding-top:10px}
+ #home .home-promo h2{font-size:14px;line-height:1.15;margin-bottom:4px}
+ #home .home-promo p{font-size:10.5px;line-height:1.28;margin-bottom:6px}
+ #home .home-promo .promo-cta{padding:6px 10px;font-size:11px}
+}
+@media(max-width:420px){
+ #home .balance-card{padding:12px 11px 11px}
+ #home .home-wallet-heading strong{font-size:21px}
+ #home .nigeria-flag{width:56px;height:56px}
+ #home .balance-card .balance{font-size:clamp(32px,9vw,39px)}
+}
+
 </style>
 </head>
 <body>
@@ -283,7 +308,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
   <div class="balance-card">
    <div class="home-wallet-heading">
     <span class="home-wallet-icon" aria-hidden="true">👛</span>
-    <strong>Wallet Balance</strong>
+    <strong>NAIRA BALANCE</strong>
    </div>
    <div class="home-wallet-main">
     <div class="nigeria-flag" role="img" aria-label="Nigerian flag"><span></span><span></span><span></span></div>
@@ -297,7 +322,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
      </div>
      <div class="available-pill"><span aria-hidden="true">✓</span> Available Balance</div>
     </div>
-    <button class="home-deposit-btn" onclick="go('deposit')">+ Deposit</button>
+    <button class="home-deposit-btn" onclick="go('deposit')">+ DEPOSIT</button>
    </div>
    <div class="home-promo">
     <h2>BUILT AROUND TRUST. DESIGNED FOR YOU.</h2>
@@ -371,8 +396,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
     <div id="adminBankEditor" class="admin-bank-editor hidden">
      <h3>Edit bank details</h3>
      <label>Bank name</label><input id="editBankName" placeholder="Enter bank name">
-     <label>Account name</label><input id="editAccountName" placeholder="Enter account name">
-     <label>Account number</label><input id="editAccountNumber" inputmode="numeric" maxlength="10" placeholder="Enter account number">
+     <label>Account name</label><input id="editAccountName" placeholder="Enter account name">     <label>Account number</label><input id="editAccountNumber" inputmode="numeric" maxlength="10" placeholder="Enter account number">
      <button id="saveBankDetails" class="wide">Save bank details</button>
      <p id="bankDetailsMsg" class="msg"></p>
     </div>
@@ -538,9 +562,7 @@ function isBettingLocked(){
  return profile?.betting_locked===true||profile?.is_betting_locked===true;
 }
 function balanceHTML(amount){
- return '<span class="balance-coin">₦</span>'+
-  '<span class="balance-separator">|</span>'+
-  '<span class="balance-amount">'+escapeHtml(money(amount))+'</span>';
+ return escapeHtml(money(amount));
 }
 function updateBalances(amount){
  const formatted=balanceHTML(amount);
@@ -607,7 +629,7 @@ async function profileLoad(authUser){
  if(error)return say('authMsg',error.message,true);
  user=authUser;profile=data;
  updateBalances(data.virtual_balance);
- $('welcome').textContent='WELCOME, '+(first(data.email||authUser.email).toUpperCase());
+ $('welcome').textContent='WELCOME, SPARKING ENTERPRISE';
  $('accountEmail').textContent=maskEmail(data.email||authUser.email||'');
  $('auth').classList.add('hidden');
  $('app').classList.remove('hidden');
@@ -773,8 +795,7 @@ function renderHome(){
  const favs=games.filter(g=>favourites.includes(g.id));
  if(!favs.length)$('homeFavourites').textContent='Add games to your favourites.';
  else favs.forEach(g=>$('homeFavourites').append(gameCard(g)));
-}
-function toggleFavourite(id){
+}function toggleFavourite(id){
  favourites=favourites.includes(id)?favourites.filter(x=>x!==id):[...favourites,id];
  localStorage.setItem('trustbet_favourites',JSON.stringify(favourites));
  render();renderHome();
@@ -859,7 +880,7 @@ $('bet').onclick=async()=>{
  againRow.append(again);
  $('resultArea').replaceChildren(panel,againRow);
 
- say('betMsg','Visual preview only. No money has been deducted or paid. Connect your secure betting backend before accepting real bets.');
+ say('betMsg','');
  played[game.id]=(played[game.id]||0)+1;
  localStorage.setItem('trustbet_played',JSON.stringify(played));
  renderHome();
