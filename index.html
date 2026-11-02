@@ -33,6 +33,7 @@ button.danger{background:linear-gradient(135deg,#b93443,#d94d5b);border-color:#b
 .row{display:flex;gap:9px;flex-wrap:wrap}
 .row>*{flex:1;min-width:110px}
 input,select,textarea{width:100%;padding:13px 14px;border:1px solid #d8e2ef;border-radius:11px;margin:6px 0 12px;font:inherit;background:#fbfcff;color:var(--ink);outline:none;transition:border-color .18s,box-shadow .18s,background .18s}
+input[type=number]{font-weight:800;font-size:16px}
 input:focus,select:focus,textarea:focus{background:#fff;border-color:var(--blue);box-shadow:0 0 0 3px #2475d01b}
 input::placeholder,textarea::placeholder{color:#9aa8b8}
 label{font-size:12px;font-weight:bold;letter-spacing:.25px;text-transform:uppercase;color:#334d70}
@@ -43,7 +44,10 @@ nav button.active{background:linear-gradient(135deg,#102d59,#2475d0);color:#fff;
 .balance-card:after{content:"";position:absolute;width:125px;height:125px;border:1px solid #ffffff20;border-radius:50%;right:-48px;top:-70px;box-shadow:0 0 0 15px #ffffff08,0 0 0 30px #ffffff06;pointer-events:none}
 .balance-main{display:flex;align-items:center;justify-content:space-between;gap:12px;position:relative;z-index:1}
 .balance-summary{min-width:0}
-.balance{font-size:27px;line-height:1.05;margin:5px 0 0;letter-spacing:-.7px;font-weight:900;background:linear-gradient(180deg,#fff 0%,#d9e0e8 35%,#8997a8 52%,#f7f9fc 70%,#aab5c2 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;text-shadow:0 2px 8px #0002}
+.balance{display:flex;align-items:center;gap:9px;font-size:27px;line-height:1.05;margin:5px 0 0;letter-spacing:-.7px;font-weight:950;color:#ffd76a;text-shadow:0 2px 8px #0004}
+.balance-coin{display:inline-grid;place-items:center;width:29px;height:29px;flex:0 0 29px;border-radius:50%;background:linear-gradient(145deg,#fff2a8,#e5a928 55%,#9d6410);border:2px solid #ffeb9a;color:#714600;font-size:15px;font-weight:950;box-shadow:inset 0 1px 3px #fff9,0 2px 5px #0004}
+.balance-separator{color:#fff2bd;font-weight:500;opacity:.9}
+.balance-amount{color:#ffd76a;font-weight:950}
 .balance-card small{letter-spacing:1.5px;font-weight:bold;color:#c9ddf7}
 .balance-card>.balance-main>button{min-width:105px;padding:9px 13px;font-size:12px;white-space:nowrap;background:linear-gradient(135deg,#d9efff,#8fc9ff);color:#10345d;border:1px solid #b9e0ff;box-shadow:0 5px 15px #001b1033}
 .hidden{display:none!important}
@@ -76,6 +80,8 @@ nav button.active{background:linear-gradient(135deg,#102d59,#2475d0);color:#fff;
 .play-balance{background:linear-gradient(110deg,#eff5fd,#e4eefb);border:1px solid #d2e1f4;border-radius:13px;padding:12px 15px;margin:12px 0 16px;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .play-balance span{font-size:11px;font-weight:800;letter-spacing:.6px;color:#55708f}
 .play-balance strong{font-size:20px;color:#174b88}
+.play-balance strong .balance-amount{color:#b77b13}
+.play-balance strong .balance-separator{color:#9b741e}
 .odds-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin:12px 0}
 .odd-box{position:relative;background:linear-gradient(180deg,#fff,#f8fbff);color:#18365d;border:1px solid #d8e4f2;border-radius:13px;text-align:left;padding:14px;min-height:84px;box-shadow:0 3px 9px #102d5908;transition:transform .16s,border-color .16s,background .16s,box-shadow .16s}
 .odd-box:hover{transform:translateY(-2px);border-color:#8fb4e2;box-shadow:0 7px 15px #102d5912}
@@ -90,7 +96,8 @@ nav button.active{background:linear-gradient(135deg,#102d59,#2475d0);color:#fff;
 .lost{background:linear-gradient(120deg,#851c2b,#d33e50,#811b2a);box-shadow:0 0 20px #c43d4b55,inset 0 1px 9px #ffffff50}
 .result-panel strong{font-size:25px;display:block;margin:5px}
 .result-detail{font-size:13px;font-weight:normal;letter-spacing:0}
-.result-panel .play-again{display:block;margin:14px auto 0;min-width:150px;background:#fff;color:var(--navy);border:1px solid #fff;box-shadow:0 4px 12px #0002}
+.play-again-row{display:flex;width:100%;margin:10px 0 14px}
+.play-again-row .play-again{width:100%;min-height:48px;margin:0;border-radius:12px;background:linear-gradient(135deg,#fff,#edf3fb);color:var(--navy);border:1px solid #d7e3f2;font-weight:900;box-shadow:0 5px 14px #102d5918}
 .info{background:#eff5fd;border:1px solid #dce7f5;color:#486080;padding:12px;border-radius:9px;font-size:13px;line-height:1.55}
 .msg{font-size:13px;color:var(--green)}.error{color:var(--red)}
 .support-link{display:flex;gap:12px;align-items:center;border:1px solid #e0e8f2;border-radius:13px;padding:13px;margin:8px 0;text-decoration:none;color:var(--ink);background:#fbfcff;transition:background .16s,border-color .16s,transform .16s}
@@ -124,7 +131,6 @@ footer{text-align:center;padding:24px 24px 90px;color:var(--muted);font-size:12p
 .home-activity-row{display:flex;align-items:center;gap:9px;margin:0 0 9px}
 .home-activity-slot{flex:1;min-width:0;height:34px;overflow:hidden}
 .home-activity-row #logout{flex:0 0 auto;min-width:0;width:auto;padding:7px 10px;font-size:10px;border-radius:9px}
-.welcome-bonus{margin:0 0 12px;padding:10px 13px;border-radius:11px;background:linear-gradient(100deg,#fff8e8,#fff1c9);border:1px solid #e8d39a;color:#735514;font-size:12px;font-weight:800}
 .betting-lock{margin:10px 0;padding:12px;border:1px solid #e8b7bd;background:#fff0f1;color:#9d2634;border-radius:11px;font-size:13px;line-height:1.5}
 .deposit-layout{display:grid;grid-template-columns:1fr;gap:13px}
 .deposit-form-card{padding:15px 17px;margin-bottom:0}
@@ -144,9 +150,14 @@ footer{text-align:center;padding:24px 24px 90px;color:var(--muted);font-size:12p
 .admin-request:last-child{border-bottom:0}
 .admin-request .row{align-items:center}
 .admin-request .row button{font-size:11px;padding:8px}
-.bonus-note{font-size:12px;color:#64758c;line-height:1.5}
 .status-pill{display:inline-block;padding:4px 8px;border-radius:999px;font-size:10px;font-weight:900;background:#fff0f1;color:#a72d3b}
 .status-pill.approved{background:#e6f8f0;color:#087c50}
+.wallet-balance-card{background:linear-gradient(125deg,#0b2144,#102d59 58%,#2166ad);color:#fff;border:1px solid #2a609e;border-radius:17px;padding:18px;margin:0 0 13px;box-shadow:0 14px 32px #102d5925}
+.wallet-balance-card h2{color:#fff;margin:0 0 12px}
+.wallet-balance-card .balance{margin:0 0 15px}
+.wallet-balance-card .row{position:relative;z-index:1}
+.wallet-balance-card .row button{min-width:110px}
+.wallet-balance-card .row button.secondary{background:#edf3fb;color:#173d70}
 details{border:1px solid #e2e9f2;border-radius:12px;padding:13px 14px;margin:9px 0;background:#fbfcff}
 details[open]{background:#f5f8fd}
 summary{font-weight:750;color:#31547f;cursor:pointer}
@@ -222,7 +233,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
   <button id="logout" class="danger">Log out</button>
  </div>
  <div class="row app-heading-row" style="align-items:center">
-  <div class="page-heading" style="flex:3"><h1 id="heading"></h1><p id="welcome" class="welcome-line">WELCOME, SPARKLING ENTERPRISE</p><p class="welcome-copy">Welcome to TRUSTBET. Explore the platform, manage your wallet, and view your account activity in one place.</p></div>
+  <div class="page-heading" style="flex:3"><h1 id="heading"></h1><p id="welcome" class="welcome-line">WELCOME</p><p class="welcome-copy">Welcome to TRUSTBET. Explore the platform, manage your wallet, and view your account activity in one place.</p></div>
  </div>
 
  <nav>
@@ -244,7 +255,6 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
     <button class="promo-cta" onclick="go('games')">Explore games <span aria-hidden="true">→</span></button>
    </div>
   </div>
-  <div class="welcome-bonus">₦9,000 NEW-ACCOUNT WELCOME BONUS <div class="bonus-note">Eligibility and actual credit are confirmed by the account system. Bonus funds are not credited by this page alone.</div></div>
   <div id="bettingLockNotice" class="betting-lock hidden"></div>
   <div class="card">
    <h2>Quick access</h2>
@@ -279,11 +289,13 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
  </section>
 
  <section id="wallet" class="hidden">
-  <div class="card">
+  <div class="wallet-balance-card">
    <h2>My Wallet</h2>
    <div id="walletBalance" class="balance">₦0</div>
    <div class="row"><button onclick="go('deposit')">+ Deposit</button><button class="secondary" onclick="go('withdraw')">Withdraw</button></div>
-   <h3>Recent transactions</h3>
+  </div>
+  <div class="card">
+   <h2>Recent transactions</h2>
    <div id="tx" class="wallet-history"><div class="empty-history">Your transactions will appear here.</div></div>
   </div>
  </section>
@@ -295,16 +307,16 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
     <p class="muted">Submit a deposit request. Your wallet will only be credited after administrator approval.</p>
     <label>Bank / financial provider</label>
     <select id="depProvider"><option value="">Select bank / provider</option></select>
-    <label>Amount (₦500–₦500,000 daily limit)</label>
+    <label>Amount (Min ₦500 – Max₦500,000 daily limit)</label>
     <input id="depAmount" type="number" min="500" max="500000" step="1" placeholder="Enter deposit amount">
     <button id="depositBtn" class="wide">Submit deposit request</button>
     <p id="depMsg" class="msg"></p>
    </div>
    <div class="bank-details-card">
-    <h3>TRUSTBET Bank Details</h3>
-    <div class="bank-detail-line"><span>Bank name</span><strong id="platformBankName">Not configured</strong></div>
-    <div class="bank-detail-line"><span>Account name</span><strong id="platformAccountName">Not configured</strong></div>
-    <div class="bank-detail-line"><span>Account number</span><strong id="platformAccountNumber">Not configured</strong></div>
+    <h3>TRUSTBET BANK DETAILS 🏦</h3>
+    <div class="bank-detail-line"><span>BANK NAME</span><strong id="platformBankName"></strong></div>
+    <div class="bank-detail-line"><span>ACCOUNT NUMBER</span><strong id="platformAccountNumber"></strong></div>
+    <div class="bank-detail-line"><span>ACCOUNT NAME</span><strong id="platformAccountName"></strong></div>
     <p class="bank-note">Make payment only to the verified account details displayed here. Submitting a request does not automatically add money to your wallet.</p>
     <div id="adminBankEditor" class="admin-bank-editor hidden">
      <h3>Edit bank details</h3>
@@ -316,9 +328,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
     </div>
    </div>
   </div>
- </section>
-
- <section id="withdraw" class="hidden">
+ </section> <section id="withdraw" class="hidden">
   <div class="card">
    <h2>Withdraw Naira</h2>
    <p class="muted">Minimum withdrawal: ₦50,000 · Maximum per day: ₦1,000,000. Pending requests count towards the daily limit.</p>
@@ -329,7 +339,8 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
    <button id="withdrawBtn" class="wide">Submit withdrawal request</button>
    <p id="wdMsg" class="msg"></p>
   </div>
- </section> <section id="account" class="hidden">
+ </section>
+ <section id="account" class="hidden">
   <div class="card">
    <h2>👤 Account</h2><p id="accountEmail"></p>
    <div id="adminArea" class="hidden">
@@ -427,8 +438,8 @@ const games=[
 {id:'bottle_flip',name:'Flip the Bottle',icon:'🍾',cat:'Trust Games',count:4,odds:[['🔥 HIGH',12.8],['😎 MEDIUM',5.8],['😌 LOW',3.1],['🥹 OOPS',0.9]]},
 {id:'under_over',name:'Under or Over 7',icon:'🔢',cat:'Casino',count:4,odds:[['🔥 HIGH',14.0],['😎 MEDIUM',6.4],['😌 LOW',3.4],['🥹 OOPS',1.2]]},
 {id:'lucky_wheel',name:'Lucky Wheel',icon:'🎯',cat:'Trust Games',count:4,odds:[['🔥 HIGH',16.0],['😎 MEDIUM',7.2],['😌 LOW',3.9],['🥹 OOPS',1.8]]},
-{id:'number_prediction',name:'Number Prediction',icon:'🔮',cat:'Trust Games',count:5,odds:[['🔥 HIGH',18.0],['😎 MEDIUM',8.2],['😌 LOW',4.3],['🥹 OOPS',2.2],['💎 SPECIAL ODDS',50,true]]},
-{id:'penalty_shootout',name:'Penalty Shootout',icon:'⚽',cat:'Sports',count:5,odds:[['🔥 HIGH',20.5],['😎 MEDIUM',9.5],['😌 LOW',4.6],['🥹 OOPS',2.6],['💎 SPECIAL ODDS',50,true]]}
+{id:'number_prediction',name:'Number Prediction',icon:'🔮',cat:'Trust Games',count:5,odds:[['🔥 HIGH',18.0],['😎 MEDIUM',8.2],['😌 LOW',4.3],['🥹 OOPS',2.2],['💎 SPECIAL ODDS',100,true]]},
+{id:'penalty_shootout',name:'Penalty Shootout',icon:'⚽',cat:'Sports',count:5,odds:[['🔥 HIGH',20.5],['😎 MEDIUM',9.5],['😌 LOW',4.6],['🥹 OOPS',2.6],['💎 SPECIAL ODDS',100,true]]}
 ];
 
 const money=n=>'₦'+Number(n||0).toLocaleString('en-NG',{maximumFractionDigits:0});
@@ -472,9 +483,16 @@ function isSelfExcluded(){
 function isBettingLocked(){
  return profile?.betting_locked===true||profile?.is_betting_locked===true;
 }
+function balanceHTML(amount){
+ return '<span class="balance-coin">₦</span>'+
+  '<span class="balance-separator">|</span>'+
+  '<span class="balance-amount">'+escapeHtml(money(amount))+'</span>';
+}
 function updateBalances(amount){
- const formatted=money(amount);
- $('balance').textContent=$('walletBalance').textContent=$('gameBalance').textContent=formatted;
+ const formatted=balanceHTML(amount);
+ $('balance').innerHTML=formatted;
+ $('walletBalance').innerHTML=formatted;
+ $('gameBalance').innerHTML=formatted;
 }
 function updateLockNotice(){
  const locked=isBettingLocked();
@@ -613,14 +631,14 @@ async function loadBankDetails(){
  const{data,error}=await supabase.from('platform_bank_details')
   .select('bank_name,account_name,account_number').eq('id',1).maybeSingle();
  if(error){
-  $('platformBankName').textContent='Bank details unavailable';
-  $('platformAccountName').textContent='Please try again later';
-  $('platformAccountNumber').textContent='—';
+  $('platformBankName').textContent='';
+  $('platformAccountName').textContent='';
+  $('platformAccountNumber').textContent='';
   return;
  }
- $('platformBankName').textContent=data?.bank_name||'Not configured';
- $('platformAccountName').textContent=data?.account_name||'Not configured';
- $('platformAccountNumber').textContent=data?.account_number||'Not configured';
+ $('platformBankName').textContent=data?.bank_name||'';
+ $('platformAccountNumber').textContent=data?.account_number||'';
+ $('platformAccountName').textContent=data?.account_name||'';
  if(data){
   $('editBankName').value=data.bank_name||'';
   $('editAccountName').value=data.account_name||'';
@@ -661,7 +679,9 @@ $('withdrawBtn').onclick=async()=>{
  say('wdMsg','Withdrawal request submitted and pending review.');
  $('wdAmount').value='';$('accName').value='';$('accNo').value='';
  await loadWallet();
-};/* Game cards, favourites and frequently played */
+};
+
+/* Game cards, favourites and frequently played */
 function gameCard(g){
  const d=document.createElement('div');d.className='game';
  const top=document.createElement('div');top.className='game-top';
@@ -712,9 +732,7 @@ document.querySelectorAll('#cats button').forEach(b=>b.onclick=()=>{
  document.querySelectorAll('#cats button').forEach(x=>x.classList.toggle('active',x===b));
  render(b.dataset.cat);
 });
-$('gameSearch').oninput=()=>render(activeCategory);
-
-/* Game preview. Real stakes, payouts and lock enforcement belong in Supabase. */
+$('gameSearch').oninput=()=>render(activeCategory);/* Game preview. Real stakes, payouts and lock enforcement belong in Supabase. */
 function openGame(g){
  if(isSelfExcluded())return alert('Self-exclusion is active.');
  if(isBettingLocked())return alert('Betting is locked. Submit a deposit request and wait for administrator approval.');
@@ -723,7 +741,7 @@ function openGame(g){
  $('gameTitle').textContent=g.icon+' '+g.name;
  $('stake').value='';$('resultArea').innerHTML='';say('betMsg','');
  drawOdds();$('bet').disabled=true;
- $('gameBalance').textContent=money(profile.virtual_balance);
+ $('gameBalance').innerHTML=balanceHTML(profile.virtual_balance);
  $('play').scrollIntoView({behavior:'smooth'});
 }
 function drawOdds(){
@@ -763,13 +781,20 @@ $('bet').onclick=async()=>{
  const detail=document.createElement('div');detail.className='result-detail';
  detail.textContent=(chosen[2]?'SPECIAL ODDS':chosen[0])+' · '+(won?'Preview payout: '+money(payout):'Preview stake lost: '+money(stake));
  panel.append(title,detail);
- const again=document.createElement('button');again.className='play-again';again.textContent='Play Again';
+
+ const againRow=document.createElement('div');
+ againRow.className='play-again-row';
+ const again=document.createElement('button');
+ again.className='play-again';
+ again.textContent='Play Again';
  again.onclick=()=>{
   selectedOdd=null;$('stake').value='';$('resultArea').innerHTML='';
   say('betMsg','Choose your odds to play again.');
   drawOdds();$('bet').disabled=true;$('stake').focus();
  };
- panel.append(again);$('resultArea').replaceChildren(panel);
+ againRow.append(again);
+ $('resultArea').replaceChildren(panel,againRow);
+
  say('betMsg','Visual preview only. No money has been deducted or paid. Connect your secure betting backend before accepting real bets.');
  played[game.id]=(played[game.id]||0)+1;
  localStorage.setItem('trustbet_played',JSON.stringify(played));
@@ -920,8 +945,15 @@ async function loadWallet(){
  });
  if(!withdrawals.error)(withdrawals.data||[]).forEach(x=>{
   const st=statusFor('withdrawal',x.status);
-  items.push({amount:x.amount,symbol:x.status==='approved'?'−':'',label:st.label,color:st.color,
-   description:'Withdrawal to '+(x.bank_name||'selected provider'),created_at:x.created_at});
+  const approved=String(x.status||'').toLowerCase()==='approved';
+  items.push({
+   amount:x.amount,
+   symbol:approved?'+':'',
+   label:approved?'WITHDRAWAL APPROVED · WITHDRAWN':st.label,
+   color:approved?'green':'red',
+   description:'Withdrawal to '+(x.bank_name||'selected provider'),
+   created_at:x.created_at
+  });
  });
  if(!bets.error)(bets.data||[]).forEach(x=>{
   const outcome=String(x.outcome||'').toLowerCase(),won=outcome==='won'||outcome==='win';
