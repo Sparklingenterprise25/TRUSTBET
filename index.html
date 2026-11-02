@@ -714,6 +714,7 @@ $('depositBtn').onclick=async()=>{
  }
  if(result.error)return say('depMsg',result.error.message,true);
  say('depMsg','Deposit request submitted and awaiting administrator review. Tracking code: '+code);
+ setTimeout(() => go('wallet'), 5000);
  $('depAmount').value='';
  await loadWallet();
  if(isAdmin())await adminDeposits();
