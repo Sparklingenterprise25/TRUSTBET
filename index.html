@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -355,7 +356,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
   <div id="play" class="card hidden">
    <div class="section-head"><h2 id="gameTitle">Game</h2><button id="closeGame" class="secondary">Close</button></div>
    <div class="play-balance"><span>YOUR AVAILABLE BALANCE</span><strong id="gameBalance">₦0</strong></div>
-   <label>Stake (minimum ₦100)</label><input id="stake" type="number" min="100" step="1" placeholder="Enter stake">
+   <label id="stakeLabel">Stake</label><input id="stake" type="number" min="100" step="1" placeholder="Enter stake">
    <p class="muted">Choose your odds. Only your selected box will display 🔒.</p>
    <div id="oddsGrid" class="odds-grid"></div>
    <button id="bet" class="wide" disabled>Place bet</button>
@@ -396,7 +397,8 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
     <div id="adminBankEditor" class="admin-bank-editor hidden">
      <h3>Edit bank details</h3>
      <label>Bank name</label><input id="editBankName" placeholder="Enter bank name">
-     <label>Account name</label><input id="editAccountName" placeholder="Enter account name">     <label>Account number</label><input id="editAccountNumber" inputmode="numeric" maxlength="10" placeholder="Enter account number">
+     <label>Account name</label><input id="editAccountName" placeholder="Enter account name">
+     <label>Account number</label><input id="editAccountNumber" inputmode="numeric" maxlength="10" placeholder="Enter account number">
      <button id="saveBankDetails" class="wide">Save bank details</button>
      <p id="bankDetailsMsg" class="msg"></p>
     </div>
@@ -427,6 +429,12 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
      <p class="muted">Review requests here. Approval must be handled by your secured backend.</p>
      <button id="refreshAdminDeposits" class="secondary">Refresh requests</button>
      <div id="adminDeposits"></div>
+    </div>
+    <div class="admin-section">
+     <h3>Pending withdrawal requests</h3>
+     <p class="muted">Review bank details and payment before approving a withdrawal.</p>
+     <button id="refreshAdminWithdrawals" class="secondary">Refresh requests</button>
+     <div id="adminWithdrawals"></div>
     </div>
     <h3>Admin Support Inbox</h3><div id="adminInbox"></div>
    </div>
@@ -555,6 +563,7 @@ function tracking(){
  return[...bytes].map(x=>chars[x%chars.length]).join('');
 }
 function isAdmin(){return profile?.role==='admin';}
+function minimumStake(g){return ({2:100,3:200,4:300,5:500})[g?.odds?.length]||100;}
 function isSelfExcluded(){
  return !!(profile?.self_exclusion_until&&new Date(profile.self_exclusion_until)>new Date());
 }
@@ -639,7 +648,7 @@ async function profileLoad(authUser){
  banks();render();renderHome();exStatus();updateLockNotice();
  go('home');
  await loadBankDetails();
- if(isAdmin())await adminDeposits();
+ if(isAdmin()){await adminDeposits();await adminWithdrawals();}
  await adminInbox();
  await loadNotifications();
  subscribeNotifications();
@@ -795,7 +804,8 @@ function renderHome(){
  const favs=games.filter(g=>favourites.includes(g.id));
  if(!favs.length)$('homeFavourites').textContent='Add games to your favourites.';
  else favs.forEach(g=>$('homeFavourites').append(gameCard(g)));
-}function toggleFavourite(id){
+}
+function toggleFavourite(id){
  favourites=favourites.includes(id)?favourites.filter(x=>x!==id):[...favourites,id];
  localStorage.setItem('trustbet_favourites',JSON.stringify(favourites));
  render();renderHome();
@@ -824,7 +834,7 @@ function openGame(g){
  game=g;selectedOdd=null;
  $('play').classList.remove('hidden');
  $('gameTitle').textContent=g.icon+' '+g.name;
- $('stake').value='';$('resultArea').innerHTML='';say('betMsg','');
+ $('stake').value='';$('stake').min=String(minimumStake(g));$('stakeLabel').textContent='Stake (minimum '+money(minimumStake(g))+')';$('resultArea').innerHTML='';say('betMsg','');
  drawOdds();$('bet').disabled=true;
  $('gameBalance').innerHTML=balanceHTML(profile.virtual_balance);
  $('play').scrollIntoView({behavior:'smooth'});
@@ -857,7 +867,7 @@ $('bet').onclick=async()=>{
  if(isBettingLocked())return say('betMsg','Betting is locked. A deposit request must be approved first.',true);
  if(isSelfExcluded())return say('betMsg','Self-exclusion is active.',true);
  const stake=Number($('stake').value);
- if(!Number.isSafeInteger(stake)||stake<100)return say('betMsg','Minimum stake is ₦100.',true);
+ if(!Number.isSafeInteger(stake)||stake<minimumStake(game))return say('betMsg','Minimum stake for this game is '+money(minimumStake(game))+'.',true);
  if(selectedOdd===null)return say('betMsg','Select an odds box first.',true);
  const chosen=game.odds[selectedOdd],won=Math.random()<0.5;
  const payout=won?stake*chosen[1]:0;
@@ -886,7 +896,7 @@ $('bet').onclick=async()=>{
  renderHome();
 };
 $('stake').oninput=()=>{
- $('bet').disabled=isBettingLocked()||isSelfExcluded()||selectedOdd===null||Number($('stake').value)<100;
+ $('bet').disabled=isBettingLocked()||isSelfExcluded()||selectedOdd===null||Number($('stake').value)<minimumStake(game);
 };
 $('cats').querySelector('[data-cat="All"]').classList.add('active');
 
@@ -919,16 +929,9 @@ async function reviewDeposit(id,decision,approveButton,rejectButton){
  if(!isAdmin())return alert('Administrator access required.');
  if(!confirm((decision==='approve'?'Approve':'Reject')+' this deposit request?'))return;
  approveButton.disabled=true;rejectButton.disabled=true;
- /*
-  Expected backend RPC:
-  admin_review_deposit(p_request_id UUID, p_decision TEXT)
-  The server must verify admin role, lock the request, prevent duplicate approval,
-  credit the user's wallet exactly once on approval, and clear the betting lock only
-  after successful approved deposit credit.
- */
- const{error}=await supabase.rpc('admin_review_deposit',{
-  p_request_id:id,p_decision:decision
- });
+ const rpc=decision==='approve'?'approve_deposit':'reject_deposit';
+ const args=decision==='approve'?{p_request_id:id}:{p_request_id:id,p_reason:'Payment could not be verified.'};
+ const{error}=await supabase.rpc(rpc,args);
  if(error){
   alert('Backend approval action failed: '+error.message);
   approveButton.disabled=false;rejectButton.disabled=false;return;
@@ -937,6 +940,47 @@ async function reviewDeposit(id,decision,approveButton,rejectButton){
  alert('Deposit request '+(decision==='approve'?'approved':'rejected')+'.');
 }
 $('refreshAdminDeposits').onclick=adminDeposits;
+$('refreshAdminWithdrawals').onclick=adminWithdrawals;
+
+/* Admin withdrawal review. Wallet debit happens only after approval RPC succeeds. */
+async function adminWithdrawals(){
+ if(!isAdmin())return;
+ const area=$('adminWithdrawals');
+ area.textContent='Loading withdrawal requests...';
+ const{data,error}=await supabase.from('withdrawal_requests')
+  .select('id,user_id,amount,bank_name,account_name,account_number,status,created_at')
+  .eq('status','pending').order('created_at',{ascending:true}).limit(100);
+ if(error){area.textContent='Unable to load requests: '+error.message;return;}
+ area.innerHTML='';
+ if(!data?.length){area.textContent='No pending withdrawal requests.';return;}
+ data.forEach(item=>{
+  const row=document.createElement('div');row.className='admin-request';
+  const info=document.createElement('div');
+  info.innerHTML='<b>'+escapeHtml(money(item.amount))+'</b> · '+escapeHtml(item.bank_name||'Bank')+
+   '<br><small>'+escapeHtml(item.account_name||'')+' · '+escapeHtml(item.account_number||'')+
+   '<br>User: '+escapeHtml(item.user_id)+'</small>';
+  const status=document.createElement('span');status.className='status-pill';status.textContent='PENDING';
+  const actions=document.createElement('div');actions.className='row';
+  const approve=document.createElement('button');approve.textContent='Approve';
+  const reject=document.createElement('button');reject.textContent='Reject';reject.className='danger';
+  approve.onclick=()=>reviewWithdrawal(item.id,'approve',approve,reject);
+  reject.onclick=()=>reviewWithdrawal(item.id,'reject',approve,reject);
+  actions.append(approve,reject);row.append(info,status,actions);area.append(row);
+ });
+}
+async function reviewWithdrawal(id,decision,approveButton,rejectButton){
+ if(!isAdmin())return alert('Administrator access required.');
+ if(!confirm((decision==='approve'?'Approve':'Reject')+' this withdrawal request?'))return;
+ let reason='';
+ if(decision==='reject'){reason=prompt('Reason for rejection:','Withdrawal could not be processed.');if(reason===null)return;if(!reason.trim())return alert('A rejection reason is required.');}
+ approveButton.disabled=true;rejectButton.disabled=true;
+ const rpc=decision==='approve'?'approve_withdrawal':'reject_withdrawal';
+ const args=decision==='approve'?{p_request_id:id}:{p_request_id:id,p_reason:reason.trim()};
+ const{error}=await supabase.rpc(rpc,args);
+ if(error){alert('Withdrawal review failed: '+error.message);approveButton.disabled=false;rejectButton.disabled=false;return;}
+ await adminWithdrawals();await loadWallet();
+ alert('Withdrawal request '+(decision==='approve'?'approved. Complete the bank transfer.':'rejected.') );
+}
 
 /* Notifications */
 $('closeNotifications').onclick=()=>$('notificationPanel').classList.add('hidden');
