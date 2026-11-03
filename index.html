@@ -34,7 +34,7 @@ button.danger{background:linear-gradient(135deg,#b93443,#d94d5b);border-color:#b
 .row>*{flex:1;min-width:110px}
 input,select,textarea{width:100%;padding:13px 14px;border:1px solid #d8e2ef;border-radius:11px;margin:6px 0 12px;font:inherit;background:#fbfcff;color:var(--ink);outline:none;transition:border-color .18s,box-shadow .18s,background .18s}
 input[type=number]{font-weight:800;font-size:16px}
-.bank-search{display:block!important;visibility:visible!important;opacity:1!important;width:100%;min-height:46px;margin:6px 0 8px;padding:13px 14px;border:1px solid #d8e2ef;border-radius:11px;background:#fff;color:var(--ink);font:inherit;position:relative;z-index:1}
+.bank-picker{position:relative;width:100%;margin:6px 0 12px}.bank-picker select{display:none}.bank-picker-trigger{width:100%;text-align:left;background:#fbfcff;color:var(--ink);border:1px solid #d8e2ef;border-radius:11px;padding:13px 14px;min-height:48px;box-shadow:none}.bank-picker-panel{display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:30;background:#fff;border:1px solid #d8e2ef;border-radius:12px;padding:9px;box-shadow:0 12px 30px #102d5926;max-height: min( min(60vh,420px),420px);overflow:hidden}.bank-picker.open .bank-picker-panel{display:block}.bank-picker-search{width:100%;margin:0 0 8px!important;min-height:44px}.bank-picker-options{max-height: min(48vh,340px);overflow-y:auto}.bank-picker-option{display:block;width:100%;text-align:left;background:#fff;color:var(--ink);border:0;border-radius:8px;padding:11px 10px;box-shadow:none}.bank-picker-option:active,.bank-picker-option:hover{background:#edf4ff}.bank-picker-empty{padding:12px;color:#718096;font-size:13px}
 input:focus,select:focus,textarea:focus{background:#fff;border-color:var(--blue);box-shadow:0 0 0 3px #2475d01b}
 input::placeholder,textarea::placeholder{color:#9aa8b8}
 label{font-size:12px;font-weight:bold;letter-spacing:.25px;text-transform:uppercase;color:#334d70}
@@ -433,7 +433,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
     </div>
     <p class="muted">Submit a deposit request. Your wallet will be credited shortly.</p>
     <label>Bank / financial provider</label>
-    <input id="depProviderSearch" class="bank-search" type="search" placeholder="Search bank / provider..." autocomplete="off" aria-label="Search deposit banks"><select id="depProvider"><option value="">Select bank / provider</option></select>
+    <select id="depProvider"><option value="">Select bank / provider</option></select>
     <label>Amount (Min ₦500 – Max₦500,000 daily limit)</label>
     <input id="depAmount" type="number" min="500" max="500000" step="1" placeholder="Enter deposit amount">
     <label>Your actual bank account name</label>
@@ -449,7 +449,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
    <h2>Withdraw Naira</h2>
    <p class="muted withdrawal-limits"><span>Minimum withdrawal: ₦50,000 per day</span><span>Maximum withdrawal: ₦1,000,000 per day</span></p>
    <label>Amount (₦50,000–₦1,000,000 daily limit)</label><input id="wdAmount" type="number" min="50000" max="1000000" step="1" placeholder="Enter withdrawal amount">
-   <label>Bank / financial provider</label><input id="bankSearch" class="bank-search" type="search" placeholder="Search bank / provider..." autocomplete="off" aria-label="Search withdrawal banks"><select id="bank"><option value="">Select bank / provider</option></select>
+   <label>Bank / financial provider</label><select id="bank"><option value="">Select bank / provider</option></select>
    <label>Account name</label><input id="accName" placeholder="Enter account name">
    <label>Account number</label><input id="accNo" inputmode="numeric" maxlength="10" placeholder="10-digit account number">
    <button id="withdrawBtn" class="wide">Submit withdrawal request</button>
@@ -587,19 +587,29 @@ function confirmRequest(id,message){
  requestRedirectTimer=setTimeout(()=>go('home'),10000);
 }
 function banks(){
- [['depProvider','depProviderSearch'],['bank','bankSearch']].forEach(([id,searchId])=>{
-  const select=$(id), search=$(searchId);
-  const selected=select.value, query=search.value.trim().toLowerCase();
+ [['depProvider'],['bank']].forEach(([id])=>{
+  const select=$(id), selected=select.value;
   select.innerHTML='<option value="">Select bank / provider</option>';
-  providers.filter(name=>name.toLowerCase().includes(query)).forEach(name=>{
-   const option=document.createElement('option');
-   option.value=name;option.textContent=name;select.append(option);
-  });
-  if(selected && providers.includes(selected) && providers.some(name=>name===selected && name.toLowerCase().includes(query)))select.value=selected;
+  providers.forEach(name=>{const option=document.createElement('option');option.value=name;option.textContent=name;select.append(option);});
+  if(selected && providers.includes(selected))select.value=selected;
  });
 }
-$('depProviderSearch').addEventListener('input',banks);
-$('bankSearch').addEventListener('input',banks);
+
+function setupBankPicker(id){
+ const select=$(id), wrap=document.createElement('div');wrap.className='bank-picker';
+ select.parentNode.insertBefore(wrap,select);wrap.append(select);
+ const trigger=document.createElement('button');trigger.type='button';trigger.className='bank-picker-trigger';trigger.textContent='Select bank / provider ▾';
+ const panel=document.createElement('div');panel.className='bank-picker-panel';
+ const search=document.createElement('input');search.type='search';search.className='bank-picker-search';search.placeholder='Search bank/provider';search.setAttribute('aria-label','Search bank/provider');search.autocomplete='off';
+ const options=document.createElement('div');options.className='bank-picker-options';panel.append(search,options);wrap.append(trigger,panel);
+ function renderOptions(){const q=search.value.trim().toLowerCase();options.innerHTML='';const matches=[...select.options].slice(1).filter(o=>o.textContent.toLowerCase().includes(q));if(!matches.length){const empty=document.createElement('div');empty.className='bank-picker-empty';empty.textContent='No matching bank/provider';options.append(empty);return;}matches.forEach(o=>{const b=document.createElement('button');b.type='button';b.className='bank-picker-option';b.textContent=o.textContent;b.addEventListener('click',()=>{select.value=o.value;select.dispatchEvent(new Event('change',{bubbles:true}));trigger.textContent=o.textContent+' ▾';wrap.classList.remove('open');search.value='';});options.append(b);});}
+ trigger.addEventListener('click',()=>{wrap.classList.toggle('open');if(wrap.classList.contains('open')){renderOptions();search.focus();}});
+ search.addEventListener('input',renderOptions);
+ document.addEventListener('click',e=>{if(!wrap.contains(e.target))wrap.classList.remove('open');});
+ select.addEventListener('change',()=>{trigger.textContent=(select.selectedOptions[0]?.textContent||'Select bank / provider')+' ▾';});
+ renderOptions();
+}
+setupBankPicker('depProvider');setupBankPicker('bank');
 function maskEmail(email){
  const value=String(email||''),at=value.lastIndexOf('@');
  if(at<1)return value;
