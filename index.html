@@ -1289,8 +1289,7 @@ function renderAdminUsers(){
    const email=item.email||'this user';
    if(!confirm('WARNING: Permanently delete '+email+' and ALL linked records, including wallet and transaction history? This cannot be undone.'))return;
    if(!confirm('SECOND CONFIRMATION: Are you absolutely sure you want to permanently delete '+email+'?'))return;
-   const finalCheck=prompt('FINAL CONFIRMATION: Type DELETE to permanently remove '+email+'.');
-   if(finalCheck!=='DELETE'){if(finalCheck!==null)alert('Deletion cancelled. The required word did not match.');return;}
+   if(!confirm('THIRD AND FINAL CONFIRMATION: Tap OK to permanently delete '+email+'. This action cannot be undone.'))return;
    remove.disabled=true;toggle.disabled=true;
    try{await adminUserAction('delete',item.id);await adminUsers();alert('User account and linked records deleted.');}
    catch(error){alert('Deletion failed: '+(error.message||error));remove.disabled=false;toggle.disabled=false;}
