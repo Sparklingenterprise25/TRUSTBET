@@ -897,8 +897,9 @@ $('phoneSignup').onclick=async()=>{
  try{
   const phone=fullPhoneNumber(),password=$('phonePassword').value;
   if(!/^\\d{8,}$/.test(password))return say('authMsg','Phone password must contain only numbers and be at least 8 digits.',true);
-  const{error}=await supabase.auth.signUp({phone,password});
-  if(error)return say('authMsg',error.message,true);
+  const{data,error}=await supabase.functions.invoke('trustbet-phone-signup',{body:{phone,password}});
+  if(error)return say('authMsg',error.message||'Phone registration failed.',true);
+  if(data?.error)return say('authMsg',data.error,true);
   $('phoneOtpBox').classList.add('hidden');
   $('authMsg').innerHTML='';
   const success=document.createElement('div');
