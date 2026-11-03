@@ -703,7 +703,7 @@ function say(id,message,isError=false){
 }
 function welcomeName(email){
  const value=String(email||'');
- if(/^\+?\d{7,15}$/.test(value.replace(/\D/g,'')) && !value.includes('@'))return value.replace(/\D/g,'');
+ if(/^\+?\d{7,15}$/.test(value.replace(/\D/g,'')) && !value.includes('@')){const digits=value.replace(/\D/g,'');return digits.startsWith('234')?'0'+digits.slice(3):value;}
  const local=value.split('@')[0].toLowerCase();
  if(local==='superhybridservices')return 'SUPER HYBRID';
  if(local==='sparklingenterprise25')return 'SPARKLING ENTERPRISE';
