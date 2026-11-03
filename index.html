@@ -873,7 +873,7 @@ $('emailMode').onclick=()=>{$('emailAuth').classList.remove('hidden');$('phoneAu
 $('phoneMode').onclick=()=>{$('phoneAuth').classList.remove('hidden');$('emailAuth').classList.add('hidden');$('phoneMode').classList.remove('secondary');$('emailMode').classList.add('secondary');};
 function fullPhoneNumber(){
  const code=$('phoneCountry').value;
- let digits=$('phoneNumber').value.replace(/\\D/g,'');
+ let digits=$('phoneNumber').value.replace(/\D/g,'');
  if(digits.startsWith('0'))digits=digits.slice(1);
  if(digits.startsWith(code.replace('+','')))digits=digits.slice(code.length-1);
  if(digits.length<5||digits.length>14)throw new Error('Enter a valid phone number.');
