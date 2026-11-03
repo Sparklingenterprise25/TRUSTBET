@@ -12,9 +12,9 @@ const encoder = new TextEncoder();
 function b64(value: string) {
   return Uint8Array.from(atob(value), (c) => c.charCodeAt(0));
 }
-async function hashCode(code: string, pepper: string) {
-  const digest = await crypto.subtle.digest("SHA-256", encoder.encode(pepper + ":" + code));
-  return Array.from(new Uint8Array(digest), (x) => x.toString(16).padStart(2, "0")).join("");
+async function digest(value: string, pepper: string) {
+  const result = await crypto.subtle.digest("SHA-256", encoder.encode(pepper + ":" + value));
+  return Array.from(new Uint8Array(result), (x) => x.toString(16).padStart(2, "0")).join("");
 }
 
 Deno.serve(async (req: Request) => {
@@ -38,6 +38,12 @@ Deno.serve(async (req: Request) => {
 
   const admin = createClient(url, serviceKey, { auth: { autoRefreshToken: false, persistSession: false } });
   const normalized = identifier.toLowerCase();
+  const identifierHash = await digest("recovery-identifier:" + normalized, pepper);
+  const { data: allowed, error: rateError } = await admin.rpc("trustbet_allow_recovery_attempt", {
+    p_identifier_hash: identifierHash,
+  });
+  if (rateError) return reply({ error: "Recovery service is temporarily unavailable." }, 503);
+  if (allowed !== true) return reply({ error: "Too many recovery attempts. Please wait 15 minutes before trying again." }, 429);
   const query = normalized.includes("@")
     ? admin.from("profiles").select("id").ilike("email", normalized).maybeSingle()
     : admin.from("profiles").select("id").eq("phone", identifier).maybeSingle();
@@ -45,7 +51,7 @@ Deno.serve(async (req: Request) => {
   // Keep unknown accounts and invalid/used codes indistinguishable to callers.
   if (lookupError || !profile?.id) return reply({ error: "The recovery details could not be verified." }, 400);
 
-  const codeHash = await hashCode(code, pepper);
+  const codeHash = await digest(code, pepper);
   const claimToken = crypto.randomUUID();
   const { data: claimed, error: claimError } = await admin.rpc("trustbet_claim_recovery_code", {
     p_user_id: profile.id,
