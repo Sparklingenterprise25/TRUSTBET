@@ -1377,6 +1377,8 @@ function renderAdminUsers(){
    try{await adminUserAction(banned?'unban':'ban',item.id);await adminUsers();}
    catch(error){alert('User action failed: '+(error.message||error));toggle.disabled=false;}
   };
+  const recovery=document.createElement('button');recovery.className='secondary';recovery.textContent='Recovery codes';
+  recovery.onclick=()=>showRecoveryCodes(item.id);
   const remove=document.createElement('button');remove.className='danger';remove.textContent='Delete';
   remove.textContent='Delete (3 confirmations)';
   remove.onclick=async()=>{
@@ -1405,7 +1407,7 @@ function renderAdminUsers(){
    try{await adminUserAction('delete',item.id);await adminUsers();alert('User account and linked records deleted.');}
    catch(error){alert('Deletion failed: '+(error.message||error));remove.disabled=false;toggle.disabled=false;}
   };
-  actions.append(toggle,remove);row.append(info,actions);area.append(row);
+  actions.append(recovery,toggle,remove);row.append(info,actions);area.append(row);
  });
 }
 async function adminUsers(){
@@ -1423,6 +1425,35 @@ $('refreshAdminUsers').onclick=adminUsers;
 $('adminUserSearch').addEventListener('input',renderAdminUsers);
 
 /* Admin phone registration approval */
+async function recoveryAdminAction(action,userId){
+ if(!isAdmin())throw new Error('Administrator access required.');
+ const {data,error}=await supabase.functions.invoke('trustbet-recovery-admin',{body:{action,userId}});
+ if(error)throw error;
+ if(data?.error)throw new Error(data.error);
+ return data;
+}
+async function showRecoveryCodes(userId){
+ try{
+  const data=await recoveryAdminAction('ensure',userId);
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;z-index:2200;background:#071a36d9;display:flex;align-items:center;justify-content:center;padding:18px';
+  const panel=document.createElement('div');
+  panel.style.cssText='width:min(100%,420px);max-height:85vh;overflow:auto;background:#fff;color:#172b4d;border-radius:14px;padding:20px;box-shadow:0 18px 50px #0005';
+  const heading=document.createElement('h3');heading.textContent='Account recovery codes';
+  const note=document.createElement('p');note.textContent='Keep these codes private. Each code can be used once.';
+  const list=document.createElement('div');list.style.cssText='display:grid;gap:10px';
+  (data.codes||[]).forEach(item=>{
+   const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px;border:1px solid #dbe3ed;border-radius:10px';
+   const code=document.createElement('b');code.textContent=item.code;code.style.color=item.used_at?'#d32f2f':'#008000';
+   const status=document.createElement('small');status.textContent=item.used_at?'USED':'UNUSED';status.style.cssText='display:block;color:'+(item.used_at?'#d32f2f':'#008000');
+   const copy=document.createElement('button');copy.type='button';copy.className='secondary';copy.textContent='Copy';
+   copy.disabled=!!item.used_at;copy.onclick=async()=>{try{await navigator.clipboard.writeText(item.code);copy.textContent='Copied';}catch{alert('Copy is unavailable in this browser.');}};
+   const info=document.createElement('div');info.append(code,status);row.append(info,copy);list.append(row);
+  });
+  const close=document.createElement('button');close.className='secondary';close.textContent='Close';close.style.marginTop='14px';close.onclick=()=>overlay.remove();
+  panel.append(heading,note,list,close);overlay.append(panel);overlay.onclick=e=>{if(e.target===overlay)overlay.remove();};document.body.append(overlay);
+ }catch(error){alert('Could not load recovery codes: '+(error.message||error));}
+}
 async function phoneAdminAction(action,userId){
  if(!isAdmin())throw new Error('Administrator access required.');
  const {data,error}=await supabase.functions.invoke('trustbet-phone-admin',{body:{action,userId}});
