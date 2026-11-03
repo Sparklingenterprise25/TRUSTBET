@@ -474,6 +474,12 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
      <button id="refreshAdminWithdrawals" class="secondary">Refresh requests</button>
      <div id="adminWithdrawals"></div>
     </div>
+    <div class="admin-section">
+     <h3>Registered Users</h3>
+     <input id="adminUserSearch" type="search" placeholder="Search users by name or email" aria-label="Search registered users">
+     <button id="refreshAdminUsers" class="secondary">Refresh users</button>
+     <div id="adminUsers" aria-live="polite"></div>
+    </div>
     <h3>Admin Support Inbox</h3><div id="adminInbox"></div>
    </div>
   </div>
@@ -811,7 +817,7 @@ async function profileLoad(authUser){
  banks();render();renderHome();exStatus();updateLockNotice();
  go('home');
  await loadBankDetails();
- if(isAdmin()){await adminDeposits();await adminWithdrawals();}
+ if(isAdmin()){await adminDeposits();await adminWithdrawals();await adminUsers();}
  await adminInbox();
  await loadNotifications();
  subscribeNotifications();
@@ -1240,6 +1246,67 @@ async function reviewWithdrawal(id,decision,approveButton,rejectButton){
  showAdminReceipt('withdrawal',receiptItem,decision,reason);
  alert('Withdrawal request '+(decision==='approve'?'approved. Complete the bank transfer.':'rejected.') );
 }
+
+/* Admin registered-user management */
+let adminUserCache=[];
+async function adminUserAction(action,userId){
+ if(!isAdmin())throw new Error('Administrator access required.');
+ const{data,error}=await supabase.functions.invoke('admin-users',{body:{action,userId}});
+ if(error)throw error;
+ if(data?.error)throw new Error(data.error);
+ return data;
+}
+function renderAdminUsers(){
+ const area=$('adminUsers');if(!area)return;
+ const q=String($('adminUserSearch')?.value||'').trim().toLowerCase();
+ const filtered=adminUserCache.filter(item=>{
+  const name=item.profile?.full_name||'';
+  return (name+' '+item.email).toLowerCase().includes(q);
+ });
+ area.innerHTML='';
+ if(!filtered.length){area.textContent=q?'No users match that search.':'No registered users found.';return;}
+ filtered.forEach(item=>{
+  const row=document.createElement('div');row.className='admin-request';
+  const info=document.createElement('div');
+  const name=document.createElement('b');name.textContent=item.profile?.full_name||'Name not provided';
+  const details=document.createElement('small');
+  const created=item.created_at?new Date(item.created_at).toLocaleString():'Unknown';
+  const banned=item.banned_until&&new Date(item.banned_until)>new Date();
+  details.textContent=item.email+' · Joined: '+created+' · '+(banned?'BANNED':'ACTIVE');
+  details.style.display='block';
+  info.append(name,details);
+  const actions=document.createElement('div');actions.className='row';
+  const toggle=document.createElement('button');toggle.className='secondary';toggle.textContent=banned?'Unban':'Ban';
+  toggle.onclick=async()=>{
+   if(!confirm((banned?'Unban':'Ban')+' '+(item.email||'this user')+'?'))return;
+   toggle.disabled=true;
+   try{await adminUserAction(banned?'unban':'ban',item.id);await adminUsers();}
+   catch(error){alert('User action failed: '+(error.message||error));toggle.disabled=false;}
+  };
+  const remove=document.createElement('button');remove.className='danger';remove.textContent='Delete';
+  remove.onclick=async()=>{
+   if(!confirm('PERMANENTLY delete '+(item.email||'this user')+' and all linked records, including wallet and transaction history? This cannot be undone.'))return;
+   if(!confirm('Final confirmation: permanently delete this account?'))return;
+   remove.disabled=true;toggle.disabled=true;
+   try{await adminUserAction('delete',item.id);await adminUsers();alert('User account and linked records deleted.');}
+   catch(error){alert('Deletion failed: '+(error.message||error));remove.disabled=false;toggle.disabled=false;}
+  };
+  actions.append(toggle,remove);row.append(info,actions);area.append(row);
+ });
+}
+async function adminUsers(){
+ if(!isAdmin())return;
+ const area=$('adminUsers');area.textContent='Loading registered users...';
+ const button=$('refreshAdminUsers');if(button)button.disabled=true;
+ try{
+  const data=await adminUserAction('list');
+  adminUserCache=Array.isArray(data.users)?data.users:[];
+  renderAdminUsers();
+ }catch(error){area.textContent='Unable to load users: '+(error.message||error);}
+ finally{if(button)button.disabled=false;}
+}
+$('refreshAdminUsers').onclick=adminUsers;
+$('adminUserSearch').addEventListener('input',renderAdminUsers);
 
 /* Notifications */
 $('closeNotifications').onclick=()=>$('notificationPanel').classList.add('hidden');
