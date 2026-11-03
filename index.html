@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -100,8 +99,8 @@ nav button.active{background:linear-gradient(135deg,#102d59,#2475d0);color:#fff;
 .odd-box:hover{transform:translateY(-2px);border-color:#8fb4e2;box-shadow:0 7px 15px #102d5912}
 .odd-box .odd-name{font-size:11px;font-weight:800;display:block;letter-spacing:.65px;color:#71829a}
 .odd-box .odd-value{font-size:23px;font-weight:900;display:block;margin-top:7px;color:#174b88;letter-spacing:-.4px}
-.odd-box.selected{border:2px solid var(--blue);background:linear-gradient(145deg,#eff5ff,#e1edff);box-shadow:0 0 0 3px #2475d018,0 7px 16px #2475d014}
 .lock{position:absolute;right:9px;top:7px;font-size:17px}
+.odd-box.selected{border:2px solid var(--blue);background:linear-gradient(145deg,#eff5ff,#e1edff);box-shadow:0 0 0 3px #2475d018,0 7px 16px #2475d014}
 .special-odd{background:linear-gradient(145deg,#fff8e6,#f2d995 52%,#fff3d0);border:1px solid #d6b45f;color:#5b4515;box-shadow:inset 0 1px 3px #fff9,0 5px 13px #b58b3425}
 .special-odd .odd-value{color:#795713}
 .result-panel{padding:18px;border-radius:16px;margin:14px 0;color:white;text-align:center;font-weight:900;letter-spacing:.7px}
@@ -257,6 +256,16 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
  #home .balance-card .balance{font-size:clamp(32px,9vw,39px)}
 }
 
+/* Requested balance colour only; existing sizes and layout are unchanged. */
+#home .balance-card .balance,
+#homeBalanceValue,
+#walletBalance,
+#gameBalance,
+.wallet-balance-card .balance,
+.play-balance strong,
+.play-balance strong .balance-amount,
+.play-balance strong .balance-separator{color:#00E676!important}
+
 </style>
 </head>
 <body>
@@ -378,16 +387,6 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
 
  <section id="deposit" class="hidden">
   <div class="deposit-layout">
-   <div class="card deposit-form-card">
-    <h2>Deposit Naira</h2>
-    <p class="muted">Submit a deposit request. Your wallet will be credited shortly.</p>
-    <label>Bank / financial provider</label>
-    <select id="depProvider"><option value="">Select bank / provider</option></select>
-    <label>Amount (Min ₦500 – Max₦500,000 daily limit)</label>
-    <input id="depAmount" type="number" min="500" max="500000" step="1" placeholder="Enter deposit amount">
-    <button id="depositBtn" class="wide">Submit deposit request</button>
-    <p id="depMsg" class="msg"></p>
-   </div>
    <div class="bank-details-card">
     <h3>TRUSTBET BANK DETAILS 🏦</h3>
     <div class="bank-detail-line"><span>BANK NAME</span><strong id="platformBankName"></strong></div>
@@ -402,6 +401,16 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
      <button id="saveBankDetails" class="wide">Save bank details</button>
      <p id="bankDetailsMsg" class="msg"></p>
     </div>
+   </div>
+   <div class="card deposit-form-card">
+    <h2>Deposit Naira</h2>
+    <p class="muted">Submit a deposit request. Your wallet will be credited shortly.</p>
+    <label>Bank / financial provider</label>
+    <select id="depProvider"><option value="">Select bank / provider</option></select>
+    <label>Amount (Min ₦500 – Max₦500,000 daily limit)</label>
+    <input id="depAmount" type="number" min="500" max="500000" step="1" placeholder="Enter deposit amount">
+    <button id="depositBtn" class="wide">Submit deposit request</button>
+    <p id="depMsg" class="msg"></p>
    </div>
   </div>
  </section>
@@ -508,6 +517,7 @@ const $=id=>document.getElementById(id);
 let user=null,profile=null,days=0,conversation=null,channel=null,game=null;
 let selectedOdd=null,notificationChannel=null,activeCategory='All';
 let homeBalanceHidden=false;
+let requestRedirectTimer=null;
 let favourites=JSON.parse(localStorage.getItem('trustbet_favourites')||'[]');
 let played=JSON.parse(localStorage.getItem('trustbet_played')||'{}');
 
@@ -534,8 +544,17 @@ function say(id,message,isError=false){
  $(id).textContent=message;
  $(id).classList.toggle('error',isError);
 }
-function first(email){
- return(String(email||'').split('@')[0].split(/[._+-]/)[0].replace(/\d+$/,'')||'there');
+function welcomeName(email){
+ const local=String(email||'').split('@')[0].toLowerCase();
+ if(local==='superhybridservices')return 'SUPER HYBRID';
+ if(local==='sparklingenterprise25')return 'SPARKLING ENTERPRISE';
+ const parts=local.split(/[._+-]/).map(part=>part.replace(/\d+$/,'')).filter(Boolean);
+ return(parts.slice(0,2).join(' ')||'THERE').toUpperCase();
+}
+function confirmRequest(id,message){
+ say(id,message);
+ if(requestRedirectTimer)clearTimeout(requestRedirectTimer);
+ requestRedirectTimer=setTimeout(()=>go('home'),10000);
 }
 function banks(){
  ['depProvider','bank'].forEach(id=>{
@@ -639,7 +658,7 @@ async function profileLoad(authUser){
  if(!data){say('authMsg','Login succeeded, but no profile record exists for this account. Please contact the site administrator.',true);return false;}
  user=authUser;profile={...data,virtual_balance:Number(data.virtual_balance||0),role:data.role||'user'};
  updateBalances(data.virtual_balance);
- $('welcome').textContent='WELCOME, SPARKING ENTERPRISE';
+ $('welcome').textContent='WELCOME, '+welcomeName(data.email||authUser.email);
  $('accountEmail').textContent=maskEmail(data.email||authUser.email||'');
  $('auth').classList.add('hidden');
  $('app').classList.remove('hidden');
@@ -719,7 +738,7 @@ $('depositBtn').onclick=async()=>{
   if(!result.error||result.error.code!=='23505')break;
  }
  if(result.error)return say('depMsg',result.error.message,true);
- say('depMsg','Deposit request submitted and awaiting administrator review. Tracking code: '+code);
+ confirmRequest('depMsg','Deposit request submitted and awaiting administrator review. Tracking code: '+code);
  $('depAmount').value='';
  await loadWallet();
  if(isAdmin())await adminDeposits();
@@ -775,7 +794,7 @@ $('withdrawBtn').onclick=async()=>{
   user_id:user.id,amount,bank_name,account_name,account_number,status:'pending'
  });
  if(error)return say('wdMsg',error.message,true);
- say('wdMsg','Withdrawal request submitted and pending review.');
+ confirmRequest('wdMsg','Withdrawal request submitted and pending review.');
  $('wdAmount').value='';$('accName').value='';$('accNo').value='';
  await loadWallet();
 };
