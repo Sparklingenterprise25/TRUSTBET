@@ -432,8 +432,8 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
      <div class="deposit-instruction">After making your transfer to the TRUSTBET account above, return to this page, scroll down, enter the amount transferred and the account name used for the transfer, then click SUBMIT.</div>
     </div>
     <p class="muted">Submit a deposit request. Your wallet will be credited shortly.</p>
-    <label>Bank / financial provider</label>
-    <select id="depProvider"><option value="">Select bank / provider</option></select>
+    <label>SELECT BANK / FINANCIAL PROVIDER</label>
+    <select id="depProvider"><option value="">SELECT BANK / FINANCIAL PROVIDER</option></select>
     <label>Amount (Min ₦500 – Max₦500,000 daily limit)</label>
     <input id="depAmount" type="number" min="500" max="500000" step="1" placeholder="Enter deposit amount">
     <label>Your actual bank account name</label>
@@ -449,7 +449,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
    <h2>Withdraw Naira</h2>
    <p class="muted withdrawal-limits"><span>Minimum withdrawal: ₦50,000 per day</span><span>Maximum withdrawal: ₦1,000,000 per day</span></p>
    <label>Amount (₦50,000–₦1,000,000 daily limit)</label><input id="wdAmount" type="number" min="50000" max="1000000" step="1" placeholder="Enter withdrawal amount">
-   <label>Bank / financial provider</label><select id="bank"><option value="">Select bank / provider</option></select>
+   <label>SELECT BANK / FINANCIAL PROVIDER</label><select id="bank"><option value="">SELECT BANK / FINANCIAL PROVIDER</option></select>
    <label>Account name</label><input id="accName" placeholder="Enter account name">
    <label>Account number</label><input id="accNo" inputmode="numeric" maxlength="10" placeholder="10-digit account number">
    <button id="withdrawBtn" class="wide">Submit withdrawal request</button>
@@ -552,7 +552,105 @@ let favourites=JSON.parse(localStorage.getItem('trustbet_favourites')||'[]');
 let played=JSON.parse(localStorage.getItem('trustbet_played')||'{}');
 
 const providers=[
-'9 Payment Service Bank (9PSB)','Access Bank','Airtel Money','Branch','Carbon','Chipper Cash','Citibank Nigeria','Cowrywise','Ecobank Nigeria','FairMoney','Fidelity Bank','First Bank','First City Monument Bank (FCMB)','Flutterwave','Globus Bank','Guaranty Trust Bank (GTBank)','Jaiz Bank','Keystone Bank','Kuda','Lotus Bank','Moniepoint','MoMo PSB','MTN MoMo','Nova Commercial Bank','OPay','Optimus Bank','Paga','PalmPay','Parallex Bank','Paystack','PiggyVest','Polaris Bank','Premium Trust Bank','Providus Bank','Remita','Signature Bank','SmartCash PSB','Squad','Stanbic IBTC Bank','Standard Chartered Bank','Sterling Bank','SunTrust Bank','TAJBank','Titan Trust Bank','Union Bank','United Bank for Africa (UBA)','Unity Bank','VFD Microfinance Bank','Wema Bank','Zenith Bank','Alpha Morgan Bank','Alternative Bank','Hope PSB','MoneyMaster PSB','Summit Bank','Tatum Bank','Bank of Agriculture (BOA)','Bank of Industry','Development Bank of Nigeria','Federal Mortgage Bank of Nigeria','NEXIM Bank','AB Microfinance Bank','Accion Microfinance Bank','Addosser Microfinance Bank','Baobab Microfinance Bank','Bosak Microfinance Bank','Creditville Microfinance Bank','Davodani Microfinance Bank','Fina Trust Microfinance Bank','Garki Microfinance Bank','Gold Microfinance Bank','Grooming Microfinance Bank','Hasal Microfinance Bank','LAPO Microfinance Bank','Mainstreet Microfinance Bank','Mint Microfinance Bank','NPF Microfinance Bank','NIRSAL Microfinance Bank','NowNow Digital Microfinance Bank','Regent Microfinance Bank','Renmoney Microfinance Bank','Seedvest Microfinance Bank','Sparkle Microfinance Bank','Supreme Microfinance Bank','ABU Microfinance Bank','Gidauniya Alheri Microfinance Bank','GFB Microfinance Bank','Gains Microfinance Bank','Gamawa Microfinance Bank','Garewa Microfinance Bank','Garu Microfinance Bank','Gashua Microfinance Bank','Gboko Microfinance Bank','Girei Microfinance Bank','Giwa Microfinance Bank','Future Growth Microfinance Bank','Gapbridge Microfinance Bank','Gideon Trust Microfinance Bank','Imodi-Imosan Microfinance Bank','Gateway Mortgage Bank'
+'9 PSB ( 9 payment service bank )',
+'AB MFB ( ab microfinance bank limited)',
+'ABU MFB',
+'ACCESS BANK PLC',
+'ACCION MFB ( accion microfinance bank limited )',
+'ADDOSSER MFB ( addosser microfinance bank limited )',
+'AUCHI POLY MFB ( auchi poly microfinance bank )',
+'ALPHA MORGAN BANK LIMITED',
+'ALTERNATIVE BANK ( the alternative bank limited )',
+'BAOBAB MFB ( baobab microfinance bank nigeria limited )',
+'BANK OF AGRICULTURE',
+'BANK OF INDUSTRY',
+'BOSAK MFB',
+'BRANCH',
+'CARBON MFB ( carbon microfinance bank limited )',
+'CHIPPER CASH',
+'CITIBANK NIGERIA LIMITED',
+'COWRYWISE',
+'CREDITVILLE MFB',
+'DAVODANI MFB',
+'DEVELOPMENT BANK OF NIGERIA',
+'ECOBANK NIGERIA LIMITED',
+'FAIRMONEY MFB ( fairmoney microfinance bank limited )',
+'FIDELITY BANK PLC',
+'FIRST BANK OF NIGERIA LIMITED',
+'FIRST CITY MONUMENT BANK PLC',
+'FLUTTERWAVE',
+'FUTURE GROWTH MFB',
+'FEDERAL MORTGAGE BANK OF NIGERIA',
+'GAPBRIDGE MFB',
+'GAINS MFB',
+'GAREWA MFB',
+'GARKI MFB',
+'GARU MFB',
+'GASHUA MFB',
+'GAMAWA MFB',
+'GATEWAY MORTGAGE BANK LIMITED',
+'GBOKO MFB',
+'GFB MFB',
+'GIDEON TRUST MFB',
+'GIDAUNIYA ALHERI MFB',
+'GIREI MFB',
+'GIWA MFB',
+'GLOBUS BANK LIMITED',
+'GOLD MFB',
+'GROOMING MFB',
+'GTBANK PLC',
+'HASAL MFB ( hasal microfinance bank limited )',
+'HOPE PSB ( hope payment service bank limited )',
+'IMODI-IMOSAN MFB ( imodi-imosan micro finance bank )',
+'JAIZ BANK PLC',
+'KEYSTONE BANK LIMITED',
+'KUDA MFB ( kuda microfinance bank )',
+'LAPO MFB ( lapo microfinance bank limited )',
+'LOTUS BANK LIMITED',
+'MAINSTREET MFB ( mainstreet microfinance bank limited )',
+'MINT MFB',
+'MONEYMASTER PSB ( moneymaster payment service bank limited )',
+'MONIEPOINT MFB ( moniepoint microfinance bank )',
+'MOMO PSB ( momo payment service bank limited )',
+'NEXIM BANK',
+'NIRSAL MFB ( nirsal microfinance bank limited )',
+'NPF MFB',
+'NOWNOW ( nownow digital microfinance bank )',
+'NOVA COMMERCIAL BANK LIMITED',
+'OPAY ( opay microfinance bank limited )',
+'OPTIMUS BANK LIMITED',
+'PAGA ( pagatech limited )',
+'PALMPAY ( palmpay limited )',
+'PARALLEX BANK LIMITED',
+'PAYSTACK ( paystack payment limited )',
+'PIGGYVEST',
+'POLARIS BANK PLC',
+'PREMIUM TRUST BANK LIMITED',
+'PROVIDUS BANK LIMITED',
+'REGENT MFB',
+'REMITA ( remita payment service limited )',
+'RENMONEY MFB ( renmoney microfinance bank limited )',
+'SEEDVEST MFB',
+'SIGNATURE BANK LIMITED',
+'SMARTCASH PSB ( smartcash payment service bank )',
+'SPARKLE MFB',
+'SQUAD',
+'STANBIC IBTC BANK PLC',
+'STANDARD CHARTERED BANK NIGERIA LIMITED',
+'STERLING BANK PLC',
+'SUMMIT BANK LIMITED',
+'SUNTRUST BANK NIGERIA LIMITED',
+'SUPREME MFB',
+'TAJBANK LIMITED',
+'TATUM BANK LIMITED',
+'TITAN TRUST BANK LIMITED',
+'UNION BANK OF NIGERIA PLC',
+'UNITED BANK FOR AFRICA PLC',
+'UNITY BANK PLC',
+'VFD MFB ( vfd microfinance bank limited )',
+'WEMA BANK PLC',
+'ZIKORA MFB ( zikora microfinance bank )',
+'ZENITH BANK PLC'
 ];
 
 const games=[
@@ -589,7 +687,7 @@ function confirmRequest(id,message){
 function banks(){
  [['depProvider'],['bank']].forEach(([id])=>{
   const select=$(id), selected=select.value;
-  select.innerHTML='<option value="">Select bank / provider</option>';
+  select.innerHTML='<option value="">SELECT BANK / FINANCIAL PROVIDER</option>';
   providers.forEach(name=>{const option=document.createElement('option');option.value=name;option.textContent=name;select.append(option);});
   if(selected && providers.includes(selected))select.value=selected;
  });
@@ -598,7 +696,7 @@ function banks(){
 function setupBankPicker(id){
  const select=$(id), wrap=document.createElement('div');wrap.className='bank-picker';
  select.parentNode.insertBefore(wrap,select);wrap.append(select);
- const trigger=document.createElement('button');trigger.type='button';trigger.className='bank-picker-trigger';trigger.textContent='Select bank / provider ▾';
+ const trigger=document.createElement('button');trigger.type='button';trigger.className='bank-picker-trigger';trigger.textContent='SELECT BANK / FINANCIAL PROVIDER ▾';
  const panel=document.createElement('div');panel.className='bank-picker-panel';
  const search=document.createElement('input');search.type='search';search.className='bank-picker-search';search.placeholder='Search bank/provider';search.setAttribute('aria-label','Search bank/provider');search.autocomplete='off';
  const options=document.createElement('div');options.className='bank-picker-options';panel.append(search,options);wrap.append(trigger,panel);
@@ -606,7 +704,7 @@ function setupBankPicker(id){
  trigger.addEventListener('click',()=>{wrap.classList.toggle('open');if(wrap.classList.contains('open')){renderOptions();search.focus();}});
  search.addEventListener('input',renderOptions);
  document.addEventListener('click',e=>{if(!wrap.contains(e.target))wrap.classList.remove('open');});
- select.addEventListener('change',()=>{trigger.textContent=(select.selectedOptions[0]?.textContent||'Select bank / provider')+' ▾';});
+ select.addEventListener('change',()=>{trigger.textContent=(select.selectedOptions[0]?.textContent||'SELECT BANK / FINANCIAL PROVIDER')+' ▾';});
  renderOptions();
 }
 setupBankPicker('depProvider');setupBankPicker('bank');
