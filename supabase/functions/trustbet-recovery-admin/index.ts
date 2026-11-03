@@ -70,7 +70,10 @@ Deno.serve(async(req:Request)=>{
      user_id:body.userId,code_hash:hash,code_ciphertext:await encrypt(code,aes),code_slot:slot
     });
     if(!insertError)inserted=true;
-    else if(insertError.code!=="23505")return reply({error:"Could not securely create recovery codes."},500);
+    else if(insertError.code==="23505"){
+     const {data:slotRow}=await admin.from("account_recovery_codes").select("id").eq("user_id",body.userId!).eq("code_slot",slot).maybeSingle();
+     if(slotRow)inserted=true;
+    }else return reply({error:"Could not securely create recovery codes."},500);
    }
    if(!inserted)return reply({error:"Could not allocate a unique recovery-code slot. Please retry."},409);
   }
