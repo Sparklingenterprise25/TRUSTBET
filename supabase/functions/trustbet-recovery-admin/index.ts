@@ -54,23 +54,26 @@ Deno.serve(async(req:Request)=>{
  if(!["list","ensure"].includes(body.action||""))return reply({error:"Unsupported action."},400);
  const {aes,pepper}=await keys();
  if(body.action==="ensure"&&!/^[0-9a-f-]{36}$/i.test(body.userId||""))return reply({error:"Valid user ID required."},400);
- let query=admin.from("account_recovery_codes").select("id,user_id,code_hash,code_ciphertext,created_at,used_at").order("created_at",{ascending:true});
+ let query=admin.from("account_recovery_codes").select("id,user_id,code_hash,code_ciphertext,code_slot,created_at,used_at").order("created_at",{ascending:true});
  if(body.action==="ensure")query=query.eq("user_id",body.userId!);
  const {data:rows,error}=await query;
  if(error)return reply({error:error.message},500);
  if(body.action==="ensure"){
   const existing=rows||[];
-  const generated:string[]=[];
-  while(existing.length+generated.length<3){
-   const code=randomCode(),hash=await digest(code,pepper);
-   if(existing.some(x=>x.code_hash===hash)||generated.some(x=>x===code))continue;
-   generated.push(code);
-   const {error:insertError}=await admin.from("account_recovery_codes").insert({
-    user_id:body.userId,code_hash:hash,code_ciphertext:await encrypt(code,aes)
-   });
-   if(insertError)return reply({error:"Could not securely create recovery codes: "+insertError.message},500);
+  for(let slot=1;slot<=3;slot++){
+   if(existing.some(x=>x.code_slot===slot))continue;
+   let inserted=false;
+   for(let attempt=0;attempt<8&&!inserted;attempt++){
+    const code=randomCode(),hash=await digest(code,pepper);
+    if(existing.some(x=>x.code_hash===hash))continue;
+    const {error:insertError}=await admin.from("account_recovery_codes").insert({
+     user_id:body.userId,code_hash:hash,code_ciphertext:await encrypt(code,aes),code_slot:slot
+    });
+    if(!insertError)inserted=true;
+    else if(insertError.code!=="23505")return reply({error:"Could not securely create recovery codes."},500);
+   }
+   if(!inserted)return reply({error:"Could not allocate a unique recovery-code slot. Please retry."},409);
   }
- }
  const {data:all,error:readError}=await (body.action==="list"
   ?admin.from("account_recovery_codes").select("id,user_id,code_hash,code_ciphertext,created_at,used_at").order("created_at",{ascending:true})
   :admin.from("account_recovery_codes").select("id,user_id,code_hash,code_ciphertext,created_at,used_at").eq("user_id",body.userId!).order("created_at",{ascending:true}));
