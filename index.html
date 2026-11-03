@@ -1289,7 +1289,24 @@ function renderAdminUsers(){
    const email=item.email||'this user';
    if(!confirm('WARNING: Permanently delete '+email+' and ALL linked records, including wallet and transaction history? This cannot be undone.'))return;
    if(!confirm('SECOND CONFIRMATION: Are you absolutely sure you want to permanently delete '+email+'?'))return;
-   if(!confirm('THIRD AND FINAL CONFIRMATION: Tap OK to permanently delete '+email+'. This action cannot be undone.'))return;
+   const finalCheck=await new Promise(resolve=>{
+    const overlay=document.createElement('div');
+    overlay.style.cssText='position:fixed;inset:0;z-index:2000;background:#071a36d9;display:flex;align-items:center;justify-content:center;padding:18px';
+    const panel=document.createElement('div');
+    panel.style.cssText='width:min(100%,380px);background:#fff;color:#172b4d;border-radius:14px;padding:20px;box-shadow:0 18px 50px #0005';
+    const heading=document.createElement('h3');heading.textContent='Final deletion confirmation';
+    const message=document.createElement('p');message.textContent='Type DELETE exactly to permanently delete '+email+' and all linked records.';
+    const field=document.createElement('input');field.type='text';field.placeholder='Type DELETE';field.autocomplete='off';field.autocapitalize='characters';field.style.cssText='width:100%;padding:13px;border:1px solid #d8e2ef;border-radius:10px;font:inherit;margin:8px 0 14px';
+    const buttons=document.createElement('div');buttons.style.cssText='display:flex;gap:9px';
+    const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Cancel';cancel.className='secondary';cancel.style.flex='1';
+    const confirmDelete=document.createElement('button');confirmDelete.type='button';confirmDelete.textContent='Confirm deletion';confirmDelete.className='danger';confirmDelete.style.flex='1';
+    const close=value=>{overlay.remove();resolve(value);};
+    cancel.onclick=()=>close('');
+    confirmDelete.onclick=()=>close(field.value);
+    overlay.onclick=e=>{if(e.target===overlay)close('');};
+    buttons.append(cancel,confirmDelete);panel.append(heading,message,field,buttons);overlay.append(panel);document.body.append(overlay);field.focus();
+   });
+   if(finalCheck!=='DELETE'){if(finalCheck!=='')alert('Deletion cancelled. You must type DELETE exactly.');return;}
    remove.disabled=true;toggle.disabled=true;
    try{await adminUserAction('delete',item.id);await adminUsers();alert('User account and linked records deleted.');}
    catch(error){alert('Deletion failed: '+(error.message||error));remove.disabled=false;toggle.disabled=false;}
