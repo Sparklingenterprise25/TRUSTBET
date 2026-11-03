@@ -44,5 +44,10 @@ The admin recovery function must not be deployed until both secrets are configur
 
 - Development branch contains schema groundwork, phone approval RPCs, admin functions, and the access-token gate migration.
 - The access-token gate is not active until its migration is applied and the Auth hook is configured.
-- Recovery request/redeem workflow and complete phone login lockout are not yet finished.
+- Recovery-code redemption now has a branch-only Edge Function (trustbet-recovery-reset) and SQL claim/finalize/release primitives. It supports password reset using the account phone number or email plus a one-time six-digit recovery code.
+- Recovery redemption attempts are rate-limited to five attempts per account identifier per 15-minute window using a peppered identifier hash.
+- The reset function requires TRUSTBET_RECOVERY_HASH_PEPPER; the existing admin code-issuance function additionally requires TRUSTBET_RECOVERY_ENCRYPTION_KEY.
+- The frontend has not yet been connected to the reset function.
+- Recovery redemption has not yet been tested against a staging database/Auth project. The SQL migration and Edge Function are not production-ready until those tests pass.
+- Complete phone login lockout is not finished. The SQL failure-counter functions are groundwork only; the Free plan limitation described above remains.
 - No production database or live website changes have been made.
