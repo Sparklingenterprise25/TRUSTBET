@@ -150,14 +150,22 @@ footer{text-align:center;padding:24px 24px 90px;color:var(--muted);font-size:12p
 .home-activity-row #logout{flex:0 0 auto;min-width:0;width:auto;padding:7px 10px;font-size:10px;border-radius:9px}
 .betting-lock{margin:10px 0;padding:12px;border:1px solid #e8b7bd;background:#fff0f1;color:#9d2634;border-radius:11px;font-size:13px;line-height:1.5}
 .deposit-layout{display:grid;grid-template-columns:1fr;gap:13px}
-.deposit-form-card{padding:15px 17px;margin-bottom:0}
+.deposit-form-card{position:relative;padding:15px 17px;margin-bottom:0}
 .deposit-form-card input,.deposit-form-card select{padding:10px 12px;margin:4px 0 9px}
-.bank-details-card{background:linear-gradient(145deg,#0b2144,#102d59 65%,#174b88);color:#fff;border:1px solid #24558c;border-radius:16px;padding:17px}
+.bank-details-card{position:relative;background:linear-gradient(145deg,#0b2144,#102d59 65%,#174b88);color:#fff;border:1px solid #24558c;border-radius:16px;padding:17px}
+.deposit-instruction{position:absolute;z-index:5;right:0;top:-41px;width:min(60%,520px);min-height:82px;padding:10px 13px 18px;background:#d71920;color:#fff;border:2px solid #b51219;border-radius:10px;box-shadow:0 5px 15px #0003;font-size:12px;font-weight:800;line-height:1.35;text-align:center;display:flex;align-items:center;justify-content:center}
+.deposit-instruction-arrow{pointer-events:none}
+.deposit-instruction-arrow{position:absolute;right:29%;top:30px;z-index:6;color:#e00016;font-size:27px;font-weight:1000;line-height:1;text-shadow:0 1px 1px #fff}
 .bank-details-card h3{color:#fff;margin:0 0 12px}
 .bank-detail-line{padding:9px 0;border-bottom:1px solid #ffffff25;font-size:13px;overflow-wrap:anywhere}
 .bank-detail-line:last-child{border-bottom:0}
 .bank-detail-line span{display:block;color:#c5dcf7;font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px}
 .bank-detail-line strong{color:#fff;font-size:15px}
+.account-copy-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.account-copy-row strong{flex:1;min-width:120px}
+.copy-account-btn{padding:7px 11px;font-size:11px;border-radius:8px;background:#fff;color:#102d59;border:1px solid #c5dcf7;box-shadow:none}
+.copy-account-btn:active{transform:scale(.98)}
+.copy-account-feedback{font-size:10px;color:#bfe9d4;font-weight:800}
 .admin-bank-editor{margin-top:14px;padding-top:12px;border-top:1px solid #ffffff35}
 .admin-bank-editor label{color:#dcecff}
 .admin-bank-editor input{background:#fff;color:var(--ink);margin-bottom:7px}
@@ -390,7 +398,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
    <div class="bank-details-card">
     <h3>TRUSTBET BANK DETAILS 🏦</h3>
     <div class="bank-detail-line"><span>BANK NAME</span><strong id="platformBankName"></strong></div>
-    <div class="bank-detail-line"><span>ACCOUNT NUMBER</span><strong id="platformAccountNumber"></strong></div>
+    <div class="bank-detail-line"><span>ACCOUNT NUMBER</span><div class="account-copy-row"><strong id="platformAccountNumber"></strong><button type="button" id="copyPlatformAccount" class="copy-account-btn">COPY</button><span id="copyAccountFeedback" class="copy-account-feedback" aria-live="polite"></span></div></div>
     <div class="bank-detail-line"><span>ACCOUNT NAME</span><strong id="platformAccountName"></strong></div>
     <p class="bank-note">Make payment only to the verified account details displayed here. Submitting a request without actual deposit does not automatically add money to your wallet.</p>
     <div id="adminBankEditor" class="admin-bank-editor hidden">
@@ -403,12 +411,16 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
     </div>
    </div>
    <div class="card deposit-form-card">
+    <div class="deposit-instruction">After making your transfer to the TRUSTBET account above, return to this page, scroll down, enter the amount transferred and the account name used for the transfer, then click SUBMIT.</div>
+    <div class="deposit-instruction-arrow" aria-hidden="true">↓</div>
     <h2>Deposit Naira</h2>
     <p class="muted">Submit a deposit request. Your wallet will be credited shortly.</p>
     <label>Bank / financial provider</label>
     <select id="depProvider"><option value="">Select bank / provider</option></select>
     <label>Amount (Min ₦500 – Max₦500,000 daily limit)</label>
     <input id="depAmount" type="number" min="500" max="500000" step="1" placeholder="Enter deposit amount">
+    <label>Your actual bank account name</label>
+    <input id="depAccountName" type="text" maxlength="120" autocomplete="name" placeholder="Enter the account name used for the transfer">
     <button id="depositBtn" class="wide">Submit deposit request</button>
     <p id="depMsg" class="msg"></p>
    </div>
@@ -722,7 +734,9 @@ async function dailyRequestTotal(table){
 /* Deposit request: creates a pending request only; it never credits the wallet. */
 $('depositBtn').onclick=async()=>{
  const amount=Number($('depAmount').value),provider_name=$('depProvider').value;
+ const depositor_account_name=$('depAccountName').value.trim();
  if(!provider_name)return say('depMsg','Select a bank or payment provider.',true);
+ if(!depositor_account_name)return say('depMsg','Enter the actual account name used for the transfer.',true);
  if(!Number.isSafeInteger(amount)||amount<500)return say('depMsg','Minimum deposit is ₦500.',true);
  if(amount>500000)return say('depMsg','Maximum deposit per day is ₦500,000.',true);
  let total;
@@ -733,13 +747,13 @@ $('depositBtn').onclick=async()=>{
  for(let i=0;i<5;i++){
   code=tracking();
   result=await supabase.from('deposit_requests').insert({
-   user_id:user.id,tracking_code:code,amount,provider_name,status:'pending'
+   user_id:user.id,tracking_code:code,amount,provider_name,depositor_account_name,status:'pending'
   });
   if(!result.error||result.error.code!=='23505')break;
  }
  if(result.error)return say('depMsg',result.error.message,true);
  confirmRequest('depMsg','Deposit request submitted and awaiting administrator review. Tracking code: '+code);
- $('depAmount').value='';
+ $('depAmount').value='';$('depAccountName').value='';
  await loadWallet();
  if(isAdmin())await adminDeposits();
 };
@@ -763,6 +777,15 @@ async function loadBankDetails(){
   $('editAccountNumber').value=data.account_number||'';
  }
 }
+$('copyPlatformAccount').onclick=async()=>{
+ const account=$('platformAccountNumber').textContent.trim();
+ if(!account)return say('copyAccountFeedback','Account number unavailable.',true);
+ try{
+  if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(account);}
+  else{const temp=document.createElement('textarea');temp.value=account;temp.setAttribute('readonly','');temp.style.position='fixed';temp.style.opacity='0';document.body.append(temp);temp.select();const copied=document.execCommand('copy');temp.remove();if(!copied)throw new Error('Copy unavailable');}
+  $('copyAccountFeedback').textContent='COPIED';
+ }catch(e){say('copyAccountFeedback','Unable to copy. Please copy manually.',true);}
+};
 $('saveBankDetails').onclick=async()=>{
  if(!isAdmin())return say('bankDetailsMsg','Administrator access required.',true);
  const bank_name=$('editBankName').value.trim();
@@ -936,23 +959,37 @@ $('stake').oninput=()=>{
 };
 $('cats').querySelector('[data-cat="All"]').classList.add('active');
 
+/* Resolve account names for admin request cards without exposing user UUIDs. */
+async function adminProfileNames(requests){
+ const ids=[...new Set((requests||[]).map(x=>x.user_id).filter(Boolean))];
+ if(!ids.length)return new Map();
+ const{data,error}=await supabase.from('profiles').select('id,full_name').in('id',ids);
+ if(error){console.warn('Could not load requester names:',error.message);return new Map();}
+ return new Map((data||[]).map(x=>[x.id,(x.full_name||'').trim()]));
+}
+function adminRequestDate(value){return value?new Date(value).toLocaleString():'Date unavailable';}
+
 /* Admin deposit review. RPC functions must be created and permission-checked in Supabase. */
 async function adminDeposits(){
  if(!isAdmin())return;
  const area=$('adminDeposits');
  area.textContent='Loading deposit requests...';
  const{data,error}=await supabase.from('deposit_requests')
-  .select('id,user_id,tracking_code,amount,provider_name,status,created_at')
+  .select('id,user_id,tracking_code,amount,provider_name,depositor_account_name,status,created_at')
   .eq('status','pending').order('created_at',{ascending:true}).limit(100);
  if(error){area.textContent='Unable to load requests: '+error.message;return;}
  area.innerHTML='';
  if(!data?.length){area.textContent='No pending deposit requests.';return;}
+ const names=await adminProfileNames(data);
  data.forEach(item=>{
   const row=document.createElement('div');row.className='admin-request';
   const info=document.createElement('div');
   info.innerHTML='<b>'+escapeHtml(money(item.amount))+'</b> · '+escapeHtml(item.provider_name||'Provider')+
-   '<br><small>'+escapeHtml(item.tracking_code||'No reference')+' · User: '+escapeHtml(item.user_id)+'</small>';
-  const status=document.createElement('span');status.className='status-pill';status.textContent='PENDING';
+   '<br><small>Depositor account name: '+escapeHtml(item.depositor_account_name||'Not provided')+
+   '<br>Reference: '+escapeHtml(item.tracking_code||'No reference')+
+   '<br>User: '+escapeHtml(names.get(item.user_id)||'Name unavailable')+
+   '<br>Date: '+escapeHtml(adminRequestDate(item.created_at))+'</small>';
+  const status=document.createElement('span');status.className='status-pill';status.textContent=String(item.status||'pending').toUpperCase();
   const actions=document.createElement('div');actions.className='row';
   const approve=document.createElement('button');approve.textContent='Approve';
   const reject=document.createElement('button');reject.textContent='Reject';reject.className='danger';
@@ -984,18 +1021,21 @@ async function adminWithdrawals(){
  const area=$('adminWithdrawals');
  area.textContent='Loading withdrawal requests...';
  const{data,error}=await supabase.from('withdrawal_requests')
-  .select('id,user_id,amount,bank_name,account_name,account_number,status,created_at')
+  .select('id,user_id,amount,bank_name,account_name,account_number,tracking_code,status,created_at')
   .eq('status','pending').order('created_at',{ascending:true}).limit(100);
  if(error){area.textContent='Unable to load requests: '+error.message;return;}
  area.innerHTML='';
  if(!data?.length){area.textContent='No pending withdrawal requests.';return;}
+ const names=await adminProfileNames(data);
  data.forEach(item=>{
   const row=document.createElement('div');row.className='admin-request';
   const info=document.createElement('div');
   info.innerHTML='<b>'+escapeHtml(money(item.amount))+'</b> · '+escapeHtml(item.bank_name||'Bank')+
-   '<br><small>'+escapeHtml(item.account_name||'')+' · '+escapeHtml(item.account_number||'')+
-   '<br>User: '+escapeHtml(item.user_id)+'</small>';
-  const status=document.createElement('span');status.className='status-pill';status.textContent='PENDING';
+   '<br><small>Account name: '+escapeHtml(item.account_name||'')+' · Account number: '+escapeHtml(item.account_number||'')+
+   '<br>Reference: '+escapeHtml(item.tracking_code||'No reference')+
+   '<br>User: '+escapeHtml(names.get(item.user_id)||'Name unavailable')+
+   '<br>Date: '+escapeHtml(adminRequestDate(item.created_at))+'</small>';
+  const status=document.createElement('span');status.className='status-pill';status.textContent=String(item.status||'pending').toUpperCase();
   const actions=document.createElement('div');actions.className='row';
   const approve=document.createElement('button');approve.textContent='Approve';
   const reject=document.createElement('button');reject.textContent='Reject';reject.className='danger';
@@ -1120,12 +1160,26 @@ async function loadWallet(){
    created_at:x.created_at
   });
  });
- if(!bets.error)(bets.data||[]).forEach(x=>{
-  const outcome=String(x.outcome||'').toLowerCase(),won=outcome==='won'||outcome==='win';
-  items.push({amount:won?(Number(x.payout)||0):(Number(x.bet_amount)||0),symbol:won?'+':'−',
-   label:won?'WON':'LOST',color:won?'green':'red',
-   description:(x.game_id||'Bet')+(won?' · Winnings':' · Stake lost'),created_at:x.created_at});
- });
+ if(!bets.error){
+  const now=Date.now(),cutoff=now-24*60*60*1000;let recentLosses=0;
+  (bets.data||[]).forEach(x=>{
+   const outcome=String(x.outcome||'').trim().toLowerCase();
+   const won=outcome==='won'||outcome==='win'||outcome.startsWith('win:');
+   const partial=outcome.startsWith('partial return:');
+   const loss=outcome==='lost'||outcome==='loss'||outcome.startsWith('loss:');
+   if(loss){const stamp=new Date(x.created_at||0).getTime();if(stamp>=cutoff&&stamp<=now){if(recentLosses>=10)return;recentLosses++;}}
+   const returned=Number(x.payout)||0;
+   if(partial){
+    items.push({amount:returned||Number(x.bet_amount)||0,symbol:returned?'+':'−',label:'PARTIAL RETURN',color:returned?'green':'red',description:(x.game_id||'Bet')+' · Partial return',created_at:x.created_at});
+   }else if(won){
+    items.push({amount:returned,symbol:'+',label:'WON',color:'green',description:(x.game_id||'Bet')+' · Winnings',created_at:x.created_at});
+   }else if(loss){
+    items.push({amount:Number(x.bet_amount)||0,symbol:'−',label:'LOST',color:'red',description:(x.game_id||'Bet')+' · Stake lost',created_at:x.created_at});
+   }else{
+    items.push({amount:Number(x.bet_amount)||0,symbol:'−',label:'BET',color:'red',description:(x.game_id||'Bet')+' · Stake',created_at:x.created_at});
+   }
+  });
+ }
  if(!ledger.error)(ledger.data||[]).forEach(x=>{
   const type=String(x.transaction_type||'').toLowerCase();
   if(type.includes('deposit')||type.includes('withdraw')||type.includes('bet')||type.includes('win')||type.includes('loss'))return;
