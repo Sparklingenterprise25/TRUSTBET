@@ -702,7 +702,9 @@ function say(id,message,isError=false){
  $(id).classList.toggle('error',isError);
 }
 function welcomeName(email){
- const local=String(email||'').split('@')[0].toLowerCase();
+ const value=String(email||'');
+ if(/^\+?\d{7,15}$/.test(value.replace(/\D/g,'')) && !value.includes('@'))return value.replace(/\D/g,'');
+ const local=value.split('@')[0].toLowerCase();
  if(local==='superhybridservices')return 'SUPER HYBRID';
  if(local==='sparklingenterprise25')return 'SPARKLING ENTERPRISE';
  const parts=local.split(/[._+-]/).map(part=>part.replace(/\d+$/,'')).filter(Boolean);
@@ -829,7 +831,7 @@ async function profileLoad(authUser){
  if(!data){say('authMsg','Login succeeded, but no profile record exists for this account. Please contact the site administrator.',true);return false;}
  user=authUser;profile={...data,virtual_balance:Number(data.virtual_balance||0),role:data.role||'user'};
  updateBalances(data.virtual_balance);
- $('welcome').textContent='WELCOME, '+welcomeName(data.full_name||data.email||authUser.email||authUser.phone||'USER');
+ $('welcome').textContent='WELCOME, '+welcomeName(authUser.phone||data.phone||data.full_name||data.email||authUser.email||'USER');
  $('accountEmail').textContent=maskEmail(data.email||authUser.email||authUser.phone||'');
  $('auth').classList.add('hidden');
  $('app').classList.remove('hidden');
@@ -953,7 +955,7 @@ $('depositBtn').onclick=async()=>{
  let total;
  try{total=await dailyRequestTotal('deposit_requests');}
  catch(e){return say('depMsg','Could not verify today’s deposit total. Please try again.',true);}
- if(total+amount>50000000)return say('depMsg','Daily deposit limit is ₦500,000. Remaining today: '+money(Math.max(0,5000000-total)),true);
+ if(total+amount>5000000)return say('depMsg','Daily deposit limit is ₦5,000,000. Remaining today: '+money(Math.max(0,5000000-total)),true);
  let result,code;
  for(let i=0;i<5;i++){
   code=tracking();
@@ -1021,7 +1023,7 @@ $('withdrawBtn').onclick=async()=>{
  let total;
  try{total=await dailyRequestTotal('withdrawal_requests');}
  catch(e){return say('wdMsg','Could not verify today’s withdrawal total. Please try again.',true);}
- if(total+amount>5000000)return say('wdMsg','Daily withdrawal limit is ₦1,000,000. Remaining today: '+money(Math.max(0,5000000-total)),true);
+ if(total+amount>5000000)return say('wdMsg','Daily withdrawal limit is ₦5,000,000. Remaining today: '+money(Math.max(0,5000000-total)),true);
  if(!bank_name||!account_name||!/^\d{10}$/.test(account_number))
   return say('wdMsg','Enter all bank details and a valid 10-digit account number.',true);
  const{error}=await supabase.from('withdrawal_requests').insert({
