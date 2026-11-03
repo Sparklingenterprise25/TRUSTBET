@@ -432,8 +432,8 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
      <div class="deposit-instruction">After making your transfer to the TRUSTBET account above, return to this page, scroll down, enter the amount transferred and the account name used for the transfer, then click SUBMIT.</div>
     </div>
     <p class="muted">Submit a deposit request. Your wallet will be credited shortly.</p>
-    <label>SELECT BANK / FINANCIAL PROVIDER</label>
-    <select id="depProvider"><option value="">SELECT BANK / FINANCIAL PROVIDER</option></select>
+    <label>Select bank / provider</label>
+    <select id="depProvider"><option value="">Select bank / provider</option></select>
     <label>Amount (Min ₦500 – Max₦500,000 daily limit)</label>
     <input id="depAmount" type="number" min="500" max="500000" step="1" placeholder="Enter deposit amount">
     <label>Your actual bank account name</label>
@@ -449,7 +449,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
    <h2>Withdraw Naira</h2>
    <p class="muted withdrawal-limits"><span>Minimum withdrawal: ₦50,000 per day</span><span>Maximum withdrawal: ₦1,000,000 per day</span></p>
    <label>Amount (₦50,000–₦1,000,000 daily limit)</label><input id="wdAmount" type="number" min="50000" max="1000000" step="1" placeholder="Enter withdrawal amount">
-   <label>SELECT BANK / FINANCIAL PROVIDER</label><select id="bank"><option value="">SELECT BANK / FINANCIAL PROVIDER</option></select>
+   <label>Select bank / provider</label><select id="bank"><option value="">Select bank / provider</option></select>
    <label>Account name</label><input id="accName" placeholder="Enter account name">
    <label>Account number</label><input id="accNo" inputmode="numeric" maxlength="10" placeholder="10-digit account number">
    <button id="withdrawBtn" class="wide">Submit withdrawal request</button>
@@ -558,12 +558,13 @@ const providers=[
 'ACCESS BANK PLC',
 'ACCION MFB ( accion microfinance bank limited )',
 'ADDOSSER MFB ( addosser microfinance bank limited )',
-'AUCHI POLY MFB ( auchi poly microfinance bank )',
 'ALPHA MORGAN BANK LIMITED',
 'ALTERNATIVE BANK ( the alternative bank limited )',
-'BAOBAB MFB ( baobab microfinance bank nigeria limited )',
+'ANIOMA MFB ( anioma microfinance bank )',
+'AUCHI POLY MFB ( auchi poly microfinance bank )',
 'BANK OF AGRICULTURE',
 'BANK OF INDUSTRY',
+'BAOBAB MFB ( baobab microfinance bank nigeria limited )',
 'BOSAK MFB',
 'BRANCH',
 'CARBON MFB ( carbon microfinance bank limited )',
@@ -575,30 +576,30 @@ const providers=[
 'DEVELOPMENT BANK OF NIGERIA',
 'ECOBANK NIGERIA LIMITED',
 'FAIRMONEY MFB ( fairmoney microfinance bank limited )',
+'FEDERAL MORTGAGE BANK OF NIGERIA',
 'FIDELITY BANK PLC',
 'FIRST BANK OF NIGERIA LIMITED',
 'FIRST CITY MONUMENT BANK PLC',
 'FLUTTERWAVE',
 'FUTURE GROWTH MFB',
-'FEDERAL MORTGAGE BANK OF NIGERIA',
-'GAPBRIDGE MFB',
 'GAINS MFB',
+'GAMAWA MFB',
+'GAPBRIDGE MFB',
 'GAREWA MFB',
 'GARKI MFB',
 'GARU MFB',
 'GASHUA MFB',
-'GAMAWA MFB',
 'GATEWAY MORTGAGE BANK LIMITED',
 'GBOKO MFB',
 'GFB MFB',
-'GIDEON TRUST MFB',
 'GIDAUNIYA ALHERI MFB',
+'GIDEON TRUST MFB',
 'GIREI MFB',
 'GIWA MFB',
 'GLOBUS BANK LIMITED',
 'GOLD MFB',
 'GROOMING MFB',
-'GTBANK PLC',
+'GTBANK ( guaranty trust bank plc )',
 'HASAL MFB ( hasal microfinance bank limited )',
 'HOPE PSB ( hope payment service bank limited )',
 'IMODI-IMOSAN MFB ( imodi-imosan micro finance bank )',
@@ -609,14 +610,14 @@ const providers=[
 'LOTUS BANK LIMITED',
 'MAINSTREET MFB ( mainstreet microfinance bank limited )',
 'MINT MFB',
+'MOMO PSB ( momo payment service bank limited )',
 'MONEYMASTER PSB ( moneymaster payment service bank limited )',
 'MONIEPOINT MFB ( moniepoint microfinance bank )',
-'MOMO PSB ( momo payment service bank limited )',
 'NEXIM BANK',
 'NIRSAL MFB ( nirsal microfinance bank limited )',
-'NPF MFB',
-'NOWNOW ( nownow digital microfinance bank )',
 'NOVA COMMERCIAL BANK LIMITED',
+'NOWNOW ( nownow digital microfinance bank )',
+'NPF MFB',
 'OPAY ( opay microfinance bank limited )',
 'OPTIMUS BANK LIMITED',
 'PAGA ( pagatech limited )',
@@ -644,8 +645,8 @@ const providers=[
 'TAJBANK LIMITED',
 'TATUM BANK LIMITED',
 'TITAN TRUST BANK LIMITED',
+'UBA BANK ( United bank of Africa plc )',
 'UNION BANK OF NIGERIA PLC',
-'UNITED BANK FOR AFRICA PLC',
 'UNITY BANK PLC',
 'VFD MFB ( vfd microfinance bank limited )',
 'WEMA BANK PLC',
@@ -687,7 +688,7 @@ function confirmRequest(id,message){
 function banks(){
  [['depProvider'],['bank']].forEach(([id])=>{
   const select=$(id), selected=select.value;
-  select.innerHTML='<option value="">SELECT BANK / FINANCIAL PROVIDER</option>';
+  select.innerHTML='<option value="">Select bank / provider</option>';
   providers.forEach(name=>{const option=document.createElement('option');option.value=name;option.textContent=name;select.append(option);});
   if(selected && providers.includes(selected))select.value=selected;
  });
@@ -696,7 +697,7 @@ function banks(){
 function setupBankPicker(id){
  const select=$(id), wrap=document.createElement('div');wrap.className='bank-picker';
  select.parentNode.insertBefore(wrap,select);wrap.append(select);
- const trigger=document.createElement('button');trigger.type='button';trigger.className='bank-picker-trigger';trigger.textContent='SELECT BANK / FINANCIAL PROVIDER ▾';
+ const trigger=document.createElement('button');trigger.type='button';trigger.className='bank-picker-trigger';trigger.textContent='Select bank / provider ▾';
  const panel=document.createElement('div');panel.className='bank-picker-panel';
  const search=document.createElement('input');search.type='search';search.className='bank-picker-search';search.placeholder='Search bank/provider';search.setAttribute('aria-label','Search bank/provider');search.autocomplete='off';
  const options=document.createElement('div');options.className='bank-picker-options';panel.append(search,options);wrap.append(trigger,panel);
@@ -704,7 +705,7 @@ function setupBankPicker(id){
  trigger.addEventListener('click',()=>{wrap.classList.toggle('open');if(wrap.classList.contains('open')){renderOptions();search.focus();}});
  search.addEventListener('input',renderOptions);
  document.addEventListener('click',e=>{if(!wrap.contains(e.target))wrap.classList.remove('open');});
- select.addEventListener('change',()=>{trigger.textContent=(select.selectedOptions[0]?.textContent||'SELECT BANK / FINANCIAL PROVIDER')+' ▾';});
+ select.addEventListener('change',()=>{trigger.textContent=(select.selectedOptions[0]?.textContent||'Select bank / provider')+' ▾';});
  renderOptions();
 }
 setupBankPicker('depProvider');setupBankPicker('bank');
