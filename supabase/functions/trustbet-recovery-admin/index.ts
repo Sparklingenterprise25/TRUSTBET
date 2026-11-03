@@ -74,6 +74,7 @@ Deno.serve(async(req:Request)=>{
    }
    if(!inserted)return reply({error:"Could not allocate a unique recovery-code slot. Please retry."},409);
   }
+ }
  const {data:all,error:readError}=await (body.action==="list"
   ?admin.from("account_recovery_codes").select("id,user_id,code_hash,code_ciphertext,created_at,used_at").order("created_at",{ascending:true})
   :admin.from("account_recovery_codes").select("id,user_id,code_hash,code_ciphertext,created_at,used_at").eq("user_id",body.userId!).order("created_at",{ascending:true}));
