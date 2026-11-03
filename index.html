@@ -152,7 +152,7 @@ footer{text-align:center;padding:24px 24px 90px;color:var(--muted);font-size:12p
 .deposit-layout{display:grid;grid-template-columns:1fr;gap:13px}
 .deposit-form-card{position:relative;padding:15px 17px;margin-bottom:0}
 .deposit-form-card input,.deposit-form-card select{padding:10px 12px;margin:4px 0 9px}
-@media(max-width:600px){.deposit-instruction{right:2%;top:-65px;width:58%;height:52.5px;min-height:52.5px;font-size:7px;line-height:1.05;padding:4px 6px}.deposit-instruction-arrow{display:none!important}}
+@media(max-width:600px){.deposit-instruction{right:2%;top:15px;width:58%;height:52.5px;min-height:52.5px;font-size:7px;line-height:1.05;padding:4px 6px}.deposit-instruction-arrow{display:none!important}}
 .bank-details-card{position:relative;background:linear-gradient(145deg,#0b2144,#102d59 65%,#174b88);color:#fff;border:1px solid #24558c;border-radius:16px;padding:17px}
 .deposit-instruction{position:absolute;z-index:5;right:2%;top:-65px;width:min(58%,520px);height:52.5px;min-height:52.5px;padding:4px 6px;background:#d71920;color:#fff;border:2px solid #b51219;border-radius:10px;box-shadow:0 5px 15px #0003;font-size:7px;font-weight:800;line-height:1.05;text-align:center;display:flex;align-items:center;justify-content:center}
 .deposit-instruction-arrow{display:none!important}
@@ -340,7 +340,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
  <section id="home">
   <div class="balance-card">
    <div class="home-wallet-heading">
-    <span class="home-wallet-icon" aria-hidden="true">👛</span>
+    <span class="home-wallet-icon" aria-hidden="true">💰</span>
     <strong>NAIRA BALANCE</strong>
    </div>
    <div class="home-wallet-main">
@@ -1008,7 +1008,7 @@ function showAdminReceipt(kind,item,decision,reason=''){
   const wrap=(text,max,font)=>{ctx.font=font;const words=String(text).split(/\s+/);const out=[];let line='';for(const word of words){const test=line?line+' '+word:word;if(ctx.measureText(test).width>max&&line){out.push(line);line=word;}else line=test;}if(line)out.push(line);return out.length?out:[''];};
   const rendered=lines.map(([k,v])=>({k:String(k),v:wrap(v,valueWidth,'bold 25px Arial')}));
   let contentHeight=0;rendered.forEach(r=>contentHeight+=Math.max(1,r.v.length)*lineGap+rowGap);
-  const height=330+contentHeight+170;canvas.width=width;canvas.height=height;
+  const height=390+contentHeight;canvas.width=width;canvas.height=height;
   ctx.fillStyle='#eef3f9';ctx.fillRect(0,0,width,height);
   ctx.fillStyle='#102d59';ctx.fillRect(0,0,width,220);
   ctx.fillStyle='#ffffff';ctx.textAlign='center';ctx.font='bold 54px Arial';ctx.fillText('TRUSTBET',width/2,88);
@@ -1024,9 +1024,6 @@ function showAdminReceipt(kind,item,decision,reason=''){
     ctx.fillStyle='#172b4d';ctx.font='bold 25px Arial';r.v.forEach((line,i)=>ctx.fillText(line,width-pad-valueWidth,y+i*lineGap));
     y+=rowHeight+rowGap;
   });
-  const footerY=height-112;ctx.fillStyle='#102d59';ctx.fillRect(0,footerY,width,112);
-  ctx.textAlign='center';ctx.fillStyle='#ffffff';ctx.font='bold 20px Arial';ctx.fillText('TRUSTBET  •  SECURE TRANSACTION RECORD',width/2,footerY+43);
-  ctx.fillStyle='#dceaff';ctx.font='17px Arial';ctx.fillText('Keep this receipt for your records. Verify transaction details before relying on it.',width/2,footerY+76);
   const link=document.createElement('a');link.download='TRUSTBET-'+kind+'-'+status.toLowerCase()+'.png';link.href=canvas.toDataURL('image/png');link.click();
  };
 }
@@ -1215,7 +1212,7 @@ function addWalletItem(container,item){
 function downloadUserWithdrawalReceipt(data){
  if(!data || String(data.status||'').toLowerCase()!=='approved')return;
  const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
- const width=1100,height=1420;canvas.width=width;canvas.height=height;
+ const width=1100,height=1320;canvas.width=width;canvas.height=height;
  ctx.fillStyle='#eef3f9';ctx.fillRect(0,0,width,height);
  ctx.fillStyle='#102d59';ctx.fillRect(0,0,width,245);
  ctx.fillStyle='#ffffff';ctx.textAlign='center';ctx.font='bold 66px Arial';ctx.fillText('TRUSTBET',width/2,94);
@@ -1244,10 +1241,6 @@ function downloadUserWithdrawalReceipt(data){
   ctx.fillStyle='#172b4d';ctx.font='bold 27px Arial';parts.forEach((part,i)=>ctx.fillText(part,475,y+i*36));
   y+=rowHeight+12;
  });
- ctx.fillStyle='#102d59';ctx.fillRect(0,1320,width,100);
- ctx.textAlign='center';ctx.fillStyle='#ffffff';ctx.font='bold 21px Arial';
- ctx.fillText('TRUSTBET  •  SECURE WITHDRAWAL RECORD',width/2,1360);
- ctx.fillStyle='#dceaff';ctx.font='17px Arial';ctx.fillText('This receipt confirms approval of the withdrawal request. Please retain it for your records.',width/2,1390);
  const link=document.createElement('a');link.download='TRUSTBET-withdrawal-receipt-'+(data.reference||'approved')+'.png';
  link.href=canvas.toDataURL('image/png');link.click();
 }
