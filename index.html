@@ -1150,6 +1150,31 @@ function showAdminReceipt(kind,item,decision,reason=''){
  };
 }
 
+/* Two-step typed approval for deposit and withdrawal decisions. */
+function confirmAdminDecision(kind,decision){
+ if(!isAdmin())return Promise.resolve(false);
+ const word=decision.toUpperCase();
+ if(!confirm('First confirmation: '+word+' this '+kind+' request?'))return Promise.resolve(false);
+ return new Promise(resolve=>{
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;z-index:2100;background:#071a36d9;display:flex;align-items:center;justify-content:center;padding:18px';
+  const panel=document.createElement('div');
+  panel.style.cssText='width:min(100%,380px);background:#fff;color:#172b4d;border-radius:14px;padding:20px;box-shadow:0 18px 50px #0005';
+  const heading=document.createElement('h3');heading.textContent='Final '+kind+' confirmation';
+  const message=document.createElement('p');message.textContent='Type '+word+' exactly to '+decision+' this '+kind+' request.';
+  const field=document.createElement('input');field.type='text';field.placeholder='Type '+word;field.autocomplete='off';field.autocapitalize='characters';field.spellcheck=false;field.style.cssText='width:100%;padding:13px;border:1px solid #d8e2ef;border-radius:10px;font:inherit;margin:8px 0 14px';
+  const buttons=document.createElement('div');buttons.style.cssText='display:flex;gap:9px';
+  const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Cancel';cancel.className='secondary';cancel.style.flex='1';
+  const proceed=document.createElement('button');proceed.type='button';proceed.textContent=word;proceed.className=decision==='reject'?'danger':'';proceed.style.flex='1';
+  const close=value=>{overlay.remove();resolve(value);};
+  cancel.onclick=()=>close(false);
+  proceed.onclick=()=>{if(field.value.trim()!==word){alert('Type '+word+' exactly.');field.focus();return;}close(true);};
+  overlay.onclick=e=>{if(e.target===overlay)close(false);};
+  field.addEventListener('keydown',e=>{if(e.key==='Enter')proceed.click();});
+  buttons.append(cancel,proceed);panel.append(heading,message,field,buttons);overlay.append(panel);document.body.append(overlay);field.focus();
+ });
+}
+
 /* Admin deposit review. RPC functions must be created and permission-checked in Supabase. */
 async function adminDeposits(){
  if(!isAdmin())return;
@@ -1183,7 +1208,7 @@ async function adminDeposits(){
 }
 async function reviewDeposit(id,decision,approveButton,rejectButton){
  if(!isAdmin())return alert('Administrator access required.');
- if(!confirm((decision==='approve'?'Approve':'Reject')+' this deposit request?'))return;
+ if(!await confirmAdminDecision('deposit',decision))return;
  approveButton.disabled=true;rejectButton.disabled=true;
  const rpc=decision==='approve'?'approve_deposit':'reject_deposit';
  const args=decision==='approve'?{p_request_id:id}:{p_request_id:id,p_reason:'Payment could not be verified.'};
@@ -1233,9 +1258,8 @@ async function adminWithdrawals(){
 }
 async function reviewWithdrawal(id,decision,approveButton,rejectButton){
  if(!isAdmin())return alert('Administrator access required.');
- if(!confirm((decision==='approve'?'Approve':'Reject')+' this withdrawal request?'))return;
- let reason='';
- if(decision==='reject'){reason=prompt('Reason for rejection:','Withdrawal could not be processed.');if(reason===null)return;if(!reason.trim())return alert('A rejection reason is required.');}
+ if(!await confirmAdminDecision('withdrawal',decision))return;
+ const reason=decision==='reject'?'Withdrawal could not be processed.':'';
  approveButton.disabled=true;rejectButton.disabled=true;
  const rpc=decision==='approve'?'approve_withdrawal':'reject_withdrawal';
  const args=decision==='approve'?{p_request_id:id}:{p_request_id:id,p_reason:reason.trim()};
