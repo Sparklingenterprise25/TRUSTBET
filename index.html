@@ -492,6 +492,9 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
      <div id="adminWithdrawals"></div>
     </div>
     <div class="admin-section">
+     <h3>Phone Registrations Awaiting Approval</h3>
+     <button id="refreshPhoneApprovals" class="secondary">Refresh phone registrations</button>
+     <div id="phoneApprovals" aria-live="polite"></div>
      <h3>Registered Users</h3>
      <input id="adminUserSearch" type="search" placeholder="Search users by name or email" aria-label="Search registered users">
      <button id="refreshAdminUsers" class="secondary">Refresh users</button>
@@ -834,7 +837,7 @@ async function profileLoad(authUser){
  banks();render();renderHome();exStatus();updateLockNotice();
  go('home');
  await loadBankDetails();
- if(isAdmin()){await adminDeposits();await adminWithdrawals();await adminUsers();}
+ if(isAdmin()){await adminDeposits();await adminWithdrawals();await adminUsers();await adminPhoneApprovals();}
  await adminInbox();
  await loadNotifications();
  subscribeNotifications();
@@ -893,12 +896,15 @@ $('phoneLogin').onclick=async()=>{
 $('phoneSignup').onclick=async()=>{
  try{
   const phone=fullPhoneNumber(),password=$('phonePassword').value;
-  if(password.length<8)return say('authMsg','Password must contain at least 8 characters.',true);
-  const{data,error}=await supabase.auth.signUp({phone,password});
+  if(!/^\\d{8,}$/.test(password))return say('authMsg','Phone password must contain only numbers and be at least 8 digits.',true);
+  const{error}=await supabase.auth.signUp({phone,password});
   if(error)return say('authMsg',error.message,true);
-  if(data.session&&data.user){await profileLoad(data.user);return;}
-  $('phoneOtpBox').classList.remove('hidden');
-  say('authMsg','Enter the six-digit code sent by SMS to '+phone+'.');
+  $('phoneOtpBox').classList.add('hidden');
+  $('authMsg').innerHTML='';
+  const success=document.createElement('div');
+  success.style.cssText='color:#008000;font-weight:900;white-space:pre-line';
+  success.textContent='REGISTRATION SUBMITTED SUCCESSFULLY!\\nYour account registration has been received and is awaiting approval.\\nApproval may take between 30mins - 7 hours. Please check back later.\\nYou will be able to log in once your account has been approved. Save the password you entered in a safe place so you can be able to log in next time.\\nThank you for choosing TRUSTBET.';
+  $('authMsg').append(success);
  }catch(error){say('authMsg',error.message||'Phone sign-up failed.',true);}
 };
 $('phoneVerify').onclick=async()=>{
@@ -1415,6 +1421,72 @@ async function adminUsers(){
 }
 $('refreshAdminUsers').onclick=adminUsers;
 $('adminUserSearch').addEventListener('input',renderAdminUsers);
+
+/* Admin phone registration approval */
+async function phoneAdminAction(action,userId){
+ if(!isAdmin())throw new Error('Administrator access required.');
+ const {data,error}=await supabase.functions.invoke('trustbet-phone-admin',{body:{action,userId}});
+ if(error)throw error;
+ if(data?.error)throw new Error(data.error);
+ return data;
+}
+async function confirmPhoneDecision(id,decision){
+ if(!confirm('Are you sure you want to '+decision.toUpperCase()+' this phone registration?'))return false;
+ return await new Promise(resolve=>{
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;z-index:2100;background:#071a36d9;display:flex;align-items:center;justify-content:center;padding:18px';
+  const panel=document.createElement('div');
+  panel.style.cssText='width:min(100%,380px);background:#fff;color:#172b4d;border-radius:14px;padding:20px;box-shadow:0 18px 50px #0005';
+  const heading=document.createElement('h3');heading.textContent='Confirm '+decision.toUpperCase();
+  const message=document.createElement('p');message.textContent='Type '+decision.toUpperCase()+' exactly to continue.';
+  const field=document.createElement('input');field.type='text';field.placeholder=decision.toUpperCase();field.autocomplete='off';field.autocapitalize='characters';
+  const actions=document.createElement('div');actions.className='row';
+  const cancel=document.createElement('button');cancel.type='button';cancel.className='secondary';cancel.textContent='Cancel';
+  const proceed=document.createElement('button');proceed.type='button';proceed.textContent='Confirm';
+  const close=value=>{overlay.remove();resolve(value);};
+  cancel.onclick=()=>close(false);proceed.onclick=()=>close(field.value===decision.toUpperCase());
+  overlay.onclick=e=>{if(e.target===overlay)close(false);};
+  actions.append(cancel,proceed);panel.append(heading,message,field,actions);overlay.append(panel);document.body.append(overlay);field.focus();
+ });
+}
+async function adminPhoneApprovals(){
+ if(!isAdmin())return;
+ const area=$('phoneApprovals');if(!area)return;
+ area.textContent='Loading phone registrations...';
+ const button=$('refreshPhoneApprovals');if(button)button.disabled=true;
+ try{
+  const result=await phoneAdminAction('list');
+  const pending=(result.accounts||[]).filter(x=>x.account_approval_status==='pending');
+  area.innerHTML='';
+  if(!pending.length){area.textContent='No phone registrations are awaiting approval.';return;}
+  pending.forEach(item=>{
+   const row=document.createElement('div');row.className='admin-request';
+   const info=document.createElement('div');
+   const name=document.createElement('b');name.textContent=item.full_name||'Name not provided';
+   const detail=document.createElement('small');detail.style.display='block';
+   detail.textContent=(item.phone||'Phone unavailable')+' · Submitted: '+(item.account_approval_requested_at?new Date(item.account_approval_requested_at).toLocaleString():'Unknown');
+   info.append(name,detail);
+   const actions=document.createElement('div');actions.className='row';
+   const approve=document.createElement('button');approve.textContent='Approve';
+   const reject=document.createElement('button');reject.textContent='Reject';reject.className='danger';
+   approve.onclick=async()=>{
+    if(!await confirmPhoneDecision(item.id,'approve'))return;
+    approve.disabled=true;reject.disabled=true;
+    try{const result=await phoneAdminAction('approve',item.id);await adminPhoneApprovals();await adminUsers();alert(result.result?.bonus_credited?'Account approved. ₦9,000 welcome bonus credited.':'Account approved.');}
+    catch(error){alert('Approval failed: '+(error.message||error));approve.disabled=false;reject.disabled=false;}
+   };
+   reject.onclick=async()=>{
+    if(!await confirmPhoneDecision(item.id,'reject'))return;
+    approve.disabled=true;reject.disabled=true;
+    try{await phoneAdminAction('reject',item.id);await adminPhoneApprovals();alert('Phone registration rejected.');}
+    catch(error){alert('Rejection failed: '+(error.message||error));approve.disabled=false;reject.disabled=false;}
+   };
+   actions.append(approve,reject);row.append(info,actions);area.append(row);
+  });
+ }catch(error){area.textContent='Unable to load phone registrations: '+(error.message||error);}
+ finally{if(button)button.disabled=false;}
+}
+$('refreshPhoneApprovals').onclick=adminPhoneApprovals;
 
 /* Notifications */
 $('closeNotifications').onclick=()=>$('notificationPanel').classList.add('hidden');
