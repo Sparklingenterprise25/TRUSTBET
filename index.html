@@ -8,7 +8,9 @@
 <style>
 :root{--navy:#102d59;--blue:#2475d0;--pale:#edf3fb;--bg:#f3f6fb;--ink:#172b4d;--muted:#78869c;--line:#e3e9f2;--red:#c43d4b;--green:#12a875;--gold:#c7a34b;--shadow:0 10px 30px rgba(16,45,89,.075)}
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;overflow-y:auto;-webkit-overflow-scrolling:touch}
+body{min-height:100%;overflow-y:auto;touch-action:pan-y}
+#wallet{min-height:calc(100vh - 150px);overflow:visible;touch-action:pan-y}
 body{margin:0;background:radial-gradient(ellipse at 10% 0%,#e7eef9 0,transparent 36%),var(--bg);color:var(--ink);font:15px Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;letter-spacing:.05px}
 header{background:linear-gradient(115deg,#0b2144,#102d59 58%,#174b88);color:#fff;padding:14px max(5%,calc((100% - 1100px)/2));display:flex;align-items:center;justify-content:space-between;gap:14px;position:sticky;top:0;z-index:20;box-shadow:0 8px 24px #102d5930;border-bottom:1px solid #ffffff18}
 .brand{font-size:25px;font-weight:900;letter-spacing:1.2px;text-shadow:0 2px 12px #0005}.brand span{color:#8fc2ff}
@@ -324,7 +326,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
    <option value="+234" selected>+234 🇳🇬 Nigeria</option>
    <option value="+213">+213 🇩🇿 Algeria</option><option value="+244">+244 🇦🇴 Angola</option><option value="+229">+229 🇧🇯 Benin</option><option value="+267">+267 🇧🇼 Botswana</option><option value="+226">+226 🇧🇫 Burkina Faso</option><option value="+257">+257 🇧🇮 Burundi</option><option value="+238">+238 🇨🇻 Cabo Verde</option><option value="+237">+237 🇨🇲 Cameroon</option><option value="+236">+236 🇨🇫 Central African Republic</option><option value="+235">+235 🇹🇩 Chad</option><option value="+269">+269 🇰🇲 Comoros</option><option value="+242">+242 🇨🇬 Republic of the Congo</option><option value="+243">+243 🇨🇩 DR Congo</option><option value="+225">+225 🇨🇮 Côte d’Ivoire</option><option value="+253">+253 🇩🇯 Djibouti</option><option value="+20">+20 🇪🇬 Egypt</option><option value="+240">+240 🇬🇶 Equatorial Guinea</option><option value="+291">+291 🇪🇷 Eritrea</option><option value="+268">+268 🇸🇿 Eswatini</option><option value="+251">+251 🇪🇹 Ethiopia</option><option value="+241">+241 🇬🇦 Gabon</option><option value="+220">+220 🇬🇲 Gambia</option><option value="+233">+233 🇬🇭 Ghana</option><option value="+224">+224 🇬🇳 Guinea</option><option value="+245">+245 🇬🇼 Guinea-Bissau</option><option value="+254">+254 🇰🇪 Kenya</option><option value="+266">+266 🇱🇸 Lesotho</option><option value="+231">+231 🇱🇷 Liberia</option><option value="+218">+218 🇱🇾 Libya</option><option value="+261">+261 🇲🇬 Madagascar</option><option value="+265">+265 🇲🇼 Malawi</option><option value="+223">+223 🇲🇱 Mali</option><option value="+222">+222 🇲🇷 Mauritania</option><option value="+230">+230 🇲🇺 Mauritius</option><option value="+212">+212 🇲🇦 Morocco</option><option value="+258">+258 🇲🇿 Mozambique</option><option value="+264">+264 🇳🇦 Namibia</option><option value="+227">+227 🇳🇪 Niger</option><option value="+250">+250 🇷🇼 Rwanda</option><option value="+239">+239 🇸🇹 São Tomé and Príncipe</option><option value="+221">+221 🇸🇳 Senegal</option><option value="+248">+248 🇸🇨 Seychelles</option><option value="+232">+232 🇸🇱 Sierra Leone</option><option value="+252">+252 🇸🇴 Somalia</option><option value="+27">+27 🇿🇦 South Africa</option><option value="+211">+211 🇸🇸 South Sudan</option><option value="+249">+249 🇸🇩 Sudan</option><option value="+255">+255 🇹🇿 Tanzania</option><option value="+228">+228 🇹🇬 Togo</option><option value="+216">+216 🇹🇳 Tunisia</option><option value="+256">+256 🇺🇬 Uganda</option><option value="+260">+260 🇿🇲 Zambia</option><option value="+263">+263 🇿🇼 Zimbabwe</option>
   </select>
-  <label>Phone number</label><input id="phoneNumber" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="07063593605">
+  <label>Phone number</label><input id="phoneNumber" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="000 0000 0000">
   <label>Password</label><input id="phonePassword" type="password" autocomplete="current-password">
   <div class="row"><button id="phoneLogin">Sign in</button><button id="phoneSignup" class="secondary">Create account</button></div>
   <div id="phoneOtpBox" class="hidden">
@@ -451,8 +453,8 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
     <p class="muted">Submit a deposit request. Your wallet will be credited shortly.</p>
     <label>Select bank / provider</label>
     <select id="depProvider"><option value="">Select bank / provider</option></select>
-    <label>Amount (Min ₦500 – Max₦500,000 daily limit)</label>
-    <input id="depAmount" type="number" min="500" max="500000" step="1" placeholder="Enter deposit amount">
+    <label>Amount (Min ₦500 – Max₦5,000,000 daily limit)</label>
+    <input id="depAmount" type="number" min="500" max="5000000" step="1" placeholder="Enter deposit amount">
     <label>Your actual bank account name</label>
     <input id="depAccountName" type="text" maxlength="120" autocomplete="name" placeholder="Enter the account name used for the transfer">
     <button id="depositBtn" class="wide">Submit deposit request</button>
@@ -464,8 +466,8 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
  <section id="withdraw" class="hidden">
   <div class="card">
    <h2>Withdraw Naira</h2>
-   <p class="muted withdrawal-limits"><span>Minimum withdrawal: ₦50,000 per day</span><span>Maximum withdrawal: ₦1,000,000 per day</span></p>
-   <label>Amount (₦50,000–₦1,000,000 daily limit)</label><input id="wdAmount" type="number" min="50000" max="1000000" step="1" placeholder="Enter withdrawal amount">
+   <p class="muted withdrawal-limits"><span>Minimum withdrawal: ₦20,000 per day</span><span>Maximum withdrawal: ₦5,000,000 per day</span></p>
+   <label>Amount (₦20,000–₦5,000,000 daily limit)</label><input id="wdAmount" type="number" min="20000" max="5000000" step="1" placeholder="Enter withdrawal amount">
    <label>Select bank / provider</label><select id="bank"><option value="">Select bank / provider</option></select>
    <label>Account name</label><input id="accName" placeholder="Enter account name">
    <label>Account number</label><input id="accNo" inputmode="numeric" maxlength="10" placeholder="10-digit account number">
@@ -874,6 +876,7 @@ $('resend').onclick=async()=>{
 };
 $('emailMode').onclick=()=>{$('emailAuth').classList.remove('hidden');$('phoneAuth').classList.add('hidden');$('emailMode').classList.remove('secondary');$('phoneMode').classList.add('secondary');};
 $('phoneMode').onclick=()=>{$('phoneAuth').classList.remove('hidden');$('emailAuth').classList.add('hidden');$('phoneMode').classList.remove('secondary');$('emailMode').classList.add('secondary');};
+$('phoneNumber').addEventListener('input',()=>{const digits=$('phoneNumber').value.replace(/\D/g,'').slice(0,11);$('phoneNumber').value=digits.replace(/^(\d{3})(\d{0,4})(\d{0,4}).*$/,(_,a,b,c)=>[a,b,c].filter(Boolean).join(' '));});
 function fullPhoneNumber(){
  const code=$('phoneCountry').value;
  let digits=$('phoneNumber').value.replace(/\D/g,'');
@@ -896,7 +899,7 @@ $('phoneLogin').onclick=async()=>{
 $('phoneSignup').onclick=async()=>{
  try{
   const phone=fullPhoneNumber(),password=$('phonePassword').value;
-  if(!/^\d{8,}$/.test(password))return say('authMsg','Phone password must contain only numbers and be at least 8 digits.',true);
+  if(!/^\d{8,}$/.test(password))return say('authMsg','Password must contain only numbers and be at least 8 digits. (Example: 12345678)',true);
   const{data,error}=await supabase.functions.invoke('trustbet-phone-signup',{body:{phone,password}});
   if(error)return say('authMsg',error.message||'Phone registration failed.',true);
   if(data?.error)return say('authMsg',data.error,true);
@@ -946,11 +949,11 @@ $('depositBtn').onclick=async()=>{
  if(!provider_name)return say('depMsg','Select a bank or payment provider.',true);
  if(!depositor_account_name)return say('depMsg','Enter the actual account name used for the transfer.',true);
  if(!Number.isSafeInteger(amount)||amount<500)return say('depMsg','Minimum deposit is ₦500.',true);
- if(amount>500000)return say('depMsg','Maximum deposit per day is ₦500,000.',true);
+ if(amount>5000000)return say('depMsg','Maximum deposit per day is ₦5,000,000.',true);
  let total;
  try{total=await dailyRequestTotal('deposit_requests');}
  catch(e){return say('depMsg','Could not verify today’s deposit total. Please try again.',true);}
- if(total+amount>500000)return say('depMsg','Daily deposit limit is ₦500,000. Remaining today: '+money(Math.max(0,500000-total)),true);
+ if(total+amount>50000000)return say('depMsg','Daily deposit limit is ₦500,000. Remaining today: '+money(Math.max(0,5000000-total)),true);
  let result,code;
  for(let i=0;i<5;i++){
   code=tracking();
@@ -1013,12 +1016,12 @@ $('saveBankDetails').onclick=async()=>{
 $('withdrawBtn').onclick=async()=>{
  const amount=Number($('wdAmount').value),bank_name=$('bank').value;
  const account_name=$('accName').value.trim(),account_number=$('accNo').value.trim();
- if(!Number.isSafeInteger(amount)||amount<50000)return say('wdMsg','Minimum withdrawal is ₦50,000.',true);
- if(amount>1000000)return say('wdMsg','Maximum withdrawal per day is ₦1,000,000.',true);
+ if(!Number.isSafeInteger(amount)||amount<20000)return say('wdMsg','Minimum withdrawal is ₦20,000.',true);
+ if(amount>5000000)return say('wdMsg','Maximum withdrawal per day is ₦5,000,000.',true);
  let total;
  try{total=await dailyRequestTotal('withdrawal_requests');}
  catch(e){return say('wdMsg','Could not verify today’s withdrawal total. Please try again.',true);}
- if(total+amount>1000000)return say('wdMsg','Daily withdrawal limit is ₦1,000,000. Remaining today: '+money(Math.max(0,1000000-total)),true);
+ if(total+amount>5000000)return say('wdMsg','Daily withdrawal limit is ₦1,000,000. Remaining today: '+money(Math.max(0,5000000-total)),true);
  if(!bank_name||!account_name||!/^\d{10}$/.test(account_number))
   return say('wdMsg','Enter all bank details and a valid 10-digit account number.',true);
  const{error}=await supabase.from('withdrawal_requests').insert({
@@ -1087,6 +1090,7 @@ $('gameSearch').oninput=()=>render(activeCategory);
 function openGame(g){
  if(isSelfExcluded())return alert('Self-exclusion is active.');
  if(isBettingLocked())return alert('Betting is locked. Submit a deposit request and wait for administrator approval.');
+ go('games');
  game=g;selectedOdd=null;
  $('play').classList.remove('hidden');
  $('gameTitle').textContent=g.icon+' '+g.name;
