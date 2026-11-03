@@ -17,7 +17,7 @@ Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return reply({ error: "Method not allowed." }, 405);
 
-  const token = req.headers.get("Authorization")?.replace(/^Bearer\\s+/i, "");
+  const token = req.headers.get("Authorization")?.replace(/^Bearer\s+/i, "");
   const url = Deno.env.get("SUPABASE_URL");
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!token || !url || !serviceKey) return reply({ error: "Unauthorized or server configuration missing." }, 401);
