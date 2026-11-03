@@ -152,10 +152,24 @@ footer{text-align:center;padding:24px 24px 90px;color:var(--muted);font-size:12p
 .deposit-layout{display:grid;grid-template-columns:1fr;gap:13px}
 .deposit-form-card{position:relative;padding:15px 17px;margin-bottom:0}
 .deposit-form-card input,.deposit-form-card select{padding:10px 12px;margin:4px 0 9px}
+@media(max-width:600px){.deposit-instruction{right:2%;top:-65px;width:58%;height:105px;min-height:105px;font-size:12px;line-height:1.15}.deposit-instruction-arrow{display:none!important}}
 .bank-details-card{position:relative;background:linear-gradient(145deg,#0b2144,#102d59 65%,#174b88);color:#fff;border:1px solid #24558c;border-radius:16px;padding:17px}
-.deposit-instruction{position:absolute;z-index:5;right:0;top:-41px;width:min(60%,520px);min-height:82px;padding:10px 13px 18px;background:#d71920;color:#fff;border:2px solid #b51219;border-radius:10px;box-shadow:0 5px 15px #0003;font-size:12px;font-weight:800;line-height:1.35;text-align:center;display:flex;align-items:center;justify-content:center}
-.deposit-instruction-arrow{pointer-events:none}
-.deposit-instruction-arrow{position:absolute;right:29%;top:30px;z-index:6;color:#e00016;font-size:27px;font-weight:1000;line-height:1;text-shadow:0 1px 1px #fff}
+.deposit-instruction{position:absolute;z-index:5;right:2%;top:-65px;width:min(58%,520px);height:105px;min-height:105px;padding:8px 10px;background:#d71920;color:#fff;border:2px solid #b51219;border-radius:10px;box-shadow:0 5px 15px #0003;font-size:12px;font-weight:800;line-height:1.15;text-align:center;display:flex;align-items:center;justify-content:center}
+.deposit-instruction-arrow{display:none!important}
+#adminReceiptOverlay{position:fixed;inset:0;z-index:1000;background:#071a36c9;display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto}
+#adminReceiptOverlay.hidden{display:none!important}
+.admin-receipt{width:min(100%,520px);background:#fff;color:#172b4d;border-radius:16px;padding:24px;box-shadow:0 18px 55px #0005;border:2px solid #dce5f1}
+.admin-receipt h2{margin:0 0 5px;text-align:center;color:#102d59}
+.admin-receipt .receipt-sub{text-align:center;color:#78869c;font-size:12px;margin:0 0 18px}
+.admin-receipt .receipt-status{text-align:center;font-weight:950;font-size:18px;padding:10px;border-radius:10px;margin:0 0 16px;background:#e6f8f0;color:#087c50}
+.admin-receipt .receipt-status.declined{background:#fff0f1;color:#b93443}
+.admin-receipt .receipt-line{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid #e3e9f2;font-size:13px}
+.admin-receipt .receipt-line span:first-child{color:#78869c}
+.admin-receipt .receipt-line strong{text-align:right;overflow-wrap:anywhere}
+.admin-receipt .receipt-note{font-size:11px;color:#78869c;line-height:1.5;margin:16px 0}
+.admin-receipt-actions{display:flex;gap:8px;margin-top:14px}
+.admin-receipt-actions button{flex:1}
+@media print{body>*:not(#adminReceiptOverlay){display:none!important}#adminReceiptOverlay{position:static;display:block!important;background:#fff;padding:0}.admin-receipt{box-shadow:none;border:1px solid #ccc;width:100%;max-width:none}.admin-receipt-actions{display:none!important}}
 .bank-details-card h3{color:#fff;margin:0 0 12px}
 .bank-detail-line{padding:9px 0;border-bottom:1px solid #ffffff25;font-size:13px;overflow-wrap:anywhere}
 .bank-detail-line:last-child{border-bottom:0}
@@ -315,6 +329,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
   <div class="page-heading" style="flex:3"><h1 id="heading"></h1><p id="welcome" class="welcome-line">WELCOME</p><p class="welcome-copy">Welcome to TRUSTBET. Explore the platform, manage your wallet, and view your account activity in one place.</p></div>
  </div>
 
+ <div id="adminReceiptOverlay" class="hidden" aria-hidden="true"></div>
  <nav>
   <button class="active" data-page="home">⌂<br>Home</button>
   <button data-page="games">🎮<br>Games</button>
@@ -412,7 +427,6 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
    </div>
    <div class="card deposit-form-card">
     <div class="deposit-instruction">After making your transfer to the TRUSTBET account above, return to this page, scroll down, enter the amount transferred and the account name used for the transfer, then click SUBMIT.</div>
-    <div class="deposit-instruction-arrow" aria-hidden="true">↓</div>
     <h2>Deposit Naira</h2>
     <p class="muted">Submit a deposit request. Your wallet will be credited shortly.</p>
     <label>Bank / financial provider</label>
@@ -477,6 +491,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
     <summary>Information We Collect and Use</summary>
     <p>TRUSTBET collects and processes information necessary to provide and improve our services. This may include your name, email address, account details, verification information, device information, IP address, transaction history, Naira wallet activity, deposit and withdrawal details, betting activity, and customer support communications.</p>
     <p>We may also collect information about how you access and interact with our website to help maintain service quality, prevent fraud, and protect your account.</p>
+    <p><b>Transaction history retention:</b> All transaction history records, including deposits, bets, winnings, and withdrawals, are automatically cleared from the platform after 7 days. This scheduled cleanup does not change your wallet balance or delete your user account.</p>
    </details>
    <details>
     <summary>How We Use Your Information</summary>
@@ -934,7 +949,7 @@ $('bet').onclick=async()=>{
   const panel=document.createElement('div');
   panel.className='result-panel '+(data.won?'won':'lost');
   const title=document.createElement('strong');
-  title.textContent=data.won?'YOU WON!':(Number(data.payout)>0?'PARTIAL RETURN':'YOU LOST!');
+  title.textContent=data.won?'You win':(Number(data.payout)>0?'PARTIAL RETURN':'YOU LOST!');
   const detail=document.createElement('div');detail.className='result-detail';
   detail.textContent=data.outcome+' · '+(Number(data.payout)>0?'Payout: '+money(data.payout):'Stake lost: '+money(stake))+' · Wallet: '+money(data.balance);
   panel.append(title,detail);
@@ -968,6 +983,38 @@ async function adminProfileNames(requests){
  return new Map((data||[]).map(x=>[x.id,(x.full_name||'').trim()]));
 }
 function adminRequestDate(value){return value?new Date(value).toLocaleString():'Date unavailable';}
+function showAdminReceipt(kind,item,decision,reason=''){
+ if(!isAdmin())return alert('Administrator access required.');
+ const overlay=$('adminReceiptOverlay');
+ const status=decision==='approve'?'APPROVED':'DECLINED';
+ const lines=[
+  ['Request type',kind==='deposit'?'Deposit':'Withdrawal'],
+  ['Amount',money(item.amount)],
+  ['Reference',item.tracking_code||'Not available'],
+  ['User',item.user_name||'Name unavailable'],
+  ['Date submitted',adminRequestDate(item.created_at)],
+  ['Decision date',new Date().toLocaleString()],
+  ...(kind==='deposit'?[['Provider',item.provider_name||'Not provided'],['Depositor account name',item.depositor_account_name||'Not provided']]:[['Bank',item.bank_name||'Not provided'],['Account name',item.account_name||'Not provided'],['Account number',item.account_number||'Not provided']]),
+  ...(reason?[['Reason',reason]]:[])
+ ];
+ overlay.innerHTML='<div class="admin-receipt" role="dialog" aria-modal="true" aria-label="Administrator transaction decision receipt"><h2>TRUSTBET</h2><p class="receipt-sub">TRANSACTION DECISION RECEIPT</p><div class="receipt-status '+(decision==='reject'?'declined':'')+'">'+status+'</div>'+lines.map(([k,v])=>'<div class="receipt-line"><span>'+escapeHtml(k)+'</span><strong>'+escapeHtml(v)+'</strong></div>').join('')+'<p class="receipt-note">This receipt confirms the administrator decision on this request. A withdrawal approval does not itself confirm that the bank transfer has been completed.</p><div class="admin-receipt-actions"><button type="button" id="receiptPng">Download PNG</button><button type="button" id="receiptPrint" class="secondary">Print / Save PDF</button><button type="button" id="receiptClose" class="secondary">Close</button></div></div>';
+ overlay.classList.remove('hidden');overlay.setAttribute('aria-hidden','false');
+ $('receiptClose').onclick=()=>{overlay.classList.add('hidden');overlay.setAttribute('aria-hidden','true');};
+ $('receiptPrint').onclick=()=>window.print();
+ $('receiptPng').onclick=()=>{
+  if(!isAdmin())return alert('Administrator access required.');
+  const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
+  const width=900,pad=54,lineH=54;let y=230;
+  const wrap=(text,max)=>{const words=String(text).split(/\s+/);const out=[];let line='';for(const word of words){const test=line?line+' '+word:word;if(ctx.measureText(test).width>max&&line){out.push(line);line=word;}else line=test;}if(line)out.push(line);return out;};
+  ctx.font='bold 34px Arial';const rendered=lines.map(([k,v])=>{ctx.font='bold 24px Arial';const valueLines=wrap(String(v),width-2*pad-250);return {k:String(k),value:valueLines};});
+  const height=250+rendered.reduce((n,r)=>n+Math.max(1,r.value.length)*lineH+24,0)+70;canvas.width=width;canvas.height=height;
+  ctx.fillStyle='#f3f6fb';ctx.fillRect(0,0,width,height);ctx.fillStyle='#ffffff';ctx.strokeStyle='#dce5f1';ctx.lineWidth=3;ctx.beginPath();ctx.roundRect(24,24,width-48,height-48,24);ctx.fill();ctx.stroke();
+  ctx.textAlign='center';ctx.fillStyle='#102d59';ctx.font='bold 46px Arial';ctx.fillText('TRUSTBET',width/2,92);ctx.fillStyle='#78869c';ctx.font='22px Arial';ctx.fillText('TRANSACTION DECISION RECEIPT',width/2,132);
+  ctx.fillStyle=decision==='reject'?'#b93443':'#087c50';ctx.font='bold 32px Arial';ctx.fillText(status,width/2,190);
+  ctx.textAlign='left';rendered.forEach(r=>{ctx.fillStyle='#78869c';ctx.font='22px Arial';ctx.fillText(r.k,pad,y);ctx.fillStyle='#172b4d';ctx.font='bold 24px Arial';r.value.forEach((line,i)=>ctx.fillText(line,width-pad-480,y+i*lineH,480));y+=Math.max(1,r.value.length)*lineH+24;ctx.strokeStyle='#e3e9f2';ctx.beginPath();ctx.moveTo(pad,y-10);ctx.lineTo(width-pad,y-10);ctx.stroke();});
+  const link=document.createElement('a');link.download='TRUSTBET-'+kind+'-'+status.toLowerCase()+'.png';link.href=canvas.toDataURL('image/png');link.click();
+ };
+}
 
 /* Admin deposit review. RPC functions must be created and permission-checked in Supabase. */
 async function adminDeposits(){
@@ -982,6 +1029,8 @@ async function adminDeposits(){
  if(!data?.length){area.textContent='No pending deposit requests.';return;}
  const names=await adminProfileNames(data);
  data.forEach(item=>{
+  item.user_name=names.get(item.user_id)||'Name unavailable';
+  window.__trustbetDepositRequests=window.__trustbetDepositRequests||{};window.__trustbetDepositRequests[item.id]=item;
   const row=document.createElement('div');row.className='admin-request';
   const info=document.createElement('div');
   info.innerHTML='<b>'+escapeHtml(money(item.amount))+'</b> · '+escapeHtml(item.provider_name||'Provider')+
@@ -1009,7 +1058,9 @@ async function reviewDeposit(id,decision,approveButton,rejectButton){
   alert('Backend approval action failed: '+error.message);
   approveButton.disabled=false;rejectButton.disabled=false;return;
  }
+ const receiptItem={...(window.__trustbetDepositRequests||{})[id]||{id,amount:0}};
  await adminDeposits();await loadWallet();
+ showAdminReceipt('deposit',receiptItem,decision,decision==='reject'?'Payment could not be verified.':'');
  alert('Deposit request '+(decision==='approve'?'approved':'rejected')+'.');
 }
 $('refreshAdminDeposits').onclick=adminDeposits;
@@ -1028,6 +1079,8 @@ async function adminWithdrawals(){
  if(!data?.length){area.textContent='No pending withdrawal requests.';return;}
  const names=await adminProfileNames(data);
  data.forEach(item=>{
+  item.user_name=names.get(item.user_id)||'Name unavailable';
+  window.__trustbetWithdrawalRequests=window.__trustbetWithdrawalRequests||{};window.__trustbetWithdrawalRequests[item.id]=item;
   const row=document.createElement('div');row.className='admin-request';
   const info=document.createElement('div');
   info.innerHTML='<b>'+escapeHtml(money(item.amount))+'</b> · '+escapeHtml(item.bank_name||'Bank')+
@@ -1054,7 +1107,9 @@ async function reviewWithdrawal(id,decision,approveButton,rejectButton){
  const args=decision==='approve'?{p_request_id:id}:{p_request_id:id,p_reason:reason.trim()};
  const{error}=await supabase.rpc(rpc,args);
  if(error){alert('Withdrawal review failed: '+error.message);approveButton.disabled=false;rejectButton.disabled=false;return;}
+ const receiptItem={...((window.__trustbetWithdrawalRequests||{})[id]||{id,amount:0})};
  await adminWithdrawals();await loadWallet();
+ showAdminReceipt('withdrawal',receiptItem,decision,reason);
  alert('Withdrawal request '+(decision==='approve'?'approved. Complete the bank transfer.':'rejected.') );
 }
 
@@ -1102,6 +1157,7 @@ function subscribeNotifications(){
 
 /* Wallet transaction history */
 function dateText(value){return value?new Date(value).toLocaleString():'';}
+function gameDisplayName(gameId){const found=games.find(g=>g.id===String(gameId||''));return found?found.name:(String(gameId||'').replace(/[_-]+/g,' ').replace(/\b\w/g,c=>c.toUpperCase())||'Game');}
 function statusFor(kind,status){
  const s=String(status||'pending').toLowerCase();
  if(kind==='deposit'){
@@ -1170,13 +1226,13 @@ async function loadWallet(){
    if(loss){const stamp=new Date(x.created_at||0).getTime();if(stamp>=cutoff&&stamp<=now){if(recentLosses>=10)return;recentLosses++;}}
    const returned=Number(x.payout)||0;
    if(partial){
-    items.push({amount:returned||Number(x.bet_amount)||0,symbol:returned?'+':'−',label:'PARTIAL RETURN',color:returned?'green':'red',description:(x.game_id||'Bet')+' · Partial return',created_at:x.created_at});
+    items.push({amount:returned||Number(x.bet_amount)||0,symbol:returned?'+':'−',label:'PARTIAL RETURN',color:returned?'green':'red',description:gameDisplayName(x.game_id)+' · Partial return',created_at:x.created_at});
    }else if(won){
-    items.push({amount:returned,symbol:'+',label:'WON',color:'green',description:(x.game_id||'Bet')+' · Winnings',created_at:x.created_at});
+    items.push({amount:returned,symbol:'+',label:'YOU WIN',color:'green',description:gameDisplayName(x.game_id)+' · Winnings',created_at:x.created_at});
    }else if(loss){
-    items.push({amount:Number(x.bet_amount)||0,symbol:'−',label:'LOST',color:'red',description:(x.game_id||'Bet')+' · Stake lost',created_at:x.created_at});
+    items.push({amount:Number(x.bet_amount)||0,symbol:'−',label:'LOST',color:'red',description:gameDisplayName(x.game_id)+' · Stake lost',created_at:x.created_at});
    }else{
-    items.push({amount:Number(x.bet_amount)||0,symbol:'−',label:'BET',color:'red',description:(x.game_id||'Bet')+' · Stake',created_at:x.created_at});
+    items.push({amount:Number(x.bet_amount)||0,symbol:'−',label:'BET',color:'red',description:gameDisplayName(x.game_id)+' · Stake',created_at:x.created_at});
    }
   });
  }
