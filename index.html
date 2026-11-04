@@ -574,6 +574,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
      <h3>Registered Users</h3>
      <input id="adminUserSearch" type="search" placeholder="Search users by name or email" aria-label="Search registered users">
      <button id="refreshAdminUsers" class="secondary">Refresh users</button>
+     <button id="backfillRecoveryCodes" class="secondary" type="button">Generate missing recovery codes for existing accounts</button>
      <div id="adminUsers" aria-live="polite"></div>
     </div>
     <div class="admin-section" id="adminWalletCreditSection">
@@ -1785,6 +1786,18 @@ async function adminUsers(){
  finally{if(button)button.disabled=false;}
 }
 $('refreshAdminUsers').onclick=adminUsers;
+async function backfillRecoveryCodes(){
+ if(!isAdmin())return alert('Administrator access required.');
+ if(!confirm('Generate any missing recovery codes for all existing eligible accounts? Existing codes will be kept. Rejected phone registrations will be skipped.'))return;
+ const button=$('backfillRecoveryCodes');if(button)button.disabled=true;
+ try{
+  const result=await recoveryAdminAction('backfill');
+  await adminUsers();
+  alert('Recovery-code backfill finished. Accounts processed: '+result.usersProcessed+'. New codes generated: '+result.codesCreated+'. Rejected phone accounts skipped: '+result.usersSkipped+'. Failed accounts: '+result.failedUsers+'.');
+ }catch(error){alert('Could not generate missing recovery codes: '+(error.message||error));}
+ finally{if(button)button.disabled=false;}
+}
+$('backfillRecoveryCodes').onclick=backfillRecoveryCodes;
 $('adminUserSearch').addEventListener('input',renderAdminUsers);
 
 
