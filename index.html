@@ -1055,7 +1055,7 @@ $('phoneSignup').onclick=async()=>{
   $('phoneOtpBox').classList.add('hidden');
   $('authMsg').innerHTML='';
   const success=document.createElement('div');
-  success.style.cssText='color:#00FF00;font-weight:900;white-space:pre-line';
+  success.style.cssText='color:#047857;font-weight:900;white-space:pre-line';
   success.textContent='REGISTRATION SUBMITTED SUCCESSFULLY!\nYour account registration has been received and is awaiting approval.\nApproval may take between 30mins - 7 hours. Please check back later.\nYou will be able to log in once your account has been approved. Save the password you entered in a safe place so you can be able to log in next time.\nThank you for choosing TRUSTBET.';
   $('authMsg').append(success);
  }catch(error){say('authMsg',error.message||'Phone sign-up failed.',true);}
