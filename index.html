@@ -1645,7 +1645,7 @@ $('adminUserSearch').addEventListener('input',renderAdminUsers);
 
 /* Account deletion confirmation input formatting */
 function formatDeletionPhraseInput(field){
- field.maxLength=17;
+ field.maxLength=16;
  field.addEventListener('input',()=>{
   const raw=field.value.replace(/\\s+/g,'').toUpperCase().slice(0,16);
   field.value=raw.length>=7?raw.slice(0,7)+' '+raw.slice(7):raw;
@@ -1662,7 +1662,7 @@ function confirmDeletionTwoWay(action,email){
   const panel=document.createElement('div');panel.style.cssText='width:min(100%,390px);background:#fff;color:#172b4d;border-radius:14px;padding:20px;box-shadow:0 18px 50px #0005';
   const heading=document.createElement('h3');heading.textContent='Final deletion decision confirmation';
   const message=document.createElement('p');message.textContent='Type CONFIRM DELETION exactly to '+action.toLowerCase()+' this request for '+email+'.';
-  const field=document.createElement('input');field.type='text';field.placeholder='Type CONFIRM DELETION';field.autocomplete='off';field.autocapitalize='characters';field.spellcheck=false;field.style.cssText='width:100%;padding:13px;border:1px solid #d8e2ef;border-radius:10px;font:inherit;margin:8px 0 14px';
+  const field=document.createElement('input');field.type='text';field.placeholder='CONFIRM DELETION';field.autocomplete='off';field.autocapitalize='characters';field.spellcheck=false;field.style.cssText='width:100%;padding:13px;border:1px solid #d8e2ef;border-radius:10px;font:inherit;margin:8px 0 14px';
   formatDeletionPhraseInput(field);
   const buttons=document.createElement('div');buttons.style.cssText='display:flex;gap:9px';
   const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Cancel';cancel.className='secondary';cancel.style.flex='1';
@@ -2129,7 +2129,7 @@ $('requestAccountDeletion').onclick=async()=>{
   const panel=document.createElement('div');panel.style.cssText='width:min(100%,390px);background:#fff;color:#172b4d;border-radius:14px;padding:20px;box-shadow:0 18px 50px #0005';
   const heading=document.createElement('h3');heading.textContent='Final account deletion confirmation';
   const message=document.createElement('p');message.textContent='Type CONFIRM DELETION exactly to submit your request.';
-  const field=document.createElement('input');field.type='text';field.placeholder='Type CONFIRM DELETION';field.autocomplete='off';field.autocapitalize='characters';field.spellcheck=false;field.style.cssText='width:100%;padding:13px;border:1px solid #d8e2ef;border-radius:10px;font:inherit;margin:8px 0 14px';
+  const field=document.createElement('input');field.type='text';field.placeholder='CONFIRM DELETION';field.autocomplete='off';field.autocapitalize='characters';field.spellcheck=false;field.style.cssText='width:100%;padding:13px;border:1px solid #d8e2ef;border-radius:10px;font:inherit;margin:8px 0 14px';
   formatDeletionPhraseInput(field);
   const actions=document.createElement('div');actions.style.cssText='display:flex;gap:9px';
   const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Cancel';cancel.className='secondary';cancel.style.flex='1';
