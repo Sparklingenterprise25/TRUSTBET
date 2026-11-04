@@ -1665,40 +1665,38 @@ async function loadWallet(){
  const [deposits,withdrawals,bets,ledger]=await Promise.all([
   supabase.from('deposit_requests').select('amount,status,tracking_code,provider_name,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50),
   supabase.from('withdrawal_requests').select('amount,status,bank_name,account_name,account_number,tracking_code,created_at,reviewed_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50),
-  supabase.from('demo_bets').select('game_id,bet_amount,outcome,payout,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50),
+  supabase.from('demo_bets').select('id,game_id,bet_amount,outcome,payout,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50),
   supabase.from('wallet_transactions').select('transaction_type,amount,balance_after,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50)
  ]);
  const items=[],errors=[deposits,withdrawals,bets,ledger].filter(x=>x.error);
- if(!deposits.error)(deposits.data||[]).forEach(x=>{
-  const st=statusFor('deposit',x.status);
-  items.push({amount:x.amount,symbol:x.status==='approved'?'+':'',label:st.label,color:st.color,
-   description:'Deposit through '+(x.provider_name||'selected provider')+(x.tracking_code?' · Ref: '+x.tracking_code:''),created_at:x.created_at});
- });
- if(!withdrawals.error)(withdrawals.data||[]).forEach(x=>{
-  const st=statusFor('withdrawal',x.status);
-  const approved=String(x.status||'').toLowerCase()==='approved';
-  items.push({
-   amount:x.amount,
-   symbol:approved?'+':'',
-   label:approved?'WITHDRAWAL APPROVED · WITHDRAWN':st.label,
-   color:approved?'green':'red',
-   description:'Withdrawal to '+(x.bank_name||'selected provider'),
-   created_at:x.created_at,
-   withdrawalReceiptData:approved?{
-    status:x.status,amount:x.amount,bank_name:x.bank_name,account_name:x.account_name,
-    account_number:x.account_number,reference:x.tracking_code,requested_at:x.created_at,
-    approved_at:x.reviewed_at
-   }:null
-  });
- });
+ const now=Date.now(),cutoff=now-24*60*60*1000,cutoffISO=new Date(cutoff).toISOString();
+ const allowedRecentLossIds=new Set();
+ let recentLossCountingAvailable=true;
+ // Count every loss in the rolling 24-hour window, not just the 50 rows shown in history.
+ // The earliest 10 losses across all games remain visible; later losses are hidden from history only.
+ for(let from=0;;from+=1000){
+  const page=await supabase.from('demo_bets')
+   .select('id,outcome,created_at').eq('user_id',user.id)
+   .gte('created_at',cutoffISO).lte('created_at',new Date(now).toISOString())
+   .order('created_at',{ascending:true}).order('id',{ascending:true})
+   .range(from,from+999);
+  if(page.error){recentLossCountingAvailable=false;errors.push(page);break;}
+  const rows=page.data||[];
+  for(const row of rows){
+   const outcome=String(row.outcome||'').trim().toLowerCase();
+   const loss=outcome==='lost'||outcome==='loss'||outcome.startsWith('loss:');
+   if(loss&&allowedRecentLossIds.size<10)allowedRecentLossIds.add(row.id);
+  }
+  if(rows.length<1000)break;
+ }
  if(!bets.error){
-  const now=Date.now(),cutoff=now-24*60*60*1000;let recentLosses=0;
   (bets.data||[]).forEach(x=>{
    const outcome=String(x.outcome||'').trim().toLowerCase();
    const won=outcome==='won'||outcome==='win'||outcome.startsWith('win:');
    const partial=outcome.startsWith('partial return:');
    const loss=outcome==='lost'||outcome==='loss'||outcome.startsWith('loss:');
-   if(loss){const stamp=new Date(x.created_at||0).getTime();if(stamp>=cutoff&&stamp<=now){if(recentLosses>=10)return;recentLosses++;}}
+   const stamp=new Date(x.created_at||0).getTime();
+   if(loss&&stamp>=cutoff&&stamp<=now&&recentLossCountingAvailable&&!allowedRecentLossIds.has(x.id))return;
    const returned=Number(x.payout)||0;
    if(partial){
     items.push({amount:returned||Number(x.bet_amount)||0,symbol:returned?'+':'−',label:'PARTIAL RETURN',color:returned?'green':'red',description:gameDisplayName(x.game_id)+' · Partial return',created_at:x.created_at});
@@ -1711,6 +1709,26 @@ async function loadWallet(){
    }
   });
  }
+ if(!deposits.error)(deposits.data||[]).forEach(x=>{
+  const st=statusFor('deposit',x.status);
+  items.push({amount:x.amount,symbol:x.status==='approved'?'+':'',label:st.label,color:st.color,
+   description:'Deposit through '+(x.provider_name||'selected provider')+(x.tracking_code?' · Ref: '+x.tracking_code:''),created_at:x.created_at});
+ });
+ if(!withdrawals.error)(withdrawals.data||[]).forEach(x=>{
+  const st=statusFor('withdrawal',x.status);
+  const approved=String(x.status||'').toLowerCase()==='approved';
+  items.push({
+   amount:x.amount,symbol:approved?'+':'',
+   label:approved?'WITHDRAWAL APPROVED · WITHDRAWN':st.label,
+   color:approved?'green':'red',description:'Withdrawal to '+(x.bank_name||'selected provider'),
+   created_at:x.created_at,
+   withdrawalReceiptData:approved?{
+    status:x.status,amount:x.amount,bank_name:x.bank_name,account_name:x.account_name,
+    account_number:x.account_number,reference:x.tracking_code,requested_at:x.created_at,
+    approved_at:x.reviewed_at
+   }:null
+  });
+ });
  if(!ledger.error)(ledger.data||[]).forEach(x=>{
   const type=String(x.transaction_type||'').toLowerCase();
   if(type.includes('deposit')||type.includes('withdraw')||type.includes('bet')||type.includes('win')||type.includes('loss'))return;
