@@ -166,7 +166,7 @@ footer{text-align:center;padding:24px 24px 90px;color:var(--muted);font-size:12p
 .admin-receipt .receipt-sub{text-align:center;color:#78869c;font-size:12px;margin:0 0 18px}
 .admin-receipt .receipt-status{text-align:center;font-weight:950;font-size:18px;padding:10px;border-radius:10px;margin:0 0 16px;background:#e6f8f0;color:#087c50}
 .admin-receipt .receipt-status.declined{background:#fff0f1;color:#b93443}
-.admin-receipt .receipt-line{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid #e3e9f2;font-size:13px}
+.admin-receipt .receipt-line{display:flex;justify-content:space-between;gap:12px;padding:11px 13px;margin:0 0 8px;border:0;border-radius:9px;background:#f5f8fc;font-size:13px}
 .admin-receipt .receipt-line span:first-child{color:#78869c}
 .admin-receipt .receipt-line strong{text-align:right;overflow-wrap:anywhere}
 .admin-receipt .receipt-note{font-size:11px;color:#78869c;line-height:1.5;margin:16px 0}
@@ -187,7 +187,7 @@ footer{text-align:center;padding:24px 24px 90px;color:var(--muted);font-size:12p
 .admin-bank-editor label{color:#dcecff}
 .admin-bank-editor input{background:#fff;color:var(--ink);margin-bottom:7px}
 .bank-note{color:#d5e6fb;font-size:11px;line-height:1.5;margin:10px 0 0}
-.admin-section{border:1px solid #dce7f5;border-radius:12px;padding:13px;margin:12px 0;background:#f8fbff}
+.admin-section{border:1px solid #102d59;border-radius:12px;padding:14px;margin:17px 0 19px;background:#f8fbff}
 .admin-request{padding:12px 0;border-bottom:1px solid #e2e9f2}
 .admin-request:last-child{border-bottom:0}
 .admin-request .row{align-items:center}
@@ -407,7 +407,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
   <div class="balance-card">
    <div class="home-wallet-heading">
     <span class="home-wallet-icon" aria-hidden="true">💰</span>
-    <strong>AVAILABLE BALANCE</strong>
+    <strong>NAIRA&nbsp;&nbsp;&nbsp;BALANCE</strong>
    </div>
    <div class="home-wallet-main">
     <div class="nigeria-flag" role="img" aria-label="Nigerian flag"><span></span><span></span><span></span></div>
@@ -550,7 +550,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
      <div id="adminUsers" aria-live="polite"></div>
     </div>
     <div class="admin-section" id="adminWalletCreditSection">
-     <h3>Issue bonus / compensation credit</h3>
+     <h3 style="color:#12a875">ISSUE BONUS / COMPENSATION CREDIT</h3>
      <p class="muted">Admin-only wallet credit. Review the selected user, amount and message before confirming.</p>
      <input id="creditUserSearch" type="search" placeholder="Search user by name, email or phone">
      <button type="button" id="searchCreditUsers" class="secondary">Search users</button>
@@ -1313,26 +1313,36 @@ function showAdminReceipt(kind,item,decision,reason=''){
  $('receiptPng').onclick=()=>{
   if(!isAdmin())return alert('Administrator access required.');
   const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
-  const width=1000,pad=72,lineGap=25,rowGap=24,valueWidth=width-2*pad-300;
-  const wrap=(text,max,font)=>{ctx.font=font;const words=String(text).split(/\s+/);const out=[];let line='';for(const word of words){const test=line?line+' '+word:word;if(ctx.measureText(test).width>max&&line){out.push(line);line=word;}else line=test;}if(line)out.push(line);return out.length?out:[''];};
-  const rendered=lines.map(([k,v])=>({k:String(k),v:wrap(v,valueWidth,'bold 25px Arial')}));
-  let contentHeight=0;rendered.forEach(r=>contentHeight+=Math.max(1,r.v.length)*lineGap+rowGap);
-  const height=440+contentHeight;canvas.width=width;canvas.height=height;
-  ctx.fillStyle='#eef3f9';ctx.fillRect(0,0,width,height);
-  ctx.fillStyle='#102d59';ctx.fillRect(0,0,width,220);
-  ctx.fillStyle='#ffffff';ctx.textAlign='center';ctx.font='bold 54px Arial';ctx.fillText('TRUSTBET',width/2,88);
-  ctx.fillStyle='#dceaff';ctx.font='bold 23px Arial';ctx.fillText('OFFICIAL TRANSACTION DECISION RECEIPT',width/2,132);
-  ctx.fillStyle='#ffffff';ctx.globalAlpha=.16;ctx.fillRect(0,190,width,30);ctx.globalAlpha=1;
-  ctx.fillStyle=decision==='reject'?'#fff0f1':'#e6f8f0';ctx.beginPath();ctx.roundRect(width/2-170,245,340,62,20);ctx.fill();
-  ctx.fillStyle=decision==='reject'?'#b93443':'#087c50';ctx.font='bold 28px Arial';ctx.fillText(status,width/2,285);
-  let y=355;ctx.textAlign='left';
-  rendered.forEach((r,index)=>{
-    const rowHeight=Math.max(1,r.v.length)*lineGap+22;
-    ctx.fillStyle=index%2===0?'#ffffff':'#f7f9fc';ctx.beginPath();ctx.roundRect(pad-16,y-25,width-2*pad+32,rowHeight+10,12);ctx.fill();
-    ctx.fillStyle='#78869c';ctx.font='bold 21px Arial';ctx.fillText(r.k.toUpperCase(),pad,y);
-    ctx.fillStyle='#172b4d';ctx.font='bold 25px Arial';r.v.forEach((line,i)=>ctx.fillText(line,width-pad-valueWidth,y+i*lineGap));
-    y+=rowHeight+rowGap;
+  const width=1200,pad=84,labelWidth=285,valueWidth=width-2*pad-labelWidth-28;
+  const wrap=(value,max,font)=>{
+   ctx.font=font;const words=String(value??'').split(/\\s+/),out=[];let line='';
+   for(const word of words){const next=line?line+' '+word:word;if(ctx.measureText(next).width>max&&line){out.push(line);line=word;}else line=next;}
+   if(line)out.push(line);return out.length?out:['—'];
+  };
+  const rows=lines.map(([label,value])=>({label:String(label),parts:wrap(value,valueWidth,'600 27px Arial')}));
+  const rowHeights=rows.map(r=>Math.max(1,r.parts.length)*38+34);
+  const total=430+rowHeights.reduce((a,b)=>a+b+13,0)+100;
+  canvas.width=width;canvas.height=total;
+  const c=canvas.getContext('2d');
+  c.fillStyle='#eef2f7';c.fillRect(0,0,width,total);
+  c.fillStyle='#102d59';c.fillRect(0,0,width,235);
+  c.fillStyle='#ffffff';c.textAlign='center';c.font='900 66px Arial';c.fillText('TRUSTBET',width/2,94);
+  c.fillStyle='#dceaff';c.font='700 25px Arial';c.fillText('TRANSACTION DECISION RECEIPT',width/2,145);
+  c.fillStyle='#ffffff';c.font='400 19px Arial';c.fillText('OFFICIAL ACCOUNT RECORD',width/2,184);
+  const approved=decision==='approve';
+  c.fillStyle=approved?'#e3f6ed':'#fff0f1';c.beginPath();c.roundRect(width/2-190,260,380,72,18);c.fill();
+  c.fillStyle=approved?'#087c50':'#b42332';c.font='900 32px Arial';c.fillText(status,width/2,307);
+  let y=390;
+  rows.forEach((r,index)=>{
+   const h=rowHeights[index];
+   c.fillStyle='#ffffff';c.beginPath();c.roundRect(pad,y,width-2*pad,h,14);c.fill();
+   c.fillStyle='#6d7c91';c.textAlign='left';c.font='800 19px Arial';c.fillText(r.label.toUpperCase(),pad+22,y+34);
+   c.fillStyle='#172b4d';c.font='600 27px Arial';
+   r.parts.forEach((part,j)=>c.fillText(part,pad+labelWidth+18,y+36+j*38));
+   y+=h+13;
   });
+  c.fillStyle='#6d7c91';c.textAlign='center';c.font='400 18px Arial';
+  c.fillText('Generated by TRUSTBET • Keep this receipt for your records',width/2,total-48);
   const link=document.createElement('a');link.download='TRUSTBET-'+kind+'-'+status.toLowerCase()+'.png';link.href=canvas.toDataURL('image/png');link.click();
  };
 }
@@ -1638,7 +1648,7 @@ $('refreshPhoneApprovals').onclick=adminPhoneApprovals;
 
 /* Secure administrator wallet credits */
 const TRUSTBET_CREDIT_MESSAGES={
- bonus:'This is a bonus from trust bet platform',
+ bonus:'This is a bonus from trust bet platform to eligible users thank you for being part of trustbet',
  compensation:'This credit is issued by the TRUSTBET platform in Compensation of your game losses experienced on the platform.Thank you for being part of TRUSTBET.'
 };
 function updateCreditMessage(){
@@ -1761,7 +1771,7 @@ function addWalletItem(container,item){
 function downloadUserTransactionReceipt(data){
  if(!data)return;
  const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
- const width=1100,pad=70;
+ const width=1200,pad=82,labelWidth=300,valueWidth=width-2*pad-labelWidth-36;
  const status=String(data.status||'pending').toUpperCase();
  const rejected=status==='REJECTED';
  const title=(data.kind==='deposit'?'DEPOSIT':'WITHDRAWAL')+' RECEIPT';
@@ -1781,36 +1791,36 @@ function downloadUserTransactionReceipt(data){
  }
  if(rejected)rows.push(['Rejection reason',data.rejection_reason||'No reason was provided']);
  if(data.kind==='withdrawal'&&!rejected)rows.push(['Important notice','Approval confirms review only; it is not proof that funds have arrived in your bank account.']);
- const valueX=440,valueMax=width-pad-valueX-25,lineHeight=38,rowGap=14;
- ctx.font='bold 25px Arial';
- const measured=rows.map(([label,value])=>{
-  const words=String(value).split(/\s+/),parts=[];let line='';
-  for(const word of words){const test=line?line+' '+word:word;if(ctx.measureText(test).width>valueMax&&line){parts.push(line);line=word;}else line=test;}
-  if(line)parts.push(line);
-  return {label,parts,height:Math.max(1,parts.length)*lineHeight+30};
- });
- const headerHeight=260,amountBlock=150,contentTop=headerHeight+amountBlock;
- const rowsHeight=measured.reduce((sum,r)=>sum+r.height+rowGap,0);
- canvas.width=width;canvas.height=contentTop+rowsHeight+85;
+ const wrap=(value,max,font)=>{
+  ctx.font=font;const words=String(value??'').split(/\\s+/),out=[];let line='';
+  for(const word of words){const next=line?line+' '+word:word;if(ctx.measureText(next).width>max&&line){out.push(line);line=word;}else line=next;}
+  if(line)out.push(line);return out.length?out:['—'];
+ };
+ const measured=rows.map(([label,value])=>({label,parts:wrap(value,valueWidth,'600 27px Arial')}));
+ const rowHeights=measured.map(r=>Math.max(1,r.parts.length)*38+34);
+ const height=440+rowHeights.reduce((a,b)=>a+b+13,0)+105;
+ canvas.width=width;canvas.height=height;
  const c=canvas.getContext('2d');
- c.fillStyle='#eef3f9';c.fillRect(0,0,width,canvas.height);
- c.fillStyle='#102d59';c.fillRect(0,0,width,headerHeight);
- c.textAlign='center';c.fillStyle='#fff';c.font='bold 66px Arial';c.fillText('TRUSTBET',width/2,92);
- c.fillStyle='#dceaff';c.font='bold 27px Arial';c.fillText('OFFICIAL '+title,width/2,148);
- c.fillStyle=rejected?'#fde8e8':'#e6f8f0';c.beginPath();c.roundRect(350,180,400,62,20);c.fill();
- c.fillStyle=rejected?'#b42318':'#087c50';c.font='bold 27px Arial';c.fillText(status,width/2,221);
- c.fillStyle='#fff';c.beginPath();c.roundRect(65,headerHeight+12,970,canvas.height-headerHeight-28,25);c.fill();
- c.strokeStyle='#dce5f1';c.lineWidth=3;c.stroke();
- c.textAlign='center';c.fillStyle='#78869c';c.font='bold 23px Arial';c.fillText('TRANSACTION AMOUNT',width/2,headerHeight+65);
- c.fillStyle='#102d59';c.font='bold 53px Arial';c.fillText('₦'+Number(data.amount||0).toLocaleString('en-NG',{minimumFractionDigits:2,maximumFractionDigits:2}),width/2,headerHeight+125);
- let y=contentTop;
- c.textAlign='left';
+ c.fillStyle='#eef2f7';c.fillRect(0,0,width,height);
+ c.fillStyle='#102d59';c.fillRect(0,0,width,235);
+ c.fillStyle='#ffffff';c.textAlign='center';c.font='900 66px Arial';c.fillText('TRUSTBET',width/2,94);
+ c.fillStyle='#dceaff';c.font='700 25px Arial';c.fillText('OFFICIAL '+title,width/2,145);
+ c.fillStyle='#ffffff';c.font='400 19px Arial';c.fillText('TRANSACTION RECORD',width/2,184);
+ c.fillStyle=rejected?'#fff0f1':status==='APPROVED'?'#e3f6ed':'#fff7df';
+ c.beginPath();c.roundRect(width/2-190,260,380,72,18);c.fill();
+ c.fillStyle=rejected?'#b42332':status==='APPROVED'?'#087c50':'#936b12';
+ c.font='900 32px Arial';c.fillText(status,width/2,307);
+ let y=390;
  measured.forEach((r,index)=>{
-  c.fillStyle=index%2===0?'#f7f9fc':'#fff';c.beginPath();c.roundRect(100,y-24,900,r.height,12);c.fill();
-  c.fillStyle='#78869c';c.font='bold 19px Arial';c.fillText(r.label.toUpperCase(),125,y);
-  c.fillStyle='#172b4d';c.font='bold 24px Arial';r.parts.forEach((part,i)=>c.fillText(part,valueX,y+i*lineHeight));
-  y+=r.height+rowGap;
+  const h=rowHeights[index];
+  c.fillStyle='#ffffff';c.beginPath();c.roundRect(pad,y,width-2*pad,h,14);c.fill();
+  c.fillStyle='#6d7c91';c.textAlign='left';c.font='800 19px Arial';c.fillText(r.label.toUpperCase(),pad+22,y+34);
+  c.fillStyle='#172b4d';c.font='600 27px Arial';
+  r.parts.forEach((part,j)=>c.fillText(part,pad+labelWidth+18,y+36+j*38));
+  y+=h+13;
  });
+ c.fillStyle='#6d7c91';c.textAlign='center';c.font='400 18px Arial';
+ c.fillText('Generated by TRUSTBET • Keep this receipt for your records',width/2,height-48);
  const ref=(data.reference||'transaction').replace(/[^a-z0-9_-]/gi,'-');
  const link=document.createElement('a');link.download='TRUSTBET-'+data.kind+'-'+status.toLowerCase()+'-'+ref+'.png';
  link.href=canvas.toDataURL('image/png');link.click();
