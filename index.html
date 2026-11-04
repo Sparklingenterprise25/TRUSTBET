@@ -1131,9 +1131,9 @@ $('phoneSignup').onclick=async()=>{
  const namesPanel=$('phoneSignupNames');
  if(namesPanel.classList.contains('hidden')){namesPanel.classList.remove('hidden');$('phoneFirstName').focus();$('phoneSignup').textContent='Submit registration';return;}
  try{
-  const firstName=$('phoneFirstName').value.trim().replace(/\\s+/g,' '),surname=$('phoneSurname').value.trim().replace(/\\s+/g,' ');
+  const firstName=$('phoneFirstName').value.trim().replace(/\s+/g,' '),surname=$('phoneSurname').value.trim().replace(/\s+/g,' ');
   if(!firstName||!surname)return say('authMsg','Enter both your first name and surname to create a phone account.',true);
-  if(firstName.split(/\\s+/).length!==1||surname.split(/\\s+/).length!==1)return say('authMsg','Enter only one first name and one surname.',true);
+  if(firstName.split(/\s+/).length!==1||surname.split(/\s+/).length!==1)return say('authMsg','Enter only one first name and one surname.',true);
   const phone=fullPhoneNumber(),password=$('phonePassword').value;
   if(!/^(?=.{8,15}$)(?=[0-9]*[A-Za-z][0-9]*$)[A-Za-z0-9]+$/.test(password))return say('authMsg','Phone passwords must be 8–15 characters: exactly one letter and all remaining characters numbers.',true);
   const{data,error}=await supabase.functions.invoke('trustbet-phone-signup',{body:{phone,password,first_name:firstName,last_name:surname}});
