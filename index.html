@@ -1057,7 +1057,15 @@ $('phoneSignup').onclick=async()=>{
   const success=document.createElement('div');
   success.style.cssText='color:#047857;font-weight:900;white-space:pre-line';
   success.textContent='REGISTRATION SUBMITTED SUCCESSFULLY!\nYour account registration has been received and is awaiting approval.\nApproval may take between 30mins - 7 hours. Please check back later.\nYou will be able to log in once your account has been approved. Save the password you entered in a safe place so you can be able to log in next time.\nThank you for choosing TRUSTBET.';
-  $('authMsg').append(success);
+  const notice=document.createElement('div');
+  notice.append(success);
+  const closeButton=document.createElement('button');
+  closeButton.type='button';
+  closeButton.textContent='CLOSE';
+  closeButton.style.cssText='display:block;margin:10px 0 0 auto;background:#047857;color:#fff;border:0;border-radius:6px;padding:8px 18px;font-weight:800;cursor:pointer';
+  closeButton.onclick=()=>notice.remove();
+  notice.append(closeButton);
+  $('authMsg').append(notice);
  }catch(error){say('authMsg',error.message||'Phone sign-up failed.',true);}
 };
 $('phoneVerify').onclick=async()=>{
