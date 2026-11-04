@@ -1357,7 +1357,7 @@ function adminRequestNameEditor(kind,item,field,label,refresh){
  const feedback=document.createElement('small');feedback.style.cssText='width:100%;display:block;color:#087c50';
  save.onclick=async()=>{
   if(!isAdmin())return alert('Administrator access required.');
-  const value=input.value.toUpperCase().trim().replace(/\\s+/g,' ');
+  const value=input.value.toUpperCase().trim().replace(/\s+/g,' ');
   if(!value){feedback.textContent='Enter a valid account name.';feedback.style.color='#b93443';return;}
   if(value===String(item[field]||'')){feedback.textContent='No changes to save.';return;}
   save.disabled=true;input.disabled=true;feedback.textContent='Saving…';feedback.style.color='#78869c';
