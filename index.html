@@ -1222,8 +1222,7 @@ function drawOdds(){
   const b=document.createElement('button');
   b.className='odd-box'+(odd[2]?' special-odd':'');
   b.innerHTML='<span class="odd-name"></span><span class="odd-value"></span><span class="lock"></span>';
-  const oddsLabel=String(odd[0]).replace(/\bWON\b/gi,'WIN');
-  b.querySelector('.odd-name').textContent=/\bWIN\b/i.test(oddsLabel)?oddsLabel:oddsLabel+' WIN';
+  b.querySelector('.odd-name').textContent=odd[0];
   b.querySelector('.odd-value').textContent=odd[1]+'x';
   b.onclick=()=>{
    if(isBettingLocked()||isSelfExcluded())return;
