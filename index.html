@@ -1646,9 +1646,12 @@ $('adminUserSearch').addEventListener('input',renderAdminUsers);
 /* Account deletion confirmation input formatting */
 function formatDeletionPhraseInput(field){
  field.maxLength=16;
+ field.autocomplete='off';
+ field.autocapitalize='characters';
+ field.spellcheck=false;
  field.addEventListener('input',()=>{
-  const raw=field.value.replace(/\\s+/g,'').toUpperCase().slice(0,16);
-  field.value=raw.length>=7?raw.slice(0,7)+' '+raw.slice(7):raw;
+  const raw=field.value.replace(/\s/g,'').toUpperCase().slice(0,15);
+  field.value=raw.length>7?raw.slice(0,7)+' '+raw.slice(7):raw;
  });
 }
 
