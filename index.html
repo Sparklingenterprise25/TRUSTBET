@@ -880,7 +880,7 @@ $('recoverySubmit').onclick=async()=>{
  const identifier=$('recoveryIdentifier').value.trim();
  const code=$('recoveryCode').value.trim();
  const newPassword=$('recoveryNewPassword').value;
- if(!identifier||!/^\\d{6}$/.test(code)||newPassword.length<8||newPassword.length>72){
+ if(!identifier||!/^\d{6}$/.test(code)||newPassword.length<8||newPassword.length>72){
   say('recoveryMsg','Enter your email or full phone number, six-digit recovery code, and a password of 8–72 characters.',true);
   return;
  }
