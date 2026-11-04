@@ -1697,8 +1697,16 @@ $('notificationBell').onclick=async()=>{
   await loadNotifications();
   const ids=Array.from(document.querySelectorAll('.notification-item.unread')).map(x=>x.dataset.id);
   if(ids.length){
-   await supabase.from('user_notifications').update({is_read:true}).in('id',ids);
-   await loadNotifications();
+   const{data:marked,error}=await supabase.from('user_notifications')
+    .update({is_read:true})
+    .eq('user_id',user.id)
+    .in('id',ids)
+    .select('id');
+   if(error){
+    $('notificationList').insertAdjacentHTML('afterbegin','<p class="error">Unable to mark notifications as read. Please try again.</p>');
+    return;
+   }
+   if(marked?.length)await loadNotifications();
   }
  }
 };
