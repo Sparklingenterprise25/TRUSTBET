@@ -549,6 +549,12 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
      <div id="adminSelfExclusion" aria-live="polite"></div>
     </div>
     <div class="admin-section">
+     <h3 style="color:#b42332">❌ ACCOUNT DELETION REQUESTS</h3>
+     <p class="muted">Review customer requests. Approve or reject after your human review.</p>
+     <button id="refreshAccountDeletion" class="secondary" type="button">Refresh deletion requests</button>
+     <div id="adminAccountDeletionRequests" aria-live="polite"></div>
+    </div>
+    <div class="admin-section">
      <h3>Pending deposit requests</h3>
      <p class="muted">Review requests here. Approval must be handled by your secured backend.</p>
      <button id="refreshAdminDeposits" class="secondary">Refresh requests</button>
@@ -644,6 +650,21 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
    <button id="activate" class="wide">Submit self-exclusion request</button>
    <button id="cancelExclusion" class="wide danger hidden" style="background:#c43d4b;color:#fff">CANCEL</button>
    <p id="exMsg" class="msg"></p>
+  </div>
+  <div class="card account-info-box" style="border:2px solid #c43d4b;background:linear-gradient(180deg,#fff,#fff8f8)">
+   <div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><h2 style="color:#b42332;margin:0">❌ DANGER ZONE</h2><span style="color:#b42332;font-size:12px;font-weight:900">🔒 LOCKED</span></div>
+   <p class="muted">Permanent account deletion options are restricted. Open this section only if you genuinely want to request deletion of your TRUSTBET account.</p>
+   <button id="unlockDangerZone" class="wide danger" type="button">🔓 UNLOCK DANGER ZONE</button>
+   <div id="dangerZoneContent" class="hidden" style="margin-top:14px;border-top:1px solid #f0c6ca;padding-top:14px">
+    <h3 style="color:#b42332">⚠️ Account Deletion Request</h3>
+    <p>You are about to request the permanent deletion of your TRUSTBET account.</p>
+    <p>Once submitted, your request will be forwarded directly to the administrator for review. Your account will not be deleted until the administrator approves your request.</p>
+    <p style="color:#b42332;font-weight:800">WARNING: Approved deletion may permanently remove your account and associated data. You may not be able to recover your account after approval.</p>
+    <ul><li>Pending requests will be visible in the administrator dashboard.</li><li>The administrator can APPROVE or REJECT your request.</li></ul>
+    <p><b>Security confirmation required:</b> First confirm in your browser, then type <b>CONFIRM DELETION</b> exactly.</p>
+    <button id="requestAccountDeletion" class="wide danger" type="button" style="background:#b42332;border-color:#991b1b">🗑️ REQUEST ACCOUNT DELETION</button>
+    <p id="deletionMsg" class="msg" aria-live="polite"></p>
+   </div>
   </div>
  </section>
 </div>
@@ -924,7 +945,7 @@ async function profileLoad(authUser){
  banks();render();renderHome();exStatus();updateLockNotice();
  go('home');
  await loadBankDetails();
- if(isAdmin()){await adminDeposits();await adminWithdrawals();await adminSelfExclusion();await adminUsers();await adminPhoneApprovals();}
+ if(isAdmin()){await adminDeposits();await adminWithdrawals();await adminSelfExclusion();await adminAccountDeletionRequests();await adminUsers();await adminPhoneApprovals();}
  await adminInbox();
  await loadNotifications();
  subscribeNotifications();
@@ -1573,6 +1594,7 @@ function renderAdminUsers(){
    try{await adminUserAction(banned?'unban':'ban',item.id);await adminUsers();}
    catch(error){alert('User action failed: '+(error.message||error));toggle.disabled=false;}
   };
+  if(item.profile?.role==='admin'||item.id==='461892b7-f24b-4ba8-99d7-fa9bb44d1a33'){row.append(info);area.append(row);return;}
   const recovery=document.createElement('button');recovery.className='secondary';recovery.textContent='Recovery codes';
   recovery.onclick=()=>showRecoveryCodes(item.id);
   const remove=document.createElement('button');remove.className='danger';remove.textContent='Delete';
@@ -1619,6 +1641,55 @@ async function adminUsers(){
 }
 $('refreshAdminUsers').onclick=adminUsers;
 $('adminUserSearch').addEventListener('input',renderAdminUsers);
+
+
+/* Account deletion requests */
+async function deletionAction(body){const {data,error}=await supabase.functions.invoke('trustbet-account-deletion',{body});if(error)throw error;if(data?.error)throw new Error(data.error);return data;}
+function confirmDeletionTwoWay(action,email){
+ if(!isAdmin())return Promise.resolve(false);
+ if(!confirm('First confirmation: '+action+' permanent account deletion for '+email+'?'))return Promise.resolve(false);
+ return new Promise(resolve=>{
+  const overlay=document.createElement('div');overlay.style.cssText='position:fixed;inset:0;z-index:2300;background:#071a36e8;display:flex;align-items:center;justify-content:center;padding:18px';
+  const panel=document.createElement('div');panel.style.cssText='width:min(100%,390px);background:#fff;color:#172b4d;border-radius:14px;padding:20px;box-shadow:0 18px 50px #0005';
+  const heading=document.createElement('h3');heading.textContent='Final deletion decision confirmation';
+  const message=document.createElement('p');message.textContent='Type CONFIRM DELETION exactly to '+action.toLowerCase()+' this request for '+email+'.';
+  const field=document.createElement('input');field.type='text';field.placeholder='Type CONFIRM DELETION';field.autocomplete='off';field.autocapitalize='characters';field.spellcheck=false;field.style.cssText='width:100%;padding:13px;border:1px solid #d8e2ef;border-radius:10px;font:inherit;margin:8px 0 14px';
+  const buttons=document.createElement('div');buttons.style.cssText='display:flex;gap:9px';
+  const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Cancel';cancel.className='secondary';cancel.style.flex='1';
+  const proceed=document.createElement('button');proceed.type='button';proceed.textContent=action;proceed.className='danger';proceed.style.flex='1';
+  const close=value=>{overlay.remove();resolve(value);};cancel.onclick=()=>close(false);
+  proceed.onclick=()=>{if(field.value==='CONFIRM DELETION')close(true);else alert('The exact phrase CONFIRM DELETION is required.');};
+  overlay.onclick=e=>{if(e.target===overlay)close(false);};buttons.append(cancel,proceed);panel.append(heading,message,field,buttons);overlay.append(panel);document.body.append(overlay);field.focus();
+ });
+}
+async function adminAccountDeletionRequests(){
+ if(!isAdmin())return;const area=$('adminAccountDeletionRequests');if(!area)return;
+ area.textContent='Loading deletion requests…';const button=$('refreshAccountDeletion');if(button)button.disabled=true;
+ try{
+  const data=await deletionAction({action:'list'});const requests=Array.isArray(data.requests)?data.requests:[];
+  area.innerHTML='';if(!requests.length){area.textContent='No pending account deletion requests.';return;}
+  requests.forEach(request=>{
+   const row=document.createElement('div');row.className='admin-request';const info=document.createElement('div');
+   const name=document.createElement('b');name.textContent=request.full_name||'Name not provided';
+   const details=document.createElement('small');details.style.display='block';
+   details.textContent=(request.email||'No email')+' · Account ID: '+request.user_id+' · Requested: '+new Date(request.submitted_at).toLocaleString()+' · PENDING';
+   info.append(name,details);const actions=document.createElement('div');actions.className='row';
+   const approve=document.createElement('button');approve.textContent='APPROVE';approve.className='danger';
+   const reject=document.createElement('button');reject.textContent='REJECT';reject.className='secondary';
+   approve.onclick=async()=>{if(!await confirmDeletionTwoWay('APPROVE',request.email||request.user_id))return;approve.disabled=true;reject.disabled=true;
+    try{await deletionAction({action:'review',requestId:request.id,decision:'APPROVE'});alert('Account deletion approved and account deleted.');await adminAccountDeletionRequests();await adminUsers();}
+    catch(error){alert('Approval failed: '+(error.message||error));approve.disabled=false;reject.disabled=false;}
+   };
+   reject.onclick=async()=>{if(!await confirmDeletionTwoWay('REJECT',request.email||request.user_id))return;approve.disabled=true;reject.disabled=true;
+    try{await deletionAction({action:'review',requestId:request.id,decision:'REJECT'});alert('Account deletion request rejected.');await adminAccountDeletionRequests();}
+    catch(error){alert('Rejection failed: '+(error.message||error));approve.disabled=false;reject.disabled=false;}
+   };
+   actions.append(approve,reject);row.append(info,actions);area.append(row);
+  });
+ }catch(error){area.textContent='Unable to load deletion requests: '+(error.message||error);}
+ finally{if(button)button.disabled=false;}
+}
+$('refreshAccountDeletion').onclick=adminAccountDeletionRequests;
 
 /* Admin phone registration approval */
 async function recoveryAdminAction(action,userId){
@@ -2023,6 +2094,8 @@ $('activate').onclick=async()=>{
  say('exMsg','SELF-EXCLUSION REQUEST SUBMITTED👉 Your self-exclusion request has been successfully submitted and is awaiting . You can continue to log in and use all TRUSTBET features while your request will be EXECUTED before 48 hours.',false);
  days=0;document.querySelectorAll('#exclusion button').forEach(x=>x.classList.remove('selected'));
  await exStatus();
+ say('exMsg','Request submitted. Returning to Home in 7 seconds…',false);
+ if(requestRedirectTimer)clearTimeout(requestRedirectTimer);requestRedirectTimer=setTimeout(()=>go('home'),7000);
 };
 $('cancelExclusion').onclick=async()=>{
  if(!currentExclusionRequest?.id)return;
@@ -2031,7 +2104,32 @@ $('cancelExclusion').onclick=async()=>{
  const{error}=await supabase.rpc('cancel_self_exclusion_request',{p_request_id:currentExclusionRequest.id});
  $('cancelExclusion').disabled=false;
  if(error)return say('exMsg',error.message,true);
- say('exMsg','Your self-exclusion request has been cancelled.',false);await exStatus();
+ say('exMsg','Your self-exclusion request has been cancelled. Returning to Home in 7 seconds…',false);await exStatus();
+ if(requestRedirectTimer)clearTimeout(requestRedirectTimer);requestRedirectTimer=setTimeout(()=>go('home'),7000);
+};
+
+
+/* Customer account deletion */
+$('unlockDangerZone').onclick=()=>{const content=$('dangerZoneContent');const opening=content.classList.contains('hidden');content.classList.toggle('hidden',!opening);$('unlockDangerZone').textContent=opening?'🔒 LOCK DANGER ZONE':'🔓 UNLOCK DANGER ZONE';};
+$('requestAccountDeletion').onclick=async()=>{
+ if(!user||isAdmin())return say('deletionMsg','Administrator accounts cannot request deletion through TRUSTBET. Use Supabase manually.',true);
+ if(!confirm('First confirmation: Submit a permanent account deletion request? Your account will only be deleted if the administrator approves.'))return;
+ const typed=await new Promise(resolve=>{
+  const overlay=document.createElement('div');overlay.style.cssText='position:fixed;inset:0;z-index:2300;background:#071a36e8;display:flex;align-items:center;justify-content:center;padding:18px';
+  const panel=document.createElement('div');panel.style.cssText='width:min(100%,390px);background:#fff;color:#172b4d;border-radius:14px;padding:20px;box-shadow:0 18px 50px #0005';
+  const heading=document.createElement('h3');heading.textContent='Final account deletion confirmation';
+  const message=document.createElement('p');message.textContent='Type CONFIRM DELETION exactly to submit your request.';
+  const field=document.createElement('input');field.type='text';field.placeholder='Type CONFIRM DELETION';field.autocomplete='off';field.autocapitalize='characters';field.spellcheck=false;field.style.cssText='width:100%;padding:13px;border:1px solid #d8e2ef;border-radius:10px;font:inherit;margin:8px 0 14px';
+  const actions=document.createElement('div');actions.style.cssText='display:flex;gap:9px';
+  const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Cancel';cancel.className='secondary';cancel.style.flex='1';
+  const submit=document.createElement('button');submit.type='button';submit.textContent='Submit request';submit.className='danger';submit.style.flex='1';
+  const close=value=>{overlay.remove();resolve(value);};cancel.onclick=()=>close(false);
+  submit.onclick=()=>{if(field.value==='CONFIRM DELETION')close(true);else alert('You must type CONFIRM DELETION exactly.');};
+  overlay.onclick=e=>{if(e.target===overlay)close(false);};actions.append(cancel,submit);panel.append(heading,message,field,actions);overlay.append(panel);document.body.append(overlay);field.focus();
+ });
+ if(!typed)return;const button=$('requestAccountDeletion');button.disabled=true;
+ try{await deletionAction({action:'submit'});say('deletionMsg','Your account deletion request has been submitted and sent to the administrator for review. Your account remains active until the request is approved.',false);button.classList.add('hidden');}
+ catch(error){say('deletionMsg',error.message||'Unable to submit your request.',true);button.disabled=false;}
 };
 
 /* Customer support chat */
