@@ -33,12 +33,12 @@ Deno.serve(async(req:Request)=>{
  if(req.method!=="POST")return reply({error:"Method not allowed."},405);
  const url=Deno.env.get("SUPABASE_URL"),key=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
  if(!url||!key)return reply({error:"Server configuration missing."},500);
- let body:{phone?:string;password?:string};try{body=await req.json();}catch{return reply({error:"Invalid request."},400);}
- const phone=String(body.phone||"").trim(),password=String(body.password||"");
+ let body:{phone?:string;password?:string;first_name?:string;last_name?:string};try{body=await req.json();}catch{return reply({error:"Invalid request."},400);}
+ const phone=String(body.phone||"").trim(),password=String(body.password||"");\n const firstName=String(body.first_name||"").trim().replace(/\\s+/g," "),lastName=String(body.last_name||"").trim().replace(/\\s+/g," ");\n if(!firstName||!lastName||/\\s/.test(firstName)||/\\s/.test(lastName)||firstName.length>60||lastName.length>60)return reply({error:"Enter one first name and one surname. Both are required."},400);
  if(!/^\+[1-9]\d{7,14}$/.test(phone))return reply({error:"Enter a valid international phone number."},400);
  if(!/^(?=.{8,15}$)(?=[0-9]*[A-Za-z][0-9]*$)[A-Za-z0-9]+$/.test(password))return reply({error:"Phone passwords must be 8–15 characters: exactly one letter and all remaining characters numbers."},400);
  const admin=createClient(url,key,{auth:{autoRefreshToken:false,persistSession:false}});
- const {data,error}=await admin.auth.admin.createUser({phone,password,phone_confirm:true,user_metadata:{phone}});
+ const {data,error}=await admin.auth.admin.createUser({phone,password,phone_confirm:true,user_metadata:{phone,first_name:firstName,last_name:lastName,full_name:(firstName+" "+lastName).toUpperCase()}});
  if(error)return reply({error:error.message},400);
  if(!data.user)return reply({error:"Registration could not be completed."},500);
  const {error:banError}=await admin.auth.admin.updateUserById(data.user.id,{ban_duration:"876000h"});
