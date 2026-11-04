@@ -188,6 +188,10 @@ footer{text-align:center;padding:24px 24px 90px;color:var(--muted);font-size:12p
 .admin-bank-editor input{background:#fff;color:var(--ink);margin-bottom:7px}
 .bank-note{color:#d5e6fb;font-size:11px;line-height:1.5;margin:10px 0 0}
 .admin-section{border:1px solid #102d59;border-radius:12px;padding:14px;margin:17px 0 19px;background:#f8fbff}
+.admin-support-notice{border:2px solid #d62839;border-radius:12px;padding:12px 14px;margin:10px 0;background:#fffafa;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.admin-support-notice .support-notice-text{flex:1;min-width:0}
+.admin-support-bell{display:inline-flex;align-items:center;gap:5px;flex-shrink:0;font-size:20px;line-height:1}
+.admin-support-bell-count{color:#d00000;font-size:14px;font-weight:900;min-width:12px;text-align:center}
 .account-info-box{border:1px solid #102d59;border-radius:12px;padding:16px;margin:18px 0 22px;background:#f8fbff}
 .admin-request{padding:12px 0;border-bottom:1px solid #e2e9f2}
 .admin-request:last-child{border-bottom:0}
@@ -633,7 +637,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
 import{supabase}from'./supabase.js';
 
 const $=id=>document.getElementById(id);
-let user=null,profile=null,days=0,conversation=null,channel=null,game=null;
+let user=null,profile=null,days=0,conversation=null,channel=null,game=null,supportAdminChannel=null;
 let selectedOdd=null,notificationChannel=null,activeCategory='All';
 let homeBalanceHidden=false;
 let requestRedirectTimer=null;
@@ -1983,13 +1987,24 @@ async function adminInbox(){
  if(error){$('adminInbox').textContent=error.message;return;}
  $('adminInbox').innerHTML='';
  (data||[]).forEach(c=>{
-  const d=document.createElement('div');d.className='conversation';
-  d.textContent=c.subject+' · '+c.status+' · Unread '+(c.admin_unread_count||0);
+  const d=document.createElement('div');d.className='conversation admin-support-notice';
+  const label=document.createElement('span');label.className='support-notice-text';
+  label.textContent=c.subject+' · '+c.status+' · Unread '+(c.admin_unread_count||0);
+  const bell=document.createElement('span');bell.className='admin-support-bell';bell.setAttribute('aria-label','Unread support notifications');
+  bell.textContent='🔔';
+  const count=document.createElement('span');count.className='admin-support-bell-count';
+  count.textContent=Number(c.admin_unread_count||0)>0?String(c.admin_unread_count):'';
+  bell.append(count);d.append(label,bell);
   d.onclick=async()=>{
    conversation=c;$('chatPanel').classList.remove('hidden');await chatLoad();
   };
   $('adminInbox').append(d);
  });
+ if(supportAdminChannel)supabase.removeChannel(supportAdminChannel);
+ supportAdminChannel=supabase.channel('trustbet-admin-support-inbox')
+  .on('postgres_changes',{event:'INSERT',schema:'public',table:'support_messages'},adminInbox)
+  .on('postgres_changes',{event:'UPDATE',schema:'public',table:'support_conversations'},adminInbox)
+  .subscribe();
 }
 
 /* Restore an existing authenticated session. */
