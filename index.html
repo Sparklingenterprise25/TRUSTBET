@@ -2194,9 +2194,11 @@ async function conversationOpen(){
 }
 async function chatLoad(){
  if(!conversation)return;
+ const retentionDays=isAdmin()?365:7;
+ const visibleAfter=new Date(Date.now()-retentionDays*24*60*60*1000).toISOString();
  const{data,error}=await supabase.from('support_messages')
   .select('sender_id,message,created_at,read_at')
-  .eq('conversation_id',conversation.id).order('created_at');
+  .eq('conversation_id',conversation.id).gte('created_at',visibleAfter).order('created_at');
  if(error)return say('chatMsg',error.message,true);
  $('chatMessages').innerHTML='';
  (data||[]).forEach(m=>{
