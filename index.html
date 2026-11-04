@@ -1414,6 +1414,7 @@ function confirmAdminDecision(kind,decision){
   const heading=document.createElement('h3');heading.textContent='Final '+kind+' confirmation';
   const message=document.createElement('p');message.textContent='Type '+word+' exactly to '+decision+' this '+kind+' request.';
   const field=document.createElement('input');field.type='text';field.placeholder='Type '+word;field.autocomplete='off';field.autocapitalize='characters';field.spellcheck=false;field.style.cssText='width:100%;padding:13px;border:1px solid #d8e2ef;border-radius:10px;font:inherit;margin:8px 0 14px';
+  formatDeletionPhraseInput(field);
   const buttons=document.createElement('div');buttons.style.cssText='display:flex;gap:9px';
   const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Cancel';cancel.className='secondary';cancel.style.flex='1';
   const proceed=document.createElement('button');proceed.type='button';proceed.textContent=word;proceed.className=decision==='reject'?'danger':'';proceed.style.flex='1';
@@ -1642,6 +1643,15 @@ $('refreshAdminUsers').onclick=adminUsers;
 $('adminUserSearch').addEventListener('input',renderAdminUsers);
 
 
+/* Account deletion confirmation input formatting */
+function formatDeletionPhraseInput(field){
+ field.maxLength=17;
+ field.addEventListener('input',()=>{
+  const raw=field.value.replace(/\\s+/g,'').toUpperCase().slice(0,16);
+  field.value=raw.length>=7?raw.slice(0,7)+' '+raw.slice(7):raw;
+ });
+}
+
 /* Account deletion requests */
 async function deletionAction(body){const {data,error}=await supabase.functions.invoke('trustbet-account-deletion',{body});if(error)throw error;if(data?.error)throw new Error(data.error);return data;}
 function confirmDeletionTwoWay(action,email){
@@ -1653,11 +1663,12 @@ function confirmDeletionTwoWay(action,email){
   const heading=document.createElement('h3');heading.textContent='Final deletion decision confirmation';
   const message=document.createElement('p');message.textContent='Type CONFIRM DELETION exactly to '+action.toLowerCase()+' this request for '+email+'.';
   const field=document.createElement('input');field.type='text';field.placeholder='Type CONFIRM DELETION';field.autocomplete='off';field.autocapitalize='characters';field.spellcheck=false;field.style.cssText='width:100%;padding:13px;border:1px solid #d8e2ef;border-radius:10px;font:inherit;margin:8px 0 14px';
+  formatDeletionPhraseInput(field);
   const buttons=document.createElement('div');buttons.style.cssText='display:flex;gap:9px';
   const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Cancel';cancel.className='secondary';cancel.style.flex='1';
   const proceed=document.createElement('button');proceed.type='button';proceed.textContent=action;proceed.className='danger';proceed.style.flex='1';
   const close=value=>{overlay.remove();resolve(value);};cancel.onclick=()=>close(false);
-  proceed.onclick=()=>{if(field.value==='CONFIRM DELETION')close(true);else alert('The exact phrase CONFIRM DELETION is required.');};
+  proceed.onclick=()=>{if(field.value.trim()==='CONFIRM DELETION')close(true);else alert('The exact phrase CONFIRM DELETION is required.');};
   overlay.onclick=e=>{if(e.target===overlay)close(false);};buttons.append(cancel,proceed);panel.append(heading,message,field,buttons);overlay.append(panel);document.body.append(overlay);field.focus();
  });
 }
@@ -2119,11 +2130,12 @@ $('requestAccountDeletion').onclick=async()=>{
   const heading=document.createElement('h3');heading.textContent='Final account deletion confirmation';
   const message=document.createElement('p');message.textContent='Type CONFIRM DELETION exactly to submit your request.';
   const field=document.createElement('input');field.type='text';field.placeholder='Type CONFIRM DELETION';field.autocomplete='off';field.autocapitalize='characters';field.spellcheck=false;field.style.cssText='width:100%;padding:13px;border:1px solid #d8e2ef;border-radius:10px;font:inherit;margin:8px 0 14px';
+  formatDeletionPhraseInput(field);
   const actions=document.createElement('div');actions.style.cssText='display:flex;gap:9px';
   const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Cancel';cancel.className='secondary';cancel.style.flex='1';
   const submit=document.createElement('button');submit.type='button';submit.textContent='Submit request';submit.className='danger';submit.style.flex='1';
   const close=value=>{overlay.remove();resolve(value);};cancel.onclick=()=>close(false);
-  submit.onclick=()=>{if(field.value==='CONFIRM DELETION')close(true);else alert('You must type CONFIRM DELETION exactly.');};
+  submit.onclick=()=>{if(field.value.trim()==='CONFIRM DELETION')close(true);else alert('You must type CONFIRM DELETION exactly.');};
   overlay.onclick=e=>{if(e.target===overlay)close(false);};actions.append(cancel,submit);panel.append(heading,message,field,actions);overlay.append(panel);document.body.append(overlay);field.focus();
  });
  if(!typed)return;const button=$('requestAccountDeletion');button.disabled=true;
