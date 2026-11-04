@@ -987,13 +987,13 @@ $('resend').onclick=async()=>{
 };
 $('emailMode').onclick=()=>{$('emailAuth').classList.remove('hidden');$('phoneAuth').classList.add('hidden');$('emailMode').classList.remove('secondary');$('phoneMode').classList.add('secondary');};
 $('phoneMode').onclick=()=>{$('phoneAuth').classList.remove('hidden');$('emailAuth').classList.add('hidden');$('phoneMode').classList.remove('secondary');$('emailMode').classList.add('secondary');};
-$('phoneNumber').addEventListener('input',()=>{const digits=$('phoneNumber').value.replace(/\D/g,'').slice(0,14);$('phoneNumber').value=digits.replace(/^(\d{3})(\d{0,4})(\d{0,7}).*$/,(_,a,b,c)=>[a,b,c].filter(Boolean).join(' '));});
+$('phoneNumber').addEventListener('input',()=>{const digits=$('phoneNumber').value.replace(/\D/g,'').slice(0,15);$('phoneNumber').value=digits.replace(/^(\d{3})(\d{0,4})(\d{0,8}).*$/,(_,a,b,c)=>[a,b,c].filter(Boolean).join(' '));});
 function fullPhoneNumber(){
  const code=$('phoneCountry').value;
  let digits=$('phoneNumber').value.replace(/\D/g,'');
  if(digits.startsWith('0'))digits=digits.slice(1);
  if(digits.startsWith(code.replace('+','')))digits=digits.slice(code.length-1);
- if(digits.length<5||digits.length>14)throw new Error('Enter a valid phone number.');
+ if(digits.length<8||digits.length>15)throw new Error('Enter a valid phone number with 8 to 15 digits.');
  return code+digits;
 }
 $('phoneLogin').onclick=async()=>{
