@@ -1006,7 +1006,7 @@ $('phoneLogin').onclick=async()=>{
  const button=$('phoneLogin');button.disabled=true;button.textContent='Signing in…';
  try{
   const phone=fullPhoneNumber(),password=$('phonePassword').value;
-  if(!/^[0-9]{8,72}$/.test(password))return say('authMsg','Phone account passwords must contain only digits (8–15 digits).',true);
+  if(!/^[0-9]{8,15}$/.test(password))return say('authMsg','Phone account passwords must contain only digits (8–15 digits).',true);
   const{data,error}=await supabase.auth.signInWithPassword({phone,password});
   if(error){say('authMsg',error.message,true);return;}
   await profileLoad(data.user);
@@ -1016,9 +1016,13 @@ $('phoneLogin').onclick=async()=>{
 $('phoneSignup').onclick=async()=>{
  try{
   const phone=fullPhoneNumber(),password=$('phonePassword').value;
-  if(!/^[0-9]{8,72}$/.test(password))return say('authMsg','Phone account passwords must contain only digits (8–15 digits).',true);
+  if(!/^[0-9]{8,15}$/.test(password))return say('authMsg','Phone account passwords must contain only digits (8–15 digits).',true);
   const{data,error}=await supabase.functions.invoke('trustbet-phone-signup',{body:{phone,password}});
-  if(error)return say('authMsg',error.message||'Phone registration failed.',true);
+  if(error){
+   let detail=error.message||'Phone registration failed.';
+   try{const response=error.context;if(response&&typeof response.json==='function'){const body=await response.clone().json();detail=body?.error||body?.message||detail;}}catch{}
+   return say('authMsg',detail,true);
+  }
   if(data?.error)return say('authMsg',data.error,true);
   $('phoneOtpBox').classList.add('hidden');
   $('authMsg').innerHTML='';
