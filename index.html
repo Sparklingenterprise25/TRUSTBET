@@ -470,7 +470,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
    <div class="section-head"><h2 id="gameTitle">Game</h2><button id="closeGame" class="secondary">Close</button></div>
    <div id="gameStage" class="admin-game-stage" aria-hidden="true"></div>
    <div class="play-balance"><span>YOUR AVAILABLE BALANCE</span><strong id="gameBalance">₦0</strong></div>
-   <label id="stakeLabel">Stake</label><input id="stake" type="number" min="100" step="1" placeholder="Enter stake">
+   <label id="stakeLabel">Stake</label><input id="stake" type="text" inputmode="numeric" autocomplete="off" placeholder="Enter stake">
    <p class="muted">Choose your odds. Only your selected box will display 🔒.</p>
    <div id="oddsGrid" class="odds-grid"></div>
    <button id="bet" class="wide" disabled>Place bet</button>
@@ -516,7 +516,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
     <label>Select bank / provider</label>
     <select id="depProvider"><option value="">Select bank / provider</option></select>
     <label>Amount (Min ₦500 – Max₦5,000,000 daily limit)</label>
-    <input id="depAmount" type="number" min="500" max="5000000" step="1" placeholder="Enter deposit amount">
+    <input id="depAmount" type="text" inputmode="numeric" autocomplete="off" placeholder="Enter deposit amount">
     <label>Your actual bank account name</label>
     <input id="depAccountName" type="text" maxlength="120" autocomplete="name" autocapitalize="characters" placeholder="Enter the account name used for the transfer">
     <button id="depositBtn" class="wide">Submit deposit request</button>
@@ -529,7 +529,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
   <div class="card">
    <h2>Withdraw Naira</h2>
    <p class="muted withdrawal-limits"><span>Minimum withdrawal: ₦20,000 per day</span><span>Maximum withdrawal: ₦5,000,000 per day</span></p>
-   <label>Amount (₦20,000–₦5,000,000 daily limit)</label><input id="wdAmount" type="number" min="20000" max="5000000" step="1" placeholder="Enter withdrawal amount">
+   <label>Amount (₦20,000–₦5,000,000 daily limit)</label><input id="wdAmount" type="text" inputmode="numeric" autocomplete="off" placeholder="Enter withdrawal amount">
    <label>Select bank / provider</label><select id="bank"><option value="">Select bank / provider</option></select>
    <label>Account name</label><input id="accName" type="text" maxlength="120" autocapitalize="characters" placeholder="Enter account name">
    <label>Account number</label><input id="accNo" inputmode="numeric" maxlength="10" placeholder="10-digit account number">
@@ -583,7 +583,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
      <select id="creditUserSelect"><option value="">Select a user</option></select>
      <label>Credit type</label>
      <select id="creditType"><option value="bonus">Bonus</option><option value="compensation">Compensation</option></select>
-     <label>Amount (₦)</label><input id="creditAmount" type="number" min="1" step="1" placeholder="Enter amount">
+     <label>Amount (₦)</label><input id="creditAmount" type="text" inputmode="numeric" autocomplete="off" placeholder="Enter amount">
      <label>Customer message (read-only)</label><textarea id="creditMessage" readonly></textarea>
      <button type="button" id="issueWalletCredit" class="wide">Review and issue credit</button>
      <p id="walletCreditMsg" class="msg" aria-live="polite"></p>
@@ -1078,6 +1078,26 @@ $('logout').onclick=async()=>{
  location.reload();
 };
 
+/* Naira amount inputs: display thousands separators while keeping numeric values clean for calculations. */
+function formatAmountInput(field){
+ const digits=String(field.value||'').replace(/\\D/g,'');
+ const formatted=digits.replace(/\\B(?=(\\d{3})+(?!\\d))/g,',');
+ if(field.value!==formatted){
+  const oldPos=field.selectionStart??field.value.length;
+  const digitsBefore=String(field.value).slice(0,oldPos).replace(/\\D/g,'').length;
+  field.value=formatted;
+  let pos=0,count=0;
+  while(pos<formatted.length&&count<digitsBefore){if(/\\d/.test(formatted[pos]))count++;pos++;}
+  try{field.setSelectionRange(pos,pos);}catch{}
+ }
+}
+function readAmountInput(id){const raw=$(id)?.value||'';return Number(raw.replace(/,/g,''));}
+['depAmount','wdAmount','creditAmount','stake'].forEach(id=>{
+ const field=$(id);if(!field)return;
+ field.addEventListener('input',()=>formatAmountInput(field));
+ field.addEventListener('blur',()=>formatAmountInput(field));
+});
+
 /* Daily totals include pending requests. Enforce the same caps in Supabase as well. */
 async function dailyRequestTotal(table){
  const now=new Date();
@@ -1091,7 +1111,7 @@ async function dailyRequestTotal(table){
 
 /* Deposit request: creates a pending request only; it never credits the wallet. */
 $('depositBtn').onclick=async()=>{
- const amount=Number($('depAmount').value),provider_name=$('depProvider').value;
+ const amount=readAmountInput('depAmount'),provider_name=$('depProvider').value;
  const depositor_account_name=$('depAccountName').value.toUpperCase().trim();
  if(!provider_name)return say('depMsg','Select a bank or payment provider.',true);
  if(!depositor_account_name)return say('depMsg','Enter the actual account name used for the transfer.',true);
@@ -1168,7 +1188,7 @@ $('saveBankDetails').onclick=async()=>{
 
 /* Withdrawal requests */
 $('withdrawBtn').onclick=async()=>{
- const amount=Number($('wdAmount').value),bank_name=$('bank').value;
+ const amount=readAmountInput('wdAmount'),bank_name=$('bank').value;
  const account_name=$('accName').value.toUpperCase().trim(),account_number=$('accNo').value.trim();
  if(!Number.isSafeInteger(amount)||amount<20000)return say('wdMsg','Minimum withdrawal is ₦20,000.',true);
  if(amount>5000000)return say('wdMsg','Maximum withdrawal per day is ₦5,000,000.',true);
@@ -1293,7 +1313,7 @@ $('closeGame').onclick=()=>{
 $('bet').onclick=async()=>{
  if(isBettingLocked())return say('betMsg','Betting is locked for this account.',true);
  if(isSelfExcluded())return say('betMsg','Self-exclusion is active.',true);
- const stake=Number($('stake').value);
+ const stake=readAmountInput('stake');
  if(!Number.isSafeInteger(stake)||stake<minimumStake(game))return say('betMsg','Minimum stake for this game is '+money(minimumStake(game))+'.',true);
  if(selectedOdd===null)return say('betMsg','Select an odds box first.',true);
  const chosen=game.odds[selectedOdd];
@@ -1334,7 +1354,7 @@ $('bet').onclick=async()=>{
  }
 };
 $('stake').oninput=()=>{
- $('bet').disabled=isBettingLocked()||isSelfExcluded()||selectedOdd===null||Number($('stake').value)<minimumStake(game);
+ $('bet').disabled=isBettingLocked()||isSelfExcluded()||selectedOdd===null||readAmountInput('stake')<minimumStake(game);
 };
 $('cats').querySelector('[data-cat="All"]').classList.add('active');
 
@@ -1855,7 +1875,7 @@ if($('searchCreditUsers'))$('searchCreditUsers').onclick=async()=>{
 };
 if($('issueWalletCredit'))$('issueWalletCredit').onclick=async()=>{
  if(!isAdmin())return say('walletCreditMsg','Administrator access required.',true);
- const userId=$('creditUserSelect').value,amount=Number($('creditAmount').value),type=$('creditType').value,message=TRUSTBET_CREDIT_MESSAGES[type];
+ const userId=$('creditUserSelect').value,amount=readAmountInput('creditAmount'),type=$('creditType').value,message=TRUSTBET_CREDIT_MESSAGES[type];
  if(!userId)return say('walletCreditMsg','Select a user first.',true);
  if(!Number.isSafeInteger(amount)||amount<=0)return say('walletCreditMsg','Enter a valid positive whole-number amount.',true);
  const target=$('creditUserSelect').selectedOptions[0]?.textContent||'selected user';
