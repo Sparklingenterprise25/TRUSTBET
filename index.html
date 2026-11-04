@@ -335,6 +335,16 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
   </div>
  </div>
  <p id="authMsg" class="msg"></p>
+ <div style="margin-top:10px"><button id="forgotPasswordOpen" type="button" class="secondary">Forgot password?</button></div>
+ <div id="recoveryPanel" class="hidden" style="margin-top:14px;padding:14px;border:1px solid #d6deea;border-radius:12px">
+  <h3>Reset your password</h3>
+  <p class="muted">Enter your registered email or full phone number, your six-digit recovery code, and a new password.</p>
+  <label>Email or full phone number</label><input id="recoveryIdentifier" type="text" autocomplete="username" placeholder="name@example.com or +234...">
+  <label>Six-digit recovery code</label><input id="recoveryCode" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code">
+  <label>New password</label><input id="recoveryNewPassword" type="password" minlength="8" maxlength="72" autocomplete="new-password">
+  <div class="row"><button id="recoverySubmit" type="button">Reset password</button><button id="recoveryCancel" type="button" class="secondary">Cancel</button></div>
+  <p id="recoveryMsg" class="msg"></p>
+ </div>
 </section>
 
 <div id="app" class="hidden">
@@ -850,6 +860,43 @@ async function profileLoad(authUser){
  return true;
 }
 
+$('forgotPasswordOpen').onclick=()=>{
+ const panel=$('recoveryPanel');
+ panel.classList.toggle('hidden');
+ if(!panel.classList.contains('hidden')){
+  const email=$('email').value.trim();
+  if(email)$('recoveryIdentifier').value=email;
+  else if(!$('phoneAuth').classList.contains('hidden')){
+   try{$('recoveryIdentifier').value=fullPhoneNumber();}catch{}
+  }
+ }
+};
+$('recoveryCancel').onclick=()=>{
+ $('recoveryPanel').classList.add('hidden');
+ $('recoveryMsg').textContent='';
+};
+$('recoverySubmit').onclick=async()=>{
+ const button=$('recoverySubmit');
+ const identifier=$('recoveryIdentifier').value.trim();
+ const code=$('recoveryCode').value.trim();
+ const newPassword=$('recoveryNewPassword').value;
+ if(!identifier||!/^\\d{6}$/.test(code)||newPassword.length<8||newPassword.length>72){
+  say('recoveryMsg','Enter your email or full phone number, six-digit recovery code, and a password of 8–72 characters.',true);
+  return;
+ }
+ button.disabled=true;button.textContent='Resetting…';
+ try{
+  const {data,error}=await supabase.functions.invoke('trustbet-recovery-reset',{body:{identifier,code,newPassword}});
+  if(error)throw error;
+  if(data?.error)throw new Error(data.error);
+  say('recoveryMsg',data?.message||'Password reset successfully. You can now sign in.',false);
+  $('recoveryCode').value='';$('recoveryNewPassword').value='';
+ }catch(error){
+  say('recoveryMsg',error?.message||'Password reset failed. Check your details and try again.',true);
+ }finally{
+  button.disabled=false;button.textContent='Reset password';
+ }
+};
 $('login').onclick=async()=>{
  const button=$('login');button.disabled=true;button.textContent='Signing in…';
  try{
