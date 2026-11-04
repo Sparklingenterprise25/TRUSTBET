@@ -1347,6 +1347,35 @@ async function adminProfileNames(requests){
  return new Map((data||[]).map(x=>[x.id,(x.full_name||'').trim()]));
 }
 function adminRequestDate(value){return value?new Date(value).toLocaleString():'Date unavailable';}
+function adminRequestNameEditor(kind,item,field,label,refresh){
+ if(!isAdmin())return null;
+ const editor=document.createElement('div');editor.style.cssText='display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0;width:100%';
+ const input=document.createElement('input');input.type='text';input.value=item[field]||'';input.maxLength=120;input.autocomplete='off';input.setAttribute('aria-label',label);
+ input.placeholder='Correct '+label.toLowerCase();input.style.cssText='flex:1;min-width:180px;margin:0;padding:10px 12px;text-transform:uppercase';
+ input.addEventListener('input',()=>{const start=input.selectionStart,end=input.selectionEnd;input.value=input.value.toUpperCase();try{input.setSelectionRange(start,end);}catch{}});
+ const save=document.createElement('button');save.type='button';save.textContent='Save name';save.className='secondary';
+ const feedback=document.createElement('small');feedback.style.cssText='width:100%;display:block;color:#087c50';
+ save.onclick=async()=>{
+  if(!isAdmin())return alert('Administrator access required.');
+  const value=input.value.toUpperCase().trim().replace(/\\s+/g,' ');
+  if(!value){feedback.textContent='Enter a valid account name.';feedback.style.color='#b93443';return;}
+  if(value===String(item[field]||'')){feedback.textContent='No changes to save.';return;}
+  save.disabled=true;input.disabled=true;feedback.textContent='Saving…';feedback.style.color='#78869c';
+  const table=kind==='deposit'?'deposit_requests':'withdrawal_requests';
+  const payload=field==='depositor_account_name'?{depositor_account_name:value}:{account_name:value};
+  const{data,error}=await supabase.from(table).update(payload).eq('id',item.id).eq('status','pending').select('id').maybeSingle();
+  if(error||!data){
+   feedback.textContent=error?'Could not save: '+error.message:'This request is no longer pending; refresh the list.';
+   feedback.style.color='#b93443';save.disabled=false;input.disabled=false;return;
+  }
+  item[field]=value;
+  feedback.textContent='Updated successfully. The corrected name will appear on the receipt.';
+  feedback.style.color='#087c50';
+  await refresh();
+ };
+ editor.append(input,save,feedback);
+ return editor;
+}
 function showAdminReceipt(kind,item,decision,reason=''){
  if(!isAdmin())return alert('Administrator access required.');
  const overlay=$('adminReceiptOverlay');
@@ -1485,6 +1514,7 @@ async function adminDeposits(){
    '<br>Reference: '+escapeHtml(item.tracking_code||'No reference')+
    '<br>User: '+escapeHtml(names.get(item.user_id)||'Name unavailable')+
    '<br>Date: '+escapeHtml(adminRequestDate(item.created_at))+'</small>';
+  row.append(info,adminRequestNameEditor('deposit',item,'depositor_account_name','Depositor account name',adminDeposits));
   const status=document.createElement('span');status.className='status-pill';status.textContent=String(item.status||'pending').toUpperCase();
   const actions=document.createElement('div');actions.className='row';
   const approve=document.createElement('button');approve.textContent='Approve';
@@ -1535,6 +1565,7 @@ async function adminWithdrawals(){
    '<br>Reference: '+escapeHtml(item.tracking_code||'No reference')+
    '<br>User: '+escapeHtml(names.get(item.user_id)||'Name unavailable')+
    '<br>Date: '+escapeHtml(adminRequestDate(item.created_at))+'</small>';
+  row.append(info,adminRequestNameEditor('withdrawal',item,'account_name','Bank account name',adminWithdrawals));
   const status=document.createElement('span');status.className='status-pill';status.textContent=String(item.status||'pending').toUpperCase();
   const actions=document.createElement('div');actions.className='row';
   const approve=document.createElement('button');approve.textContent='Approve';
