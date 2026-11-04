@@ -508,7 +508,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
     <label>Amount (Min ₦500 – Max₦5,000,000 daily limit)</label>
     <input id="depAmount" type="number" min="500" max="5000000" step="1" placeholder="Enter deposit amount">
     <label>Your actual bank account name</label>
-    <input id="depAccountName" type="text" maxlength="120" autocomplete="name" placeholder="Enter the account name used for the transfer">
+    <input id="depAccountName" type="text" maxlength="120" autocomplete="name" autocapitalize="characters" placeholder="Enter the account name used for the transfer">
     <button id="depositBtn" class="wide">Submit deposit request</button>
     <p id="depMsg" class="msg"></p>
    </div>
@@ -521,7 +521,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
    <p class="muted withdrawal-limits"><span>Minimum withdrawal: ₦20,000 per day</span><span>Maximum withdrawal: ₦5,000,000 per day</span></p>
    <label>Amount (₦20,000–₦5,000,000 daily limit)</label><input id="wdAmount" type="number" min="20000" max="5000000" step="1" placeholder="Enter withdrawal amount">
    <label>Select bank / provider</label><select id="bank"><option value="">Select bank / provider</option></select>
-   <label>Account name</label><input id="accName" placeholder="Enter account name">
+   <label>Account name</label><input id="accName" type="text" maxlength="120" autocapitalize="characters" placeholder="Enter account name">
    <label>Account number</label><input id="accNo" inputmode="numeric" maxlength="10" placeholder="10-digit account number">
    <button id="withdrawBtn" class="wide">Submit withdrawal request</button>
    <p id="wdMsg" class="msg"></p>
@@ -567,17 +567,19 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
      <button type="button" id="issueWalletCredit" class="wide">Review and issue credit</button>
      <p id="walletCreditMsg" class="msg" aria-live="polite"></p>
     </div>
-    <h3>Admin Support Inbox</h3><div id="adminInbox"></div>
+    <h3>Admin Support Inbox</h3><div id="adminInbox"></div><p><a href="mailto:superhybridservices@gmail.com">Email support: superhybridservices@gmail.com</a></p><button type="button" class="secondary copy-support-email">Copy support email</button>
    </div>
   </div>
   <div class="card account-info-box">
    <h2>🎧 Customer Support</h2><p><b style="color:var(--green)">🟢 ACTIVE 24/7</b></p>
    <a class="support-link" href="#" id="chatOpen"><span class="emoji">💬</span><span><b>Live Chat</b><small>Private chat with support</small></span></a>
    <a class="support-link" href="https://wa.me/2347063593605"><span class="emoji">📱</span><span><b>WhatsApp</b><small>Chat with our team</small></span></a>
-   <a class="support-link" href="mailto:superhybridservices@gmail.com"><span class="emoji">📧</span><span><b>Email</b><small>superhybridservices@gmail.com</small></span></a>
+   <a class="support-link" href="mailto:superhybridservices@gmail.com"><span class="emoji">📧</span><span><b>Email</b><small>superhybridservices@gmail.com · Open email app</small></span></a>
+   <button type="button" class="secondary copy-support-email">Copy support email</button>
    <div class="card hidden" id="chatPanel">
    <h2>💬 Live Chat</h2><div id="chatMessages" class="chat-list"></div>
-   <textarea id="chatInput" maxlength="5000" placeholder="Write your message"></textarea>
+   <textarea id="chatInput" maxlength="1000" placeholder="Write your message (maximum 1,000 characters)"></textarea>
+   <small id="chatCharCount" class="muted">0 / 1,000 characters</small>
    <button id="sendChat" class="wide">Send message</button><p id="chatMsg" class="msg"></p>
    </div>
   </div>
@@ -1049,7 +1051,7 @@ async function dailyRequestTotal(table){
 /* Deposit request: creates a pending request only; it never credits the wallet. */
 $('depositBtn').onclick=async()=>{
  const amount=Number($('depAmount').value),provider_name=$('depProvider').value;
- const depositor_account_name=$('depAccountName').value.trim();
+ const depositor_account_name=$('depAccountName').value.toUpperCase().trim();
  if(!provider_name)return say('depMsg','Select a bank or payment provider.',true);
  if(!depositor_account_name)return say('depMsg','Enter the actual account name used for the transfer.',true);
  if(!Number.isSafeInteger(amount)||amount<500)return say('depMsg','Minimum deposit is ₦500.',true);
@@ -1119,7 +1121,7 @@ $('saveBankDetails').onclick=async()=>{
 /* Withdrawal requests */
 $('withdrawBtn').onclick=async()=>{
  const amount=Number($('wdAmount').value),bank_name=$('bank').value;
- const account_name=$('accName').value.trim(),account_number=$('accNo').value.trim();
+ const account_name=$('accName').value.toUpperCase().trim(),account_number=$('accNo').value.trim();
  if(!Number.isSafeInteger(amount)||amount<20000)return say('wdMsg','Minimum withdrawal is ₦20,000.',true);
  if(amount>5000000)return say('wdMsg','Maximum withdrawal per day is ₦5,000,000.',true);
  let total;
@@ -1941,6 +1943,9 @@ $('activate').onclick=async()=>{
 /* Customer support chat */
 $('chatOpen').onclick=async e=>{
  e.preventDefault();$('chatPanel').classList.remove('hidden');
+ $('chatInput').maxLength=isAdmin()?2000:1000;
+ $('chatInput').placeholder=isAdmin()?'Write your reply (maximum 2,000 characters)':'Write your message (maximum 1,000 characters)';
+ if($('chatCharCount'))$('chatCharCount').textContent='0 / '+(isAdmin()?2000:1000)+' characters';
  try{await conversationOpen();}catch(error){say('chatMsg',error.message,true);}
 };
 async function conversationOpen(){
@@ -1977,16 +1982,34 @@ async function chatLoad(){
  });
  $('chatMessages').scrollTop=$('chatMessages').scrollHeight;
 }
+$('chatInput').addEventListener('input',()=>{
+ const limit=isAdmin()?2000:1000;
+ if($('chatInput').value.length>limit)$('chatInput').value=$('chatInput').value.slice(0,limit);
+ if($('chatCharCount'))$('chatCharCount').textContent=$('chatInput').value.length+' / '+limit+' characters';
+});
 $('sendChat').onclick=async()=>{
+ const limit=isAdmin()?2000:1000;
  const message=$('chatInput').value.trim();
  if(!message||!conversation)return;
+ if(message.length>limit)return say('chatMsg','Message limit is '+limit+' characters.',true);
+ $('sendChat').disabled=true;
  const{error}=await supabase.from('support_messages').insert({
   conversation_id:conversation.id,sender_id:user.id,
   sender_role:isAdmin()?'admin':'user',message
  });
- if(error)return say('chatMsg',error.message,true);
- $('chatInput').value='';say('chatMsg','Message sent.');chatLoad();
+ $('sendChat').disabled=false;
+ if(error)return say('chatMsg','Message was not sent: '+error.message,true);
+ $('chatInput').value='';if($('chatCharCount'))$('chatCharCount').textContent='0 / '+limit+' characters';
+ say('chatMsg','Message sent.');await chatLoad();
 };
+document.querySelectorAll('.copy-support-email').forEach(button=>button.onclick=async()=>{
+ const email='superhybridservices@gmail.com';
+ try{
+  if(navigator.clipboard&&window.isSecureContext)await navigator.clipboard.writeText(email);
+  else{const field=document.createElement('textarea');field.value=email;field.readOnly=true;field.style.position='fixed';field.style.opacity='0';document.body.append(field);field.select();const ok=document.execCommand('copy');field.remove();if(!ok)throw new Error('Copy failed');}
+  button.textContent='Email copied';setTimeout(()=>button.textContent='Copy support email',1800);
+ }catch(error){button.textContent='Copy failed — select email above';}
+});
 async function adminInbox(){
  if(!isAdmin())return;
  const{data,error}=await supabase.from('support_conversations')
@@ -2005,6 +2028,12 @@ async function adminInbox(){
   bell.append(count);d.append(label,bell);
   d.onclick=async()=>{
    conversation=c;$('chatPanel').classList.remove('hidden');
+   $('chatInput').maxLength=2000;$('chatInput').placeholder='Write your reply (maximum 2,000 characters)';
+   if($('chatCharCount'))$('chatCharCount').textContent=$('chatInput').value.length+' / 2,000 characters';
+   if(channel)supabase.removeChannel(channel);
+   channel=supabase.channel('trustbet-admin-chat-'+c.id)
+    .on('postgres_changes',{event:'*',schema:'public',table:'support_messages',filter:'conversation_id=eq.'+c.id},chatLoad)
+    .subscribe();
    const readAt=new Date().toISOString();
    const{error:messageReadError}=await supabase.from('support_messages')
     .update({read_at:readAt}).eq('conversation_id',c.id).eq('sender_role','user').is('read_at',null);
