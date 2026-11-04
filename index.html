@@ -392,7 +392,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
   <p class="muted">Enter your registered email or full phone number, your six-digit recovery code, and a new password.</p>
   <label>Email or full phone number</label><input id="recoveryIdentifier" type="text" autocomplete="username" placeholder="name@example.com or +234...">
   <label>Six-digit recovery code</label><input id="recoveryCode" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code">
-  <label>New password</label><input id="recoveryNewPassword" type="password" minlength="8" maxlength="72" autocomplete="new-password">
+  <label>New password</label><input id="recoveryNewPassword" type="password" minlength="8" maxlength="15" autocomplete="new-password">
   <div class="row"><button id="recoverySubmit" type="button">Reset password</button><button id="recoveryCancel" type="button" class="secondary">Cancel</button></div>
   <p id="recoveryMsg" class="msg"></p>
  </div>
@@ -974,8 +974,10 @@ $('recoverySubmit').onclick=async()=>{
  const identifier=$('recoveryIdentifier').value.trim();
  const code=$('recoveryCode').value.trim();
  const newPassword=$('recoveryNewPassword').value;
- if(!identifier||!/^\d{6}$/.test(code)||newPassword.length<8||newPassword.length>72){
-  say('recoveryMsg','Enter your email or full phone number, six-digit recovery code, and a password of 8–72 characters.',true);
+ const isPhoneRecovery=!identifier.includes('@');
+ const validRecoveryPassword=isPhoneRecovery?/^[0-9]{8,15}$/.test(newPassword):(newPassword.length>=8&&newPassword.length<=15);
+ if(!identifier||!/^\d{6}$/.test(code)||!validRecoveryPassword){
+  say('recoveryMsg',isPhoneRecovery?'Phone account passwords must contain only digits (8–15 digits).':'Email account passwords must be 8–15 characters.',true);
   return;
  }
  button.disabled=true;button.textContent='Resetting…';
@@ -1002,7 +1004,7 @@ $('login').onclick=async()=>{
 };
 $('signup').onclick=async()=>{
  const email=$('email').value.trim(),password=$('password').value;
- if(password.length<8)return say('authMsg','Password must contain at least 8 characters.',true);
+ if(password.length<8||password.length>15)return say('authMsg','Email account passwords must be 8–15 characters.',true);
  const{error}=await supabase.auth.signUp({email,password});
  if(error)return say('authMsg',error.message,true);
  $('otpBox').classList.remove('hidden');
