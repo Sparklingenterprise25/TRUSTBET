@@ -336,6 +336,12 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
 .copy-support-email{background:var(--navy)!important;color:#fff!important;border:1px solid var(--navy)!important;font-weight:800}
 .copy-support-email:hover{background:#174b88!important;color:#fff!important}
 .email-open-hint{color:#d32032!important;font-weight:800}
+.password-field{display:flex;align-items:stretch;gap:7px}
+.password-field input{flex:1;min-width:0}
+.password-toggle{flex:0 0 auto;margin:6px 0 12px;padding:0 13px;background:#edf3fb;color:#173d70;border:1px solid #d8e5f5;box-shadow:none;font-size:18px}
+.copy-support-whatsapp{background:var(--navy)!important;color:#fff!important;border:1px solid var(--navy)!important;font-weight:800}
+.copy-support-whatsapp:hover{background:#174b88!important;color:#fff!important}
+.whatsapp-open-hint{color:#d32032!important;font-weight:800}
 </style>
 </head>
 <body>
@@ -358,7 +364,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
  <div class="row" style="margin:10px 0 4px"><button id="emailMode" type="button">Email</button><button id="phoneMode" type="button" class="secondary">Phone number</button></div>
  <div id="emailAuth">
   <label>Email address</label><input id="email" type="email" autocomplete="email">
-  <label>Password</label><input id="password" type="password" autocomplete="current-password">
+  <label>Password</label><div class="password-field"><input id="password" type="password" autocomplete="current-password"><button type="button" class="password-toggle" data-password-target="password" aria-label="Show password" aria-pressed="false">👁</button></div>
   <div class="row"><button id="login">Sign in</button><button id="signup" class="secondary">Create account</button></div>
   <div id="otpBox" class="hidden">
    <label>Six-digit email code</label><input id="otp" inputmode="numeric" maxlength="6">
@@ -372,7 +378,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
    <option value="+213">+213 🇩🇿 Algeria</option><option value="+244">+244 🇦🇴 Angola</option><option value="+229">+229 🇧🇯 Benin</option><option value="+267">+267 🇧🇼 Botswana</option><option value="+226">+226 🇧🇫 Burkina Faso</option><option value="+257">+257 🇧🇮 Burundi</option><option value="+238">+238 🇨🇻 Cabo Verde</option><option value="+237">+237 🇨🇲 Cameroon</option><option value="+236">+236 🇨🇫 Central African Republic</option><option value="+235">+235 🇹🇩 Chad</option><option value="+269">+269 🇰🇲 Comoros</option><option value="+242">+242 🇨🇬 Republic of the Congo</option><option value="+243">+243 🇨🇩 DR Congo</option><option value="+225">+225 🇨🇮 Côte d’Ivoire</option><option value="+253">+253 🇩🇯 Djibouti</option><option value="+20">+20 🇪🇬 Egypt</option><option value="+240">+240 🇬🇶 Equatorial Guinea</option><option value="+291">+291 🇪🇷 Eritrea</option><option value="+268">+268 🇸🇿 Eswatini</option><option value="+251">+251 🇪🇹 Ethiopia</option><option value="+241">+241 🇬🇦 Gabon</option><option value="+220">+220 🇬🇲 Gambia</option><option value="+233">+233 🇬🇭 Ghana</option><option value="+224">+224 🇬🇳 Guinea</option><option value="+245">+245 🇬🇼 Guinea-Bissau</option><option value="+254">+254 🇰🇪 Kenya</option><option value="+266">+266 🇱🇸 Lesotho</option><option value="+231">+231 🇱🇷 Liberia</option><option value="+218">+218 🇱🇾 Libya</option><option value="+261">+261 🇲🇬 Madagascar</option><option value="+265">+265 🇲🇼 Malawi</option><option value="+223">+223 🇲🇱 Mali</option><option value="+222">+222 🇲🇷 Mauritania</option><option value="+230">+230 🇲🇺 Mauritius</option><option value="+212">+212 🇲🇦 Morocco</option><option value="+258">+258 🇲🇿 Mozambique</option><option value="+264">+264 🇳🇦 Namibia</option><option value="+227">+227 🇳🇪 Niger</option><option value="+250">+250 🇷🇼 Rwanda</option><option value="+239">+239 🇸🇹 São Tomé and Príncipe</option><option value="+221">+221 🇸🇳 Senegal</option><option value="+248">+248 🇸🇨 Seychelles</option><option value="+232">+232 🇸🇱 Sierra Leone</option><option value="+252">+252 🇸🇴 Somalia</option><option value="+27">+27 🇿🇦 South Africa</option><option value="+211">+211 🇸🇸 South Sudan</option><option value="+249">+249 🇸🇩 Sudan</option><option value="+255">+255 🇹🇿 Tanzania</option><option value="+228">+228 🇹🇬 Togo</option><option value="+216">+216 🇹🇳 Tunisia</option><option value="+256">+256 🇺🇬 Uganda</option><option value="+260">+260 🇿🇲 Zambia</option><option value="+263">+263 🇿🇼 Zimbabwe</option>
   </select>
   <label>Phone number</label><input id="phoneNumber" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="000 0000 0000">
-  <label>Password</label><input id="phonePassword" type="password" autocomplete="current-password">
+  <label>Password (numbers only)</label><div class="password-field"><input id="phonePassword" type="password" inputmode="numeric" pattern="[0-9]*" autocomplete="current-password"><button type="button" class="password-toggle" data-password-target="phonePassword" aria-label="Show password" aria-pressed="false">👁</button></div>
   <div class="row"><button id="phoneLogin">Sign in</button><button id="phoneSignup" class="secondary">Create account</button></div>
   <div id="phoneOtpBox" class="hidden">
    <label>Six-digit SMS code</label><input id="phoneOtp" inputmode="numeric" maxlength="6" autocomplete="one-time-code">
@@ -571,13 +577,13 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
      <button type="button" id="issueWalletCredit" class="wide">Review and issue credit</button>
      <p id="walletCreditMsg" class="msg" aria-live="polite"></p>
     </div>
-    <h3>Admin Support Inbox</h3><div id="adminInbox"></div><p><a href="mailto:superhybridservices@gmail.com">Email support: superhybridservices@gmail.com</a></p><button type="button" class="secondary copy-support-email">Copy support email</button>
+    <h3>Admin Support Inbox</h3><div id="adminInbox"></div><p><a href="mailto:superhybridservices@gmail.com">Email support: superhybridservices@gmail.com</a></p><button type="button" class="copy-support-email">Copy support email</button><p><a href="https://wa.me/2347063593605" target="_blank" rel="noopener">WhatsApp support: +234 706 359 3605 · <span class="whatsapp-open-hint">Open WhatsApp app ♥️</span></a></p><button type="button" class="copy-support-whatsapp">Copy support WhatsApp number</button>
    </div>
   </div>
   <div class="card account-info-box">
    <h2>🎧 Customer Support</h2><p><b style="color:var(--green)">🟢 ACTIVE 24/7</b></p>
    <a class="support-link" href="#" id="chatOpen"><span class="emoji">💬</span><span><b>Live Chat</b><small>Private chat with support</small></span></a>
-   <a class="support-link" href="https://wa.me/2347063593605"><span class="emoji">📱</span><span><b>WhatsApp</b><small>Chat with our team</small></span></a>
+   <a class="support-link" href="https://wa.me/2347063593605" target="_blank" rel="noopener"><span class="emoji">📱</span><span><b>WhatsApp</b><small>+234 706 359 3605 · <span class="whatsapp-open-hint">Open WhatsApp app ♥️</span></small></span></a><button type="button" class="copy-support-whatsapp">Copy support WhatsApp number</button>
    <a class="support-link" href="mailto:superhybridservices@gmail.com"><span class="emoji">📧</span><span><b>Email</b><small>superhybridservices@gmail.com · <span class="email-open-hint">Open email app ♥️</span></small></span></a>
    <button type="button" class="secondary copy-support-email">Copy support email</button>
    <div class="card hidden" id="chatPanel">
@@ -1000,7 +1006,7 @@ $('phoneLogin').onclick=async()=>{
  const button=$('phoneLogin');button.disabled=true;button.textContent='Signing in…';
  try{
   const phone=fullPhoneNumber(),password=$('phonePassword').value;
-  if(!password)return say('authMsg','Enter your password.',true);
+  if(!/^\\d{8,72}$/.test(password))return say('authMsg','Phone account passwords must contain only digits (8–72 numbers).',true);
   const{data,error}=await supabase.auth.signInWithPassword({phone,password});
   if(error){say('authMsg',error.message,true);return;}
   await profileLoad(data.user);
@@ -1010,7 +1016,7 @@ $('phoneLogin').onclick=async()=>{
 $('phoneSignup').onclick=async()=>{
  try{
   const phone=fullPhoneNumber(),password=$('phonePassword').value;
-  if(password.length<8||password.length>72||!/[A-Za-z]/.test(password)||!/[0-9]/.test(password))return say('authMsg','Password must be 8–72 characters and contain at least one letter and one number.',true);
+  if(!/^\\d{8,72}$/.test(password))return say('authMsg','Phone account passwords must contain only digits (8–72 numbers).',true);
   const{data,error}=await supabase.functions.invoke('trustbet-phone-signup',{body:{phone,password}});
   if(error)return say('authMsg',error.message||'Phone registration failed.',true);
   if(data?.error)return say('authMsg',data.error,true);
@@ -2027,6 +2033,8 @@ $('sendChat').onclick=async()=>{
  $('chatInput').value='';if($('chatCharCount'))$('chatCharCount').textContent='0 / '+limit+' characters';
  say('chatMsg','Message submitted');await chatLoad();resetSupportChatIdle();
 };
+document.querySelectorAll('.password-toggle').forEach(button=>button.onclick=()=>{const field=$(button.dataset.passwordTarget);const reveal=field.type==='password';field.type=reveal?'text':'password';button.textContent=reveal?'🙈':'👁';button.setAttribute('aria-label',reveal?'Hide password':'Show password');button.setAttribute('aria-pressed',String(reveal));});
+document.querySelectorAll('.copy-support-whatsapp').forEach(button=>button.onclick=async()=>{const number='+234 706 359 3605';try{if(navigator.clipboard&&window.isSecureContext)await navigator.clipboard.writeText(number);else{const field=document.createElement('textarea');field.value=number;field.readOnly=true;field.style.position='fixed';field.style.opacity='0';document.body.append(field);field.select();const ok=document.execCommand('copy');field.remove();if(!ok)throw new Error('Copy failed');}button.textContent='WhatsApp number copied';setTimeout(()=>button.textContent='Copy support WhatsApp number',1800);}catch(error){button.textContent='Copy failed — select number above';}});
 document.querySelectorAll('.copy-support-email').forEach(button=>button.onclick=async()=>{
  const email='superhybridservices@gmail.com';
  try{
@@ -2038,7 +2046,7 @@ document.querySelectorAll('.copy-support-email').forEach(button=>button.onclick=
 async function adminInbox(){
  if(!isAdmin())return;
  const{data,error}=await supabase.from('support_conversations')
-  .select('id,subject,status,admin_unread_count,last_message_at')
+  .select('id,user_id,subject,status,admin_unread_count,last_message_at')
   .order('last_message_at',{ascending:false});
  if(error){$('adminInbox').textContent=error.message;return;}
  $('adminInbox').innerHTML='';
@@ -2046,11 +2054,19 @@ async function adminInbox(){
   const d=document.createElement('div');d.className='conversation admin-support-notice';
   const label=document.createElement('span');label.className='support-notice-text';
   label.textContent=c.subject+' · '+c.status+' · Unread '+(c.admin_unread_count||0);
+  const identity=document.createElement('div');identity.className='support-account-identity';identity.style.cssText='font-weight:900;color:#102d59;margin-bottom:6px;overflow-wrap:anywhere';
+  identity.textContent='Loading account details…';
+  supabase.from('profiles').select('*').eq('id',c.user_id).maybeSingle().then(({data})=>{
+   const accountEmail=data?.email||'Phone-only account';
+   const accountName=data?.full_name||data?.name||data?.display_name||'Name not provided';
+   const accountPhone=data?.phone||'';
+   identity.textContent='MESSAGE FROM '+accountEmail+' · '+String(accountName).toUpperCase()+(accountPhone?' · '+accountPhone:'');
+  }).catch(()=>{identity.textContent='MESSAGE FROM account ID '+c.user_id;});
   const bell=document.createElement('span');bell.className='admin-support-bell';bell.setAttribute('aria-label','Unread support notifications');
   bell.textContent='🔔';
   const count=document.createElement('span');count.className='admin-support-bell-count';
   count.textContent=Number(c.admin_unread_count||0)>0?String(c.admin_unread_count):'';
-  bell.append(count);d.append(label,bell);
+  bell.append(count);d.append(identity,label,bell);
   d.onclick=async()=>{
    conversation=c;$('chatPanel').classList.remove('hidden');
    $('chatInput').maxLength=2000;resetSupportChatIdle();$('chatInput').placeholder='Write your reply (maximum 2,000 characters)';
