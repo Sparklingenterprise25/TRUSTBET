@@ -1767,7 +1767,8 @@ function renderAdminUsers(){
    try{await adminUserAction('delete',item.id);await adminUsers();alert('User account and linked records deleted.');}
    catch(error){alert('Deletion failed: '+(error.message||error));remove.disabled=false;toggle.disabled=false;}
   };
-  actions.append(recovery,toggle,remove);row.append(info,actions);area.append(row);
+  if(!(item.profile?.phone&&item.profile?.account_approval_status==="rejected"))actions.append(recovery);
+  actions.append(toggle,remove);row.append(info,actions);area.append(row);
  });
 }
 async function adminUsers(){
