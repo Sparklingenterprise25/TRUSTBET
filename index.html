@@ -2142,7 +2142,7 @@ $('requestAccountDeletion').onclick=async()=>{
   overlay.onclick=e=>{if(e.target===overlay)close(false);};actions.append(cancel,submit);panel.append(heading,message,field,actions);overlay.append(panel);document.body.append(overlay);field.focus();
  });
  if(!typed)return;const button=$('requestAccountDeletion');button.disabled=true;
- try{await deletionAction({action:'submit'});say('deletionMsg','Your account deletion request has been submitted and sent to the administrator for review. Your account remains active until the request is approved.',false);button.classList.add('hidden');}
+ try{await deletionAction({action:'submit'});say('deletionMsg','Your account deletion request has been submitted and sent to the administrator for review. Your account remains active until the request is approved.',false);button.classList.add('hidden');if(requestRedirectTimer)clearTimeout(requestRedirectTimer);requestRedirectTimer=setTimeout(()=>go('home'),7000);}
  catch(error){say('deletionMsg',error.message||'Unable to submit your request.',true);button.disabled=false;}
 };
 
