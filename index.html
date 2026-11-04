@@ -1671,12 +1671,13 @@ async function loadWallet(){
  const items=[],errors=[deposits,withdrawals,bets,ledger].filter(x=>x.error);
  const now=Date.now(),cutoff=now-24*60*60*1000,cutoffISO=new Date(cutoff).toISOString();
  const allowedRecentLossIds=new Set();
+ const allowedRecentLossRows=[];
  let recentLossCountingAvailable=true;
  // Count every loss in the rolling 24-hour window, not just the 50 rows shown in history.
  // The earliest 10 losses across all games remain visible; later losses are hidden from history only.
  for(let from=0;;from+=1000){
   const page=await supabase.from('demo_bets')
-   .select('id,outcome,created_at').eq('user_id',user.id)
+   .select('id,game_id,bet_amount,outcome,payout,created_at').eq('user_id',user.id)
    .gte('created_at',cutoffISO).lte('created_at',new Date(now).toISOString())
    .order('created_at',{ascending:true}).order('id',{ascending:true})
    .range(from,from+999);
@@ -1685,12 +1686,15 @@ async function loadWallet(){
   for(const row of rows){
    const outcome=String(row.outcome||'').trim().toLowerCase();
    const loss=outcome==='lost'||outcome==='loss'||outcome.startsWith('loss:');
-   if(loss&&allowedRecentLossIds.size<10)allowedRecentLossIds.add(row.id);
+   if(loss&&allowedRecentLossIds.size<10){allowedRecentLossIds.add(row.id);allowedRecentLossRows.push(row);}
   }
   if(rows.length<1000)break;
  }
  if(!bets.error){
-  (bets.data||[]).forEach(x=>{
+  const historyBets=[...(bets.data||[])];
+  const historyBetIds=new Set(historyBets.map(x=>x.id));
+  if(recentLossCountingAvailable)allowedRecentLossRows.forEach(x=>{if(!historyBetIds.has(x.id))historyBets.push(x);});
+  historyBets.forEach(x=>{
    const outcome=String(x.outcome||'').trim().toLowerCase();
    const won=outcome==='won'||outcome==='win'||outcome.startsWith('win:');
    const partial=outcome.startsWith('partial return:');
