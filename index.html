@@ -1679,7 +1679,7 @@ if($('issueWalletCredit'))$('issueWalletCredit').onclick=async()=>{
  if(!userId)return say('walletCreditMsg','Select a user first.',true);
  if(!Number.isSafeInteger(amount)||amount<=0)return say('walletCreditMsg','Enter a valid positive whole-number amount.',true);
  const target=$('creditUserSelect').selectedOptions[0]?.textContent||'selected user';
- if(!confirm('Confirm '+type+' credit of '+money(amount)+' to '+target+'?\n\nCustomer message:\n'+message+'\n\nThis action changes the user wallet balance.'))return;
+ if(!await confirmAdminDecision('wallet credit','approve'))return;
  $('issueWalletCredit').disabled=true;
  const{data,error}=await supabase.rpc('admin_issue_wallet_credit',{p_user_id:userId,p_amount:amount,p_credit_type:type,p_message:message});
  $('issueWalletCredit').disabled=false;
