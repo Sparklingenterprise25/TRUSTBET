@@ -247,8 +247,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
  .home-wallet-heading strong{font-size:27px}
  .home-wallet-icon{font-size:31px}
  .home-deposit-btn{width:100%;margin-top:8px}
-}
-@media(max-width:380px){
+}@media(max-width:380px){
  #home .balance-card{padding:17px 12px}
  .home-wallet-heading strong{font-size:24px}
  .home-wallet-value-row{gap:6px}
@@ -375,9 +374,10 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
   <label>Country code</label>
   <select id="phoneCountry" autocomplete="country">
    <option value="+234" selected>+234 🇳🇬 Nigeria</option>
+   <option value="+1">+1 🇺🇸 United States</option>
    <option value="+213">+213 🇩🇿 Algeria</option><option value="+244">+244 🇦🇴 Angola</option><option value="+229">+229 🇧🇯 Benin</option><option value="+267">+267 🇧🇼 Botswana</option><option value="+226">+226 🇧🇫 Burkina Faso</option><option value="+257">+257 🇧🇮 Burundi</option><option value="+238">+238 🇨🇻 Cabo Verde</option><option value="+237">+237 🇨🇲 Cameroon</option><option value="+236">+236 🇨🇫 Central African Republic</option><option value="+235">+235 🇹🇩 Chad</option><option value="+269">+269 🇰🇲 Comoros</option><option value="+242">+242 🇨🇬 Republic of the Congo</option><option value="+243">+243 🇨🇩 DR Congo</option><option value="+225">+225 🇨🇮 Côte d’Ivoire</option><option value="+253">+253 🇩🇯 Djibouti</option><option value="+20">+20 🇪🇬 Egypt</option><option value="+240">+240 🇬🇶 Equatorial Guinea</option><option value="+291">+291 🇪🇷 Eritrea</option><option value="+268">+268 🇸🇿 Eswatini</option><option value="+251">+251 🇪🇹 Ethiopia</option><option value="+241">+241 🇬🇦 Gabon</option><option value="+220">+220 🇬🇲 Gambia</option><option value="+233">+233 🇬🇭 Ghana</option><option value="+224">+224 🇬🇳 Guinea</option><option value="+245">+245 🇬🇼 Guinea-Bissau</option><option value="+254">+254 🇰🇪 Kenya</option><option value="+266">+266 🇱🇸 Lesotho</option><option value="+231">+231 🇱🇷 Liberia</option><option value="+218">+218 🇱🇾 Libya</option><option value="+261">+261 🇲🇬 Madagascar</option><option value="+265">+265 🇲🇼 Malawi</option><option value="+223">+223 🇲🇱 Mali</option><option value="+222">+222 🇲🇷 Mauritania</option><option value="+230">+230 🇲🇺 Mauritius</option><option value="+212">+212 🇲🇦 Morocco</option><option value="+258">+258 🇲🇿 Mozambique</option><option value="+264">+264 🇳🇦 Namibia</option><option value="+227">+227 🇳🇪 Niger</option><option value="+250">+250 🇷🇼 Rwanda</option><option value="+239">+239 🇸🇹 São Tomé and Príncipe</option><option value="+221">+221 🇸🇳 Senegal</option><option value="+248">+248 🇸🇨 Seychelles</option><option value="+232">+232 🇸🇱 Sierra Leone</option><option value="+252">+252 🇸🇴 Somalia</option><option value="+27">+27 🇿🇦 South Africa</option><option value="+211">+211 🇸🇸 South Sudan</option><option value="+249">+249 🇸🇩 Sudan</option><option value="+255">+255 🇹🇿 Tanzania</option><option value="+228">+228 🇹🇬 Togo</option><option value="+216">+216 🇹🇳 Tunisia</option><option value="+256">+256 🇺🇬 Uganda</option><option value="+260">+260 🇿🇲 Zambia</option><option value="+263">+263 🇿🇼 Zimbabwe</option>
   </select>
-  <label>Phone number</label><input id="phoneNumber" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="13" placeholder="000 0000 0000">
+  <label>Phone number</label><input id="phoneNumber" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="13" placeholder="000 0000 0000" aria-label="Phone number">
   <label style="display:block;font-size:12px!important;font-weight:700!important;color:#16a34a!important;text-transform:none!important;">Enter Password (Only one letter, all other characters MUST BE numbers) e.g. T6574321</label><div class="password-field"><input id="phonePassword" type="password" inputmode="text" pattern="[A-Za-z0-9]*" maxlength="15" autocomplete="current-password"><button type="button" class="password-toggle" data-password-target="phonePassword" aria-label="Show password" aria-pressed="false">👁</button></div>
   <div class="row"><button id="phoneLogin">Sign in</button><button id="phoneSignup" class="secondary">Create account</button></div>
   <div id="phoneOtpBox" class="hidden">
@@ -497,8 +497,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
     <div class="bank-detail-line"><span>BANK NAME</span><strong id="platformBankName"></strong></div>
     <div class="bank-detail-line"><span>ACCOUNT NUMBER</span><div class="account-copy-row"><strong id="platformAccountNumber"></strong><button type="button" id="copyPlatformAccount" class="copy-account-btn">COPY</button><span id="copyAccountFeedback" class="copy-account-feedback" aria-live="polite"></span></div></div>
     <div class="bank-detail-line"><span>ACCOUNT NAME</span><strong id="platformAccountName"></strong></div>
-    <p class="bank-note">Make payment only to the verified account details displayed here. Submitting a request without actual deposit does not automatically add money to your wallet.</p>
-    <div id="adminBankEditor" class="admin-bank-editor hidden">
+    <p class="bank-note">Make payment only to the verified account details displayed here. Submitting a request without actual deposit does not automatically add money to your wallet.</p>    <div id="adminBankEditor" class="admin-bank-editor hidden">
      <h3>Edit bank details</h3>
      <label>Bank name</label><input id="editBankName" placeholder="Enter bank name">
      <label>Account name</label><input id="editAccountName" placeholder="Enter account name">
@@ -747,8 +746,7 @@ const providers=[
 'MONIEPOINT MFB ( moniepoint microfinance bank )',
 'NEXIM BANK',
 'NIRSAL MFB ( nirsal microfinance bank limited )',
-'NOVA COMMERCIAL BANK LIMITED',
-'NOWNOW ( nownow digital microfinance bank )',
+'NOVA COMMERCIAL BANK LIMITED','NOWNOW ( nownow digital microfinance bank )',
 'NPF MFB',
 'OPAY ( opay microfinance bank limited )',
 'OPTIMUS BANK LIMITED',
@@ -997,8 +995,7 @@ $('login').onclick=async()=>{
  const button=$('login');button.disabled=true;button.textContent='Signing in…';
  try{
   const{data,error}=await supabase.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
-  if(error){say('authMsg',error.message,true);return;}
-  await profileLoad(data.user);
+  if(error){say('authMsg',error.message,true);return;}  await profileLoad(data.user);
  }catch(error){say('authMsg','Login error: '+(error?.message||'Please try again.'),true);}
  finally{button.disabled=false;button.textContent='Sign in';}
 };
@@ -1021,24 +1018,94 @@ $('resend').onclick=async()=>{
 };
 $('emailMode').onclick=()=>{$('emailAuth').classList.remove('hidden');$('phoneAuth').classList.add('hidden');$('emailMode').classList.remove('secondary');$('phoneMode').classList.add('secondary');};
 $('phoneMode').onclick=()=>{$('phoneAuth').classList.remove('hidden');$('emailAuth').classList.add('hidden');$('phoneMode').classList.remove('secondary');$('emailMode').classList.add('secondary');};
-function formatPhoneInput(){
+/* Country-specific national mobile-number lengths and display groupings.
+   Nigeria keeps the local leading zero; other countries use the international
+   national-significant number without the domestic trunk prefix. */
+const phoneNumberRules={
+ '+1':{length:10,groups:[3,3,4],placeholder:'000 000 0000'},
+ '+213':{length:9,groups:[3,3,3],placeholder:'000 000 000'},
+ '+244':{length:9,groups:[3,3,3],placeholder:'000 000 000'},
+ '+229':{length:8,groups:[2,2,2,2],placeholder:'00 00 00 00'},
+ '+267':{length:8,groups:[2,3,3],placeholder:'00 000 000'},
+ '+226':{length:8,groups:[2,2,2,2],placeholder:'00 00 00 00'},
+ '+257':{length:8,groups:[2,2,2,2],placeholder:'00 00 00 00'},
+ '+238':{length:7,groups:[3,4],placeholder:'000 0000'},
+ '+237':{length:9,groups:[3,3,3],placeholder:'000 000 000'},
+ '+236':{length:8,groups:[2,2,2,2],placeholder:'00 00 00 00'},
+ '+235':{length:8,groups:[2,2,2,2],placeholder:'00 00 00 00'},
+ '+269':{length:7,groups:[3,4],placeholder:'000 0000'},
+ '+242':{length:9,groups:[3,3,3],placeholder:'000 000 000'},
+ '+243':{length:9,groups:[3,3,3],placeholder:'000 000 000'},
+ '+225':{length:10,groups:[2,2,2,2,2],placeholder:'00 00 00 00 00'},
+ '+253':{length:8,groups:[2,2,2,2],placeholder:'00 00 00 00'},
+ '+20':{length:10,groups:[3,3,4],placeholder:'000 000 0000'},
+ '+240':{length:9,groups:[3,3,3],placeholder:'000 000 000'},
+ '+291':{length:7,groups:[3,4],placeholder:'000 0000'},
+ '+268':{length:8,groups:[2,2,2,2],placeholder:'00 00 00 00'},
+ '+251':{length:9,groups:[3,3,3],placeholder:'000 000 000'},
+ '+241':{length:8,groups:[2,2,2,2],placeholder:'00 00 00 00'},
+ '+220':{length:7,groups:[3,4],placeholder:'000 0000'},
+ '+233':{length:9,groups:[2,3,4],placeholder:'00 000 0000'},
+ '+224':{length:9,groups:[3,3,3],placeholder:'000 000 000'},
+ '+245':{length:7,groups:[3,4],placeholder:'000 0000'},
+ '+254':{length:9,groups:[3,3,3],placeholder:'000 000 000'},
+ '+266':{length:8,groups:[2,3,3],placeholder:'00 000 000'},
+ '+231':{length:8,groups:[2,3,3],placeholder:'00 000 000'},
+ '+218':{length:9,groups:[3,3,3],placeholder:'000 000 000'},
+ '+261':{length:9,groups:[3,3,3],placeholder:'000 000 000'},
+ '+265':{length:9,groups:[3,3,3],placeholder:'000 000 000'},
+ '+223':{length:8,groups:[2,2,2,2],placeholder:'00 00 00 00'},
+ '+222':{length:8,groups:[2,2,2,2],placeholder:'00 00 00 00'},
+ '+230':{length:8,groups:[2,2,2,2],placeholder:'00 00 00 00'},
+ '+212':{length:9,groups:[3,3,3],placeholder:'000 000 000'},
+ '+258':{length:9,groups:[3,3,3],placeholder:'000 000 000'},
+ '+264':{length:9,groups:[2,3,4],placeholder:'00 000 0000'},
+ '+227':{length:8,groups:[2,2,2,2],placeholder:'00 00 00 00'},
+ '+250':{length:9,groups:[3,3,3],placeholder:'000 000 000'},
+ '+239':{length:7,groups:[3,4],placeholder:'000 0000'},
+ '+221':{length:9,groups:[2,3,4],placeholder:'00 000 0000'},
+ '+248':{length:7,groups:[3,4],placeholder:'000 0000'},
+ '+232':{length:8,groups:[2,2,2,2],placeholder:'00 00 00 00'},
+ '+252':{length:9,groups:[3,3,3],placeholder:'000 000 000'},
+ '+27':{length:9,groups:[2,3,4],placeholder:'00 000 0000'},
+ '+211':{length:9,groups:[3,3,3],placeholder:'000 000 000'},
+ '+249':{length:9,groups:[3,3,3],placeholder:'000 000 000'},
+ '+255':{length:9,groups:[3,3,3],placeholder:'000 000 000'},
+ '+228':{length:8,groups:[2,2,2,2],placeholder:'00 00 00 00'},
+ '+216':{length:8,groups:[2,2,2,2],placeholder:'00 00 00 00'},
+ '+256':{length:9,groups:[3,3,3],placeholder:'000 000 000'},
+ '+260':{length:9,groups:[3,3,3],placeholder:'000 000 000'},
+ '+263':{length:9,groups:[3,3,3],placeholder:'000 000 000'},
+ '+234':{length:11,groups:[3,4,4],placeholder:'000 0000 0000',dropTrunkZero:true}
+};
+function phoneRule(){
  const code=$('phoneCountry').value;
- const maxDigits=code==='+234'?11:15;
- const digits=$('phoneNumber').value.replace(/\D/g,'').slice(0,maxDigits);
- $('phoneNumber').value=code==='+234'
-  ?digits.replace(/^(\d{3})(\d{0,4})(\d{0,4}).*$/,(_,a,b,c)=>[a,b,c].filter(Boolean).join(' '))
-  :digits.replace(/^(\d{3})(\d{0,4})(\d{0,8}).*$/,(_,a,b,c)=>[a,b,c].filter(Boolean).join(' '));
- $('phoneNumber').maxLength=code==='+234'?13:17;
+ return phoneNumberRules[code]||{length:15,groups:[3,3,3,3,3],placeholder:'000 000 000 000 000'};
+}
+function groupPhoneDigits(digits,groups){
+ const parts=[];let offset=0;
+ for(const size of groups){if(offset>=digits.length)break;parts.push(digits.slice(offset,offset+size));offset+=size;}
+ if(offset<digits.length)parts.push(digits.slice(offset));
+ return parts.join(' ');
+}
+function formatPhoneInput(){
+ const rule=phoneRule();
+ const digits=$('phoneNumber').value.replace(/\D/g,'').slice(0,rule.length);
+ $('phoneNumber').value=groupPhoneDigits(digits,rule.groups);
+ $('phoneNumber').maxLength=rule.length+rule.groups.length-1;
+ $('phoneNumber').placeholder=rule.placeholder;
+ $('phoneNumber').setAttribute('aria-label','Phone number, '+rule.length+' digits required');
 }
 $('phoneNumber').addEventListener('input',formatPhoneInput);
 $('phoneCountry').addEventListener('change',formatPhoneInput);
 function fullPhoneNumber(){
- const code=$('phoneCountry').value;
+ const code=$('phoneCountry').value,rule=phoneRule();
  let digits=$('phoneNumber').value.replace(/\D/g,'');
- if(code==='+234'&&digits.length!==11)throw new Error('Nigerian phone numbers must contain exactly 11 digits.');
- if(code!=='+234'&&(digits.length<8||digits.length>15))throw new Error('Enter a valid phone number with 8 to 15 digits.');
- if(digits.startsWith('0'))digits=digits.slice(1);
- if(digits.startsWith(code.replace('+','')))digits=digits.slice(code.length-1);
+ if(digits.length!==rule.length){
+  const countryName=$('phoneCountry').selectedOptions[0]?.textContent||code;
+  throw new Error(countryName+' phone numbers must contain exactly '+rule.length+' digits.');
+ }
+ if(rule.dropTrunkZero&&digits.startsWith('0'))digits=digits.slice(1);
  return code+digits;
 }
 $('phoneLogin').onclick=async()=>{
@@ -1247,8 +1314,7 @@ function render(cat=activeCategory){
  activeCategory=cat;$('gameGrid').innerHTML='';
  const q=($('gameSearch').value||'').toLowerCase();
  games.filter(g=>(cat==='All'||g.cat===cat)&&g.name.toLowerCase().includes(q))
-  .forEach(g=>$('gameGrid').append(gameCard(g)));
-}
+  .forEach(g=>$('gameGrid').append(gameCard(g)));}
 function renderHome(){
  if(!$('frequentGames'))return;
  $('frequentGames').innerHTML='';
@@ -1497,7 +1563,6 @@ function confirmAdminDecision(kind,decision){
   buttons.append(cancel,proceed);panel.append(heading,message,field,buttons);overlay.append(panel);document.body.append(overlay);field.focus();
  });
 }
-
 async function adminSelfExclusion(){
  if(!isAdmin())return;
  const area=$('adminSelfExclusion');area.textContent='Loading self-exclusion requests…';
@@ -1747,8 +1812,7 @@ function confirmDeletionTwoWay(action,email){
   proceed.onclick=()=>{if(field.value.trim()==='CONFIRM DELETION')close(true);else alert('The exact phrase CONFIRM DELETION is required.');};
   overlay.onclick=e=>{if(e.target===overlay)close(false);};buttons.append(cancel,proceed);panel.append(heading,message,field,buttons);overlay.append(panel);document.body.append(overlay);field.focus();
  });
-}
-async function adminAccountDeletionRequests(){
+}async function adminAccountDeletionRequests(){
  if(!isAdmin())return;const area=$('adminAccountDeletionRequests');if(!area)return;
  area.textContent='Loading deletion requests…';const button=$('refreshAccountDeletion');if(button)button.disabled=true;
  try{
@@ -1997,8 +2061,7 @@ function addWalletItem(container,item){
   receiptButton.textContent='Download official receipt (PNG)';
   receiptButton.style.cssText='margin-top:9px;width:100%;font-size:12px;padding:10px 12px';
   receiptButton.onclick=()=>downloadUserTransactionReceipt(item.receiptData);
-  row.append(receiptButton);
- }
+  row.append(receiptButton); }
  const divider=document.createElement('hr');divider.className='tx-divider';
  container.append(row,divider);
 }
@@ -2247,8 +2310,7 @@ $('chatOpen').onclick=async e=>{
  try{await conversationOpen();resetSupportChatIdle();}catch(error){say('chatMsg',error.message,true);}
 };
 async function conversationOpen(){
- const{data,error}=await supabase.from('support_conversations')
-  .select('*').eq('user_id',user.id).eq('status','open')
+ const{data,error}=await supabase.from('support_conversations')  .select('*').eq('user_id',user.id).eq('status','open')
   .order('created_at',{ascending:false}).limit(1).maybeSingle();
  if(error)throw error;
  let current=data;
