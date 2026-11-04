@@ -1514,14 +1514,14 @@ async function adminDeposits(){
    '<br>Reference: '+escapeHtml(item.tracking_code||'No reference')+
    '<br>User: '+escapeHtml(names.get(item.user_id)||'Name unavailable')+
    '<br>Date: '+escapeHtml(adminRequestDate(item.created_at))+'</small>';
-  row.append(info,adminRequestNameEditor('deposit',item,'depositor_account_name','Depositor account name',adminDeposits));
+  const nameEditor=adminRequestNameEditor('deposit',item,'depositor_account_name','Depositor account name',adminDeposits);
   const status=document.createElement('span');status.className='status-pill';status.textContent=String(item.status||'pending').toUpperCase();
   const actions=document.createElement('div');actions.className='row';
   const approve=document.createElement('button');approve.textContent='Approve';
   const reject=document.createElement('button');reject.textContent='Reject';reject.className='danger';
   approve.onclick=()=>reviewDeposit(item.id,'approve',approve,reject);
   reject.onclick=()=>reviewDeposit(item.id,'reject',approve,reject);
-  actions.append(approve,reject);row.append(info,status,actions);area.append(row);
+  actions.append(approve,reject);row.append(info,nameEditor,status,actions);area.append(row);
  });
 }
 async function reviewDeposit(id,decision,approveButton,rejectButton){
@@ -1565,14 +1565,14 @@ async function adminWithdrawals(){
    '<br>Reference: '+escapeHtml(item.tracking_code||'No reference')+
    '<br>User: '+escapeHtml(names.get(item.user_id)||'Name unavailable')+
    '<br>Date: '+escapeHtml(adminRequestDate(item.created_at))+'</small>';
-  row.append(info,adminRequestNameEditor('withdrawal',item,'account_name','Bank account name',adminWithdrawals));
+  const nameEditor=adminRequestNameEditor('withdrawal',item,'account_name','Bank account name',adminWithdrawals);
   const status=document.createElement('span');status.className='status-pill';status.textContent=String(item.status||'pending').toUpperCase();
   const actions=document.createElement('div');actions.className='row';
   const approve=document.createElement('button');approve.textContent='Approve';
   const reject=document.createElement('button');reject.textContent='Reject';reject.className='danger';
   approve.onclick=()=>reviewWithdrawal(item.id,'approve',approve,reject);
   reject.onclick=()=>reviewWithdrawal(item.id,'reject',approve,reject);
-  actions.append(approve,reject);row.append(info,status,actions);area.append(row);
+  actions.append(approve,reject);row.append(info,nameEditor,status,actions);area.append(row);
  });
 }
 async function reviewWithdrawal(id,decision,approveButton,rejectButton){
