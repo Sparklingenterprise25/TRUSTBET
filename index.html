@@ -1118,6 +1118,13 @@ $('saveBankDetails').onclick=async()=>{
  await loadBankDetails();
 };
 
+/* Force bank account names to uppercase as the user types. */
+['depAccountName','accName'].forEach(id=>$(id).addEventListener('input',event=>{
+ const field=event.currentTarget,start=field.selectionStart,end=field.selectionEnd;
+ field.value=field.value.toUpperCase();
+ try{field.setSelectionRange(start,end);}catch{}
+}));
+
 /* Withdrawal requests */
 $('withdrawBtn').onclick=async()=>{
  const amount=Number($('wdAmount').value),bank_name=$('bank').value;
