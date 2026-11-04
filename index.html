@@ -572,6 +572,9 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
      <h3>Phone Registrations Awaiting Approval</h3>
      <button id="refreshPhoneApprovals" class="secondary">Refresh phone registrations</button>
      <div id="phoneApprovals" aria-live="polite"></div>
+     <h3>Registration Rule 2 · Preview only (OFF)</h3>
+     <p class="muted">This is a safe demonstration. It will not create an account or change the active registration rule.</p>
+     <button id="previewRegistrationRule2" class="secondary" type="button">Preview Rule 2</button>
      <h3>Registered Users</h3>
      <input id="adminUserSearch" type="search" placeholder="Search users by name or email" aria-label="Search registered users">
      <button id="refreshAdminUsers" class="secondary">Refresh users</button>
@@ -2453,6 +2456,64 @@ async function adminInbox(){
   .on('postgres_changes',{event:'UPDATE',schema:'public',table:'support_conversations'},adminInbox)
   .subscribe();
 }
+
+
+/* Registration Rule 2 is deliberately inactive. Preview mode never submits data. */
+const REGISTRATION_RULE_2_ENABLED = false;
+$('previewRegistrationRule2').onclick=()=>{
+ if(!isAdmin())return alert('Administrator access required.');
+ let stage=0,method='Phone number';
+ const overlay=document.createElement('div');
+ overlay.id='rule2PreviewOverlay';
+ overlay.style.cssText='position:fixed;inset:0;z-index:2400;background:#071a36e8;display:flex;align-items:center;justify-content:center;padding:14px;overflow:auto';
+ const panel=document.createElement('div');
+ panel.style.cssText='width:min(100%,440px);background:#fff;color:#172b4d;border-radius:16px;padding:20px;box-shadow:0 18px 55px #0007;max-height:90vh;overflow:auto';
+ const render=()=>{
+  panel.innerHTML='';
+  const heading=document.createElement('h2');
+  heading.style.cssText='margin:0 0 7px;color:#102d59';
+  heading.textContent='REGISTRATION RULE 2 · PREVIEW';
+  const status=document.createElement('p');
+  status.style.cssText='margin:0 0 16px;color:#b45309;font-size:12px;font-weight:900';
+  status.textContent='INACTIVE — DEMONSTRATION ONLY';
+  panel.append(heading,status);
+  if(stage===0){
+   const methodLabel=document.createElement('label');methodLabel.textContent='Preview account type';
+   const select=document.createElement('select');
+   select.style.cssText='width:100%;padding:11px;border:1px solid #d8e2ef;border-radius:9px;margin:6px 0 14px';
+   ['Phone number','Email'].forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;select.append(o);});
+   select.value=method;select.onchange=()=>{method=select.value;};
+   const title=document.createElement('h3');title.textContent='STEP 1 — REVIEW ACCOUNT DETAILS';
+   const details=document.createElement('div');
+   details.style.cssText='background:#f3f6fb;border:1px solid #e2e9f2;border-radius:11px;padding:14px;line-height:1.8;font-size:13px';
+   details.innerHTML=method==='Email'?'Email: demo@example.com<br>Password: ••••••••••':'First name: Demo<br>Surname: User<br>Phone: +234 800 000 0000<br>Password: ••••••••••';
+   const note=document.createElement('p');note.className='muted';note.textContent='The user reviews the entered account details before submitting registration.';
+   const next=document.createElement('button');next.className='wide';next.textContent='CREATE MY ACCOUNT';next.onclick=()=>{stage=1;render();};
+   panel.append(methodLabel,select,title,details,note,next);
+  }else if(stage===1){
+   const title=document.createElement('h3');title.textContent='STEP 2 — REGISTRATION RECEIVED';
+   const copy=document.createElement('p');copy.style.cssText='line-height:1.6';copy.textContent='Your registration has been received successfully and is awaiting administrator approval.';
+   const next=document.createElement('button');next.className='wide';next.textContent='I UNDERSTAND';next.onclick=()=>{stage=2;render();};
+   panel.append(title,copy,next);
+  }else if(stage===2){
+   const title=document.createElement('h3');title.textContent='STEP 3 — SAVE YOUR PASSWORD';
+   const copy=document.createElement('p');copy.style.cssText='line-height:1.6';copy.textContent='Please save the password you entered in a safe place. You will need it to log in after your account has been approved.';
+   const next=document.createElement('button');next.className='wide';next.textContent='CONFIRM AND FINISH';next.onclick=()=>{stage=3;render();};
+   panel.append(title,copy,next);
+  }else{
+   panel.style.background='#047857';panel.style.color='#fff';
+   const title=document.createElement('h3');title.style.color='#fff';title.textContent='REGISTRATION SUBMITTED SUCCESSFULLY!';
+   const copy=document.createElement('p');copy.style.cssText='line-height:1.65;white-space:pre-line';copy.textContent='Your account registration has been received and is awaiting approval.\\n\\nYou will be able to log in once your account has been approved. Thank you for choosing TRUSTBET.';
+   const done=document.createElement('button');done.className='wide';done.style.cssText='background:#fff;color:#047857;border:0';done.textContent='CLOSE PREVIEW';done.onclick=()=>overlay.remove();
+   panel.append(title,copy,done);
+  }
+  if(stage<3){
+   const close=document.createElement('button');close.type='button';close.className='secondary wide';close.style.marginTop='9px';close.textContent='EXIT PREVIEW';close.onclick=()=>overlay.remove();panel.append(close);
+  }
+ };
+ overlay.onclick=e=>{if(e.target===overlay)overlay.remove();};
+ overlay.append(panel);document.body.append(overlay);render();
+};
 
 /* Restore an existing authenticated session. */
 try{
