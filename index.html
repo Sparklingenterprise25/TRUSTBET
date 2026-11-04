@@ -291,6 +291,42 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
 .play-balance strong .balance-amount,
 .play-balance strong .balance-separator{color:#00E676!important}
 
+.admin-game-stage{height:190px;border-radius:15px;margin:10px 0 16px;position:relative;overflow:hidden;background:linear-gradient(180deg,#8ed8ff,#e8f7ff 70%,#66b66a 70%,#319b55);display:none}.admin-game-stage.active{display:block}.aviator-plane{position:absolute;left:-80px;top:42%;font-size:48px;filter:drop-shadow(0 5px 5px #1235);animation:aviatorFly 5s linear infinite}.aviator-cloud{position:absolute;color:#fff;font-size:40px;opacity:.8;animation:cloudDrift 12s linear infinite}.bottle-scene{position:absolute;inset:0;display:grid;place-items:center;background:linear-gradient(#d7f0ff 0 70%,#d5b17a 70%)}.flip-bottle{font-size:76px;transform-origin:50% 90%;animation:bottleFlip 1.35s cubic-bezier(.3,.05,.65,.95) infinite}.stage-caption{position:absolute;bottom:9px;left:0;right:0;text-align:center;font-weight:900;color:#173d70;font-size:12px}@keyframes aviatorFly{0%{transform:translateX(0) translateY(18px) rotate(-8deg)}50%{transform:translateX(55vw) translateY(-12px) rotate(-2deg)}100%{transform:translateX(115vw) translateY(-28px) rotate(4deg)}}@keyframes cloudDrift{from{transform:translateX(110vw)}to{transform:translateX(-100px)}}@keyframes bottleFlip{0%{transform:translateY(25px) rotate(0)}35%{transform:translateY(-70px) rotate(180deg)}70%{transform:translateY(-18px) rotate(360deg)}100%{transform:translateY(25px) rotate(360deg)}}.stage-sky,.slots-cabinet,.roulette-table,.bottle-court,.dice-table,.lucky-stage{position:absolute;inset:0;overflow:hidden}
+.stage-sky{background:linear-gradient(180deg,#78c9f4 0%,#e7f8ff 70%,#56a45d 70%,#277d42 100%)}
+.stage-cloud{position:absolute;color:white;font-size:42px;opacity:.85;animation:stageCloud 13s linear infinite}
+.stage-cloud.c1{top:16%;left:70%}.stage-cloud.c2{top:40%;left:25%;animation-delay:-6s}
+.stage-plane{position:absolute;left:-70px;top:35%;font-size:52px;filter:drop-shadow(0 4px 4px #1235);animation:stagePlane 6s linear infinite}
+.stage-runway{position:absolute;bottom:13%;left:0;right:0;border-top:3px dashed #fff8}
+@keyframes stagePlane{0%{transform:translateX(0) translateY(18px) rotate(-8deg)}50%{transform:translateX(55vw) translateY(-14px) rotate(-2deg)}100%{transform:translateX(115vw) translateY(-28px) rotate(4deg)}}
+@keyframes stageCloud{from{transform:translateX(30vw)}to{transform:translateX(-120vw)}}
+.slots-cabinet{background:linear-gradient(135deg,#481b73,#17112e);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px}
+.slots-marquee{color:#ffe88a;font-weight:1000;letter-spacing:3px;text-shadow:0 0 12px #ffb000;font-size:17px}
+.slot-reels{display:flex;gap:9px;padding:10px 15px;background:#f5e8c8;border:5px solid #d7a63a;border-radius:12px;box-shadow:0 5px 0 #8b5a17}
+.slot-reels span{width:55px;height:54px;background:#fff;border-radius:7px;display:grid;place-items:center;font-size:34px;animation:slotRoll 1.2s ease-in-out infinite}
+.slot-reels span:nth-child(2){animation-delay:.15s}.slot-reels span:nth-child(3){animation-delay:.3s}
+@keyframes slotRoll{0%,100%{transform:translateY(0);filter:blur(0)}45%{transform:translateY(5px);filter:blur(2px)}}
+.slots-controls{display:flex;gap:12px}.slots-controls i{width:13px;height:13px;border-radius:50%;background:#f5c542;box-shadow:0 0 9px #ffdf6b}
+.roulette-table{background:radial-gradient(ellipse,#16854f,#06452e);display:grid;place-items:center}
+.roulette-wheel{width:145px;height:145px;border-radius:50%;background:repeating-conic-gradient(#bd1e2d 0 15deg,#f4e5bd 15deg 30deg,#1e2731 30deg 45deg);border:9px solid #d7b66c;box-shadow:0 0 0 5px #563e1c,0 7px 15px #0018;animation:rouletteSpin 5s linear infinite;position:relative;display:grid;place-items:center}
+.roulette-rim{width:70%;height:70%;border-radius:50%;background:#164f36;border:5px solid #e0c27b;display:grid;place-items:center;color:#fff;font-size:8px;text-align:center}
+.roulette-center{width:38px;height:38px;border-radius:50%;background:#d7b66c;color:#163d2a;display:grid;place-items:center;font-size:8px;font-weight:900}
+.roulette-ball{position:absolute;top:4px;left:calc(50% - 7px);color:#fff;font-size:18px;animation:ballOrbit 2s linear infinite}
+.roulette-label{position:absolute;bottom:8px;color:#fff;font-weight:900;letter-spacing:4px}
+@keyframes rouletteSpin{to{transform:rotate(360deg)}}@keyframes ballOrbit{to{transform:rotate(360deg) translateY(58px) rotate(-360deg)}}
+.bottle-court{background:linear-gradient(#c7e9fa 0 68%,#c69a61 68%);display:grid;place-items:center}
+.bottle-platform{position:absolute;bottom:26%;width:160px;height:12px;border-radius:6px;background:#8b5a2b;box-shadow:0 4px 0 #68401f}
+.stage-bottle{font-size:72px;position:absolute;bottom:30%;transform-origin:50% 90%;animation:realBottleFlip 1.6s cubic-bezier(.2,.7,.3,1) infinite}
+@keyframes realBottleFlip{0%{transform:translateY(0) rotate(0)}28%{transform:translateY(-75px) rotate(160deg)}62%{transform:translateY(-12px) rotate(340deg)}75%,100%{transform:translateY(0) rotate(360deg)}}
+.dice-table{background:radial-gradient(ellipse,#16804a,#06432c);display:flex;align-items:center;justify-content:center;gap:16px;flex-direction:column}
+.dice-pair{display:flex;gap:18px}.stage-die{width:64px;height:64px;background:#fff;border-radius:12px;display:grid;place-items:center;font-size:48px;color:#222;box-shadow:0 5px 0 #bbb;animation:diceTumble 1.4s ease-in-out infinite}
+.stage-die:nth-child(2){animation-delay:.2s}@keyframes diceTumble{0%,100%{transform:rotate(0) translateY(0)}45%{transform:rotate(150deg) translateY(-13px)}}
+.dice-total{color:#fff;font-weight:900;letter-spacing:2px;font-size:13px}
+.lucky-stage{background:radial-gradient(circle,#58339a,#1d103c);display:grid;place-items:center}
+.lucky-wheel{width:145px;height:145px;border-radius:50%;border:8px solid #e6c56c;background:conic-gradient(#d83d48 0 45deg,#e7bd42 45deg 90deg,#238a61 90deg 135deg,#3878ca 135deg 180deg,#d83d48 180deg 225deg,#e7bd42 225deg 270deg,#238a61 270deg 315deg,#3878ca 315deg);display:grid;grid-template-columns:1fr 1fr;place-items:center;color:#fff;font-weight:1000;font-size:18px;animation:luckySpin 5s cubic-bezier(.2,.6,.2,1) infinite}
+.lucky-wheel span{filter:drop-shadow(0 1px 2px #000)}@keyframes luckySpin{to{transform:rotate(1080deg)}}
+.wheel-pointer{position:absolute;z-index:2;top:7px;left:calc(50% - 10px);color:#fff3a0;font-size:23px;text-shadow:0 2px 4px #000}
+.wheel-hub{position:absolute;left:calc(50% - 22px);top:calc(50% - 22px);width:44px;height:44px;border-radius:50%;background:#f5d47a;color:#39245f;display:grid;place-items:center;font-size:10px;font-weight:1000}
+
 </style>
 </head>
 <body>
@@ -417,6 +453,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
   </div>
   <div id="play" class="card hidden">
    <div class="section-head"><h2 id="gameTitle">Game</h2><button id="closeGame" class="secondary">Close</button></div>
+   <div id="gameStage" class="admin-game-stage" aria-hidden="true"></div>
    <div class="play-balance"><span>YOUR AVAILABLE BALANCE</span><strong id="gameBalance">₦0</strong></div>
    <label id="stakeLabel">Stake</label><input id="stake" type="number" min="100" step="1" placeholder="Enter stake">
    <p class="muted">Choose your odds. Only your selected box will display 🔒.</p>
@@ -511,6 +548,19 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
      <input id="adminUserSearch" type="search" placeholder="Search users by name or email" aria-label="Search registered users">
      <button id="refreshAdminUsers" class="secondary">Refresh users</button>
      <div id="adminUsers" aria-live="polite"></div>
+    </div>
+    <div class="admin-section" id="adminWalletCreditSection">
+     <h3>Issue bonus / compensation credit</h3>
+     <p class="muted">Admin-only wallet credit. Review the selected user, amount and message before confirming.</p>
+     <input id="creditUserSearch" type="search" placeholder="Search user by name, email or phone">
+     <button type="button" id="searchCreditUsers" class="secondary">Search users</button>
+     <select id="creditUserSelect"><option value="">Select a user</option></select>
+     <label>Credit type</label>
+     <select id="creditType"><option value="bonus">Bonus</option><option value="compensation">Compensation</option></select>
+     <label>Amount (₦)</label><input id="creditAmount" type="number" min="1" step="1" placeholder="Enter amount">
+     <label>Customer message (read-only)</label><textarea id="creditMessage" readonly></textarea>
+     <button type="button" id="issueWalletCredit" class="wide">Review and issue credit</button>
+     <p id="walletCreditMsg" class="msg" aria-live="polite"></p>
     </div>
     <h3>Admin Support Inbox</h3><div id="adminInbox"></div>
    </div>
@@ -1136,6 +1186,18 @@ document.querySelectorAll('#cats button').forEach(b=>b.onclick=()=>{
 $('gameSearch').oninput=()=>render(activeCategory);
 
 /* Game preview. Real stakes, payouts and lock enforcement belong in Supabase. */
+function renderGameStage(g){
+ const el=$('gameStage');el.classList.remove('active');el.innerHTML='';
+ const scenes={
+  aviator:'<div class="stage-sky"><span class="stage-cloud c1">☁</span><span class="stage-cloud c2">☁</span><span class="stage-plane">✈</span><span class="stage-runway"></span></div><span class="stage-caption">AVIATOR · AIRCRAFT IN FLIGHT</span>',
+  slots:'<div class="slots-cabinet"><div class="slots-marquee">TRUSTBET SLOTS</div><div class="slot-reels"><span>🍒</span><span>🔔</span><span>7️⃣</span></div><div class="slots-controls"><i></i><i></i><i></i></div></div><span class="stage-caption">SLOT MACHINE · REELS SPINNING</span>',
+  roulette:'<div class="roulette-table"><div class="roulette-wheel"><div class="roulette-rim"><div class="roulette-number-ring">0 · 32 · 15 · 19 · 4 · 21 · 2 · 25 · 17 · 34 · 6 · 27</div><div class="roulette-center">TRUST</div></div><span class="roulette-ball">●</span></div><div class="roulette-label">ROULETTE</div></div><span class="stage-caption">ROULETTE · WHEEL IN MOTION</span>',
+  bottle_flip:'<div class="bottle-court"><div class="bottle-platform"></div><span class="stage-bottle">🧴</span></div><span class="stage-caption">FLIP THE BOTTLE · BOTTLE FLIP</span>',
+  under_over:'<div class="dice-table"><div class="dice-cup">🎲 🎲</div><div class="dice-pair"><span class="stage-die">⚄</span><span class="stage-die">⚁</span></div><div class="dice-total">UNDER 7&nbsp; · &nbsp;OVER 7</div></div><span class="stage-caption">UNDER OR OVER 7 · TWO DICE</span>',
+  lucky_wheel:'<div class="lucky-stage"><div class="wheel-pointer">▼</div><div class="lucky-wheel"><span>★</span><span>7</span><span>◆</span><span>🍀</span><span>★</span><span>7</span><span>◆</span><span>🍀</span></div><div class="wheel-hub">LUCK</div></div><span class="stage-caption">LUCKY WHEEL · SPIN TO PLAY</span>'
+ };
+ if(scenes[g.id]){el.innerHTML=scenes[g.id];el.classList.add('active');}
+}
 function openGame(g){
  if(isSelfExcluded())return alert('Self-exclusion is active.');
  if(isBettingLocked())return alert('Betting is locked. Submit a deposit request and wait for administrator approval.');
@@ -1143,6 +1205,7 @@ function openGame(g){
  game=g;selectedOdd=null;
  $('play').classList.remove('hidden');
  $('gameTitle').textContent=g.icon+' '+g.name;
+ renderGameStage(g);
  $('stake').value='';$('stake').min=String(minimumStake(g));$('stakeLabel').textContent='Stake (minimum '+money(minimumStake(g))+')';$('resultArea').innerHTML='';say('betMsg','');
  drawOdds();$('bet').disabled=true;
  $('gameBalance').innerHTML=balanceHTML(profile.virtual_balance);
@@ -1573,6 +1636,44 @@ async function adminPhoneApprovals(){
 }
 $('refreshPhoneApprovals').onclick=adminPhoneApprovals;
 
+/* Secure administrator wallet credits */
+const TRUSTBET_CREDIT_MESSAGES={
+ bonus:'This is a bonus from trust bet platform',
+ compensation:'This credit is issued by the TRUSTBET platform in Compensation of your game losses experienced on the platform.Thank you for being part of TRUSTBET.'
+};
+function updateCreditMessage(){
+ const type=$('creditType')?.value||'bonus';
+ $('creditMessage').value=TRUSTBET_CREDIT_MESSAGES[type];
+}
+if($('creditType'))$('creditType').onchange=updateCreditMessage;
+if($('searchCreditUsers'))$('searchCreditUsers').onclick=async()=>{
+ if(!isAdmin())return say('walletCreditMsg','Administrator access required.',true);
+ const q=$('creditUserSearch').value.trim();
+ if(q.length<2)return say('walletCreditMsg','Enter at least 2 characters to search.',true);
+ say('walletCreditMsg','Searching users...');
+ const safe=q.replace(/[,%_]/g,' ');
+ const{data,error}=await supabase.from('profiles').select('id,full_name,email,phone').or('full_name.ilike.%'+safe+'%,email.ilike.%'+safe+'%,phone.ilike.%'+safe+'%').limit(30);
+ if(error)return say('walletCreditMsg','Could not search users: '+error.message,true);
+ const select=$('creditUserSelect');select.innerHTML='<option value="">Select a user</option>';
+ (data||[]).forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=(p.full_name||p.email||p.phone||'User')+' · '+(p.email||p.phone||p.id);select.append(o);});
+ say('walletCreditMsg',(data||[]).length+' matching users found.');
+};
+if($('issueWalletCredit'))$('issueWalletCredit').onclick=async()=>{
+ if(!isAdmin())return say('walletCreditMsg','Administrator access required.',true);
+ const userId=$('creditUserSelect').value,amount=Number($('creditAmount').value),type=$('creditType').value,message=TRUSTBET_CREDIT_MESSAGES[type];
+ if(!userId)return say('walletCreditMsg','Select a user first.',true);
+ if(!Number.isSafeInteger(amount)||amount<=0)return say('walletCreditMsg','Enter a valid positive whole-number amount.',true);
+ const target=$('creditUserSelect').selectedOptions[0]?.textContent||'selected user';
+ if(!confirm('Confirm '+type+' credit of '+money(amount)+' to '+target+'?\n\nCustomer message:\n'+message+'\n\nThis action changes the user wallet balance.'))return;
+ $('issueWalletCredit').disabled=true;
+ const{data,error}=await supabase.rpc('admin_issue_wallet_credit',{p_user_id:userId,p_amount:amount,p_credit_type:type,p_message:message});
+ $('issueWalletCredit').disabled=false;
+ if(error)return say('walletCreditMsg','Credit failed: '+error.message,true);
+ $('creditAmount').value='';
+ say('walletCreditMsg','Credit successfully issued. New wallet balance: '+money(data?.balance||0));
+};
+if($('creditMessage'))updateCreditMessage();
+
 /* Notifications */
 $('closeNotifications').onclick=()=>$('notificationPanel').classList.add('hidden');
 $('notificationBell').onclick=async()=>{
@@ -1646,63 +1747,72 @@ function addWalletItem(container,item){
  desc.textContent=item.description||'Transaction';
  const date=document.createElement('div');date.className='tx-date';date.textContent=dateText(item.created_at);
  row.append(main,desc);if(item.created_at)row.append(date);
- if(item.withdrawalReceiptData && String(item.withdrawalReceiptData.status||'').toLowerCase()==='approved'){
+ if(item.receiptData){
   const receiptButton=document.createElement('button');
-  receiptButton.type='button';receiptButton.className='secondary withdrawal-receipt-download';
-  receiptButton.textContent='Download withdrawal receipt (PNG)';
+  receiptButton.type='button';receiptButton.className='secondary transaction-receipt-download';
+  receiptButton.textContent='Download official receipt (PNG)';
   receiptButton.style.cssText='margin-top:9px;width:100%;font-size:12px;padding:10px 12px';
-  receiptButton.onclick=()=>downloadUserWithdrawalReceipt(item.withdrawalReceiptData);
+  receiptButton.onclick=()=>downloadUserTransactionReceipt(item.receiptData);
   row.append(receiptButton);
  }
  const divider=document.createElement('hr');divider.className='tx-divider';
  container.append(row,divider);
 }
-function downloadUserWithdrawalReceipt(data){
- if(!data || String(data.status||'').toLowerCase()!=='approved')return;
+function downloadUserTransactionReceipt(data){
+ if(!data)return;
  const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
  const width=1100,pad=70;
- const moneyText='₦'+Number(data.amount||0).toLocaleString('en-NG',{minimumFractionDigits:2,maximumFractionDigits:2});
+ const status=String(data.status||'pending').toUpperCase();
+ const rejected=status==='REJECTED';
+ const title=(data.kind==='deposit'?'DEPOSIT':'WITHDRAWAL')+' RECEIPT';
  const rows=[
-  ['Transaction status','APPROVED'],['Bank',data.bank_name||'Not provided'],
-  ['Account name',data.account_name||'Not provided'],['Account number',data.account_number||'Not provided'],
-  ['Transaction reference',data.reference||'Not provided'],
+  ['Transaction type',data.kind==='deposit'?'Deposit':'Withdrawal'],
+  ['Status',status],
+  ['Transaction amount','₦'+Number(data.amount||0).toLocaleString('en-NG',{minimumFractionDigits:2,maximumFractionDigits:2})],
+  ['Reference',data.reference||'Not available'],
   ['Date requested',data.requested_at?new Date(data.requested_at).toLocaleString():'Not available'],
-  ['Date approved',data.approved_at?new Date(data.approved_at).toLocaleString():'Not available']
+  ['Date reviewed',data.reviewed_at?new Date(data.reviewed_at).toLocaleString():'Not available']
  ];
- // Measure every wrapped value first, then size the bitmap to the complete content.
- const valueX=475,valueMax=width-pad-valueX-25,lineHeight=38,rowGap=14;
- ctx.font='bold 27px Arial';
+ if(data.kind==='deposit'){
+  rows.push(['Payment provider',data.provider_name||'Not provided']);
+  if(data.depositor_account_name)rows.push(['Depositor account name',data.depositor_account_name]);
+ }else{
+  rows.push(['Bank',data.bank_name||'Not provided'],['Account name',data.account_name||'Not provided'],['Account number',data.account_number||'Not provided']);
+ }
+ if(rejected)rows.push(['Rejection reason',data.rejection_reason||'No reason was provided']);
+ if(data.kind==='withdrawal'&&!rejected)rows.push(['Important notice','Approval confirms review only; it is not proof that funds have arrived in your bank account.']);
+ const valueX=440,valueMax=width-pad-valueX-25,lineHeight=38,rowGap=14;
+ ctx.font='bold 25px Arial';
  const measured=rows.map(([label,value])=>{
   const words=String(value).split(/\s+/),parts=[];let line='';
   for(const word of words){const test=line?line+' '+word:word;if(ctx.measureText(test).width>valueMax&&line){parts.push(line);line=word;}else line=test;}
   if(line)parts.push(line);
   return {label,parts,height:Math.max(1,parts.length)*lineHeight+30};
  });
- const headerHeight=270,amountBlock=245,contentTop=headerHeight+amountBlock;
+ const headerHeight=260,amountBlock=150,contentTop=headerHeight+amountBlock;
  const rowsHeight=measured.reduce((sum,r)=>sum+r.height+rowGap,0);
- const bottomPad=90,height=contentTop+rowsHeight+bottomPad;
- canvas.width=width;canvas.height=height;
- // Reacquire/reset drawing state after setting canvas dimensions.
+ canvas.width=width;canvas.height=contentTop+rowsHeight+85;
  const c=canvas.getContext('2d');
- c.fillStyle='#eef3f9';c.fillRect(0,0,width,height);
+ c.fillStyle='#eef3f9';c.fillRect(0,0,width,canvas.height);
  c.fillStyle='#102d59';c.fillRect(0,0,width,headerHeight);
- c.fillStyle='#ffffff';c.textAlign='center';c.font='bold 66px Arial';c.fillText('TRUSTBET',width/2,94);
- c.fillStyle='#dceaff';c.font='bold 27px Arial';c.fillText('OFFICIAL WITHDRAWAL RECEIPT',width/2,150);
- c.fillStyle='#e6f8f0';c.beginPath();c.roundRect(370,183,360,68,22);c.fill();
- c.fillStyle='#087c50';c.font='bold 28px Arial';c.fillText('WITHDRAWAL APPROVED',width/2,227);
- c.fillStyle='#ffffff';c.beginPath();c.roundRect(70,headerHeight+15,960,height-headerHeight-35,28);c.fill();
+ c.textAlign='center';c.fillStyle='#fff';c.font='bold 66px Arial';c.fillText('TRUSTBET',width/2,92);
+ c.fillStyle='#dceaff';c.font='bold 27px Arial';c.fillText('OFFICIAL '+title,width/2,148);
+ c.fillStyle=rejected?'#fde8e8':'#e6f8f0';c.beginPath();c.roundRect(350,180,400,62,20);c.fill();
+ c.fillStyle=rejected?'#b42318':'#087c50';c.font='bold 27px Arial';c.fillText(status,width/2,221);
+ c.fillStyle='#fff';c.beginPath();c.roundRect(65,headerHeight+12,970,canvas.height-headerHeight-28,25);c.fill();
  c.strokeStyle='#dce5f1';c.lineWidth=3;c.stroke();
- c.textAlign='center';c.fillStyle='#78869c';c.font='bold 25px Arial';c.fillText('AMOUNT APPROVED',width/2,headerHeight+95);
- c.fillStyle='#102d59';c.font='bold 66px Arial';c.fillText(moneyText,width/2,headerHeight+185);
+ c.textAlign='center';c.fillStyle='#78869c';c.font='bold 23px Arial';c.fillText('TRANSACTION AMOUNT',width/2,headerHeight+65);
+ c.fillStyle='#102d59';c.font='bold 53px Arial';c.fillText('₦'+Number(data.amount||0).toLocaleString('en-NG',{minimumFractionDigits:2,maximumFractionDigits:2}),width/2,headerHeight+125);
  let y=contentTop;
  c.textAlign='left';
  measured.forEach((r,index)=>{
-  c.fillStyle=index%2===0?'#f7f9fc':'#ffffff';c.beginPath();c.roundRect(105,y-25,890,r.height,12);c.fill();
-  c.fillStyle='#78869c';c.font='bold 21px Arial';c.fillText(r.label.toUpperCase(),130,y);
-  c.fillStyle='#172b4d';c.font='bold 27px Arial';r.parts.forEach((part,i)=>c.fillText(part,valueX,y+i*lineHeight));
+  c.fillStyle=index%2===0?'#f7f9fc':'#fff';c.beginPath();c.roundRect(100,y-24,900,r.height,12);c.fill();
+  c.fillStyle='#78869c';c.font='bold 19px Arial';c.fillText(r.label.toUpperCase(),125,y);
+  c.fillStyle='#172b4d';c.font='bold 24px Arial';r.parts.forEach((part,i)=>c.fillText(part,valueX,y+i*lineHeight));
   y+=r.height+rowGap;
  });
- const link=document.createElement('a');link.download='TRUSTBET-withdrawal-receipt-'+(data.reference||'approved')+'.png';
+ const ref=(data.reference||'transaction').replace(/[^a-z0-9_-]/gi,'-');
+ const link=document.createElement('a');link.download='TRUSTBET-'+data.kind+'-'+status.toLowerCase()+'-'+ref+'.png';
  link.href=canvas.toDataURL('image/png');link.click();
 }
 
@@ -1710,60 +1820,32 @@ async function loadWallet(){
  if(!user)return;
  const container=$('tx');container.innerHTML='<div class="empty-history">Loading transactions...</div>';
  const [deposits,withdrawals,bets,ledger]=await Promise.all([
-  supabase.from('deposit_requests').select('amount,status,tracking_code,provider_name,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50),
-  supabase.from('withdrawal_requests').select('amount,status,bank_name,account_name,account_number,tracking_code,created_at,reviewed_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50),
+  supabase.from('deposit_requests').select('amount,status,tracking_code,provider_name,depositor_account_name,created_at,reviewed_at,rejection_reason').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50),
+  supabase.from('withdrawal_requests').select('amount,status,bank_name,account_name,account_number,tracking_code,created_at,reviewed_at,rejection_reason').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50),
   supabase.from('demo_bets').select('id,game_id,bet_amount,outcome,payout,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50),
   supabase.from('wallet_transactions').select('transaction_type,amount,balance_after,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50)
  ]);
  const items=[],errors=[deposits,withdrawals,bets,ledger].filter(x=>x.error);
- const now=Date.now(),cutoff=now-24*60*60*1000,cutoffISO=new Date(cutoff).toISOString();
- const allowedRecentLossIds=new Set();
- const allowedRecentLossRows=[];
- let recentLossCountingAvailable=true;
- // Count every loss in the rolling 24-hour window, not just the 50 rows shown in history.
- // The earliest 10 losses across all games remain visible; later losses are hidden from history only.
- for(let from=0;;from+=1000){
-  const page=await supabase.from('demo_bets')
-   .select('id,game_id,bet_amount,outcome,payout,created_at').eq('user_id',user.id)
-   .gte('created_at',cutoffISO).lte('created_at',new Date(now).toISOString())
-   .order('created_at',{ascending:true}).order('id',{ascending:true})
-   .range(from,from+999);
-  if(page.error){recentLossCountingAvailable=false;errors.push(page);break;}
-  const rows=page.data||[];
-  for(const row of rows){
-   const outcome=String(row.outcome||'').trim().toLowerCase();
-   const loss=outcome==='lost'||outcome==='loss'||outcome.startsWith('loss:');
-   if(loss&&allowedRecentLossIds.size<10){allowedRecentLossIds.add(row.id);allowedRecentLossRows.push(row);}
-  }
-  if(rows.length<1000)break;
- }
  if(!bets.error){
-  const historyBets=[...(bets.data||[])];
-  const historyBetIds=new Set(historyBets.map(x=>x.id));
-  if(recentLossCountingAvailable)allowedRecentLossRows.forEach(x=>{if(!historyBetIds.has(x.id))historyBets.push(x);});
-  historyBets.forEach(x=>{
+  const now=Date.now(),cutoff=now-24*60*60*1000;let recentLosses=0;
+  (bets.data||[]).forEach(x=>{
    const outcome=String(x.outcome||'').trim().toLowerCase();
    const won=outcome==='won'||outcome==='win'||outcome.startsWith('win:');
    const partial=outcome.startsWith('partial return:');
    const loss=outcome==='lost'||outcome==='loss'||outcome.startsWith('loss:');
-   const stamp=new Date(x.created_at||0).getTime();
-   if(loss&&stamp>=cutoff&&stamp<=now&&recentLossCountingAvailable&&!allowedRecentLossIds.has(x.id))return;
+   if(loss){const stamp=new Date(x.created_at||0).getTime();if(stamp>=cutoff&&stamp<=now){if(recentLosses>=10)return;recentLosses++;}}
    const returned=Number(x.payout)||0;
-   if(partial){
-    items.push({amount:returned||Number(x.bet_amount)||0,symbol:returned?'+':'−',label:'PARTIAL RETURN',color:returned?'green':'red',description:gameDisplayName(x.game_id)+' · Partial return',created_at:x.created_at});
-   }else if(won){
-    items.push({amount:returned,symbol:'+',label:'WIN',color:'green',description:gameDisplayName(x.game_id)+' · Winnings',created_at:x.created_at});
-   }else if(loss){
-    items.push({amount:Number(x.bet_amount)||0,symbol:'−',label:'LOST',color:'red',description:gameDisplayName(x.game_id)+' · Stake lost',created_at:x.created_at});
-   }else{
-    items.push({amount:Number(x.bet_amount)||0,symbol:'−',label:'BET',color:'red',description:gameDisplayName(x.game_id)+' · Stake',created_at:x.created_at});
-   }
+   if(partial){items.push({amount:returned||Number(x.bet_amount)||0,symbol:returned?'+':'−',label:'PARTIAL RETURN',color:returned?'green':'red',description:gameDisplayName(x.game_id)+' · Partial return',created_at:x.created_at});}
+   else if(won){items.push({amount:returned,symbol:'+',label:'WIN',color:'green',description:gameDisplayName(x.game_id)+' · Winnings',created_at:x.created_at});}
+   else if(loss){items.push({amount:Number(x.bet_amount)||0,symbol:'−',label:'LOST',color:'red',description:gameDisplayName(x.game_id)+' · Stake lost',created_at:x.created_at});}
+   else{items.push({amount:Number(x.bet_amount)||0,symbol:'−',label:'BET',color:'red',description:gameDisplayName(x.game_id)+' · Stake',created_at:x.created_at});}
   });
  }
  if(!deposits.error)(deposits.data||[]).forEach(x=>{
   const st=statusFor('deposit',x.status);
   items.push({amount:x.amount,symbol:x.status==='approved'?'+':'',label:st.label,color:st.color,
-   description:'Deposit through '+(x.provider_name||'selected provider')+(x.tracking_code?' · Ref: '+x.tracking_code:''),created_at:x.created_at});
+   description:'Deposit through '+(x.provider_name||'selected provider')+(x.tracking_code?' · Ref: '+x.tracking_code:''),created_at:x.created_at,
+   receiptData:{kind:'deposit',status:x.status,amount:x.amount,reference:x.tracking_code,provider_name:x.provider_name,depositor_account_name:x.depositor_account_name,requested_at:x.created_at,reviewed_at:x.reviewed_at,rejection_reason:x.rejection_reason}});
  });
  if(!withdrawals.error)(withdrawals.data||[]).forEach(x=>{
   const st=statusFor('withdrawal',x.status);
@@ -1773,11 +1855,9 @@ async function loadWallet(){
    label:approved?'WITHDRAWAL APPROVED · WITHDRAWN':st.label,
    color:approved?'green':'red',description:'Withdrawal to '+(x.bank_name||'selected provider'),
    created_at:x.created_at,
-   withdrawalReceiptData:approved?{
-    status:x.status,amount:x.amount,bank_name:x.bank_name,account_name:x.account_name,
+   receiptData:{kind:'withdrawal',status:x.status,amount:x.amount,bank_name:x.bank_name,account_name:x.account_name,
     account_number:x.account_number,reference:x.tracking_code,requested_at:x.created_at,
-    approved_at:x.reviewed_at
-   }:null
+    reviewed_at:x.reviewed_at,rejection_reason:x.rejection_reason}
   });
  });
  if(!ledger.error)(ledger.data||[]).forEach(x=>{
