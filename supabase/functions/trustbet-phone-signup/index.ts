@@ -34,7 +34,9 @@ Deno.serve(async(req:Request)=>{
  const url=Deno.env.get("SUPABASE_URL"),key=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
  if(!url||!key)return reply({error:"Server configuration missing."},500);
  let body:{phone?:string;password?:string;first_name?:string;last_name?:string};try{body=await req.json();}catch{return reply({error:"Invalid request."},400);}
- const phone=String(body.phone||"").trim(),password=String(body.password||"");\n const firstName=String(body.first_name||"").trim().replace(/\\s+/g," "),lastName=String(body.last_name||"").trim().replace(/\\s+/g," ");\n if(!firstName||!lastName||/\\s/.test(firstName)||/\\s/.test(lastName)||firstName.length>60||lastName.length>60)return reply({error:"Enter one first name and one surname. Both are required."},400);
+ const phone=String(body.phone||"").trim(),password=String(body.password||"");
+ const firstName=String(body.first_name||"").trim().replace(/\s+/g," "),lastName=String(body.last_name||"").trim().replace(/\s+/g," ");
+ if(!firstName||!lastName||/\s/.test(firstName)||/\s/.test(lastName)||firstName.length>60||lastName.length>60)return reply({error:"Enter one first name and one surname. Both are required."},400);
  if(!/^\+[1-9]\d{7,14}$/.test(phone))return reply({error:"Enter a valid international phone number."},400);
  if(!/^(?=.{8,15}$)(?=[0-9]*[A-Za-z][0-9]*$)[A-Za-z0-9]+$/.test(password))return reply({error:"Phone passwords must be 8–15 characters: exactly one letter and all remaining characters numbers."},400);
  const admin=createClient(url,key,{auth:{autoRefreshToken:false,persistSession:false}});
