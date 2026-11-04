@@ -2004,7 +2004,15 @@ async function adminInbox(){
   count.textContent=Number(c.admin_unread_count||0)>0?String(c.admin_unread_count):'';
   bell.append(count);d.append(label,bell);
   d.onclick=async()=>{
-   conversation=c;$('chatPanel').classList.remove('hidden');await chatLoad();
+   conversation=c;$('chatPanel').classList.remove('hidden');
+   const readAt=new Date().toISOString();
+   const{error:messageReadError}=await supabase.from('support_messages')
+    .update({read_at:readAt}).eq('conversation_id',c.id).eq('sender_role','user').is('read_at',null);
+   if(messageReadError)return say('chatMsg','Unable to mark support messages as read: '+messageReadError.message,true);
+   const{error:countReadError}=await supabase.from('support_conversations')
+    .update({admin_unread_count:0}).eq('id',c.id);
+   if(countReadError)return say('chatMsg','Unable to clear support alert: '+countReadError.message,true);
+   c.admin_unread_count=0;await adminInbox();await chatLoad();
   };
   $('adminInbox').append(d);
  });
