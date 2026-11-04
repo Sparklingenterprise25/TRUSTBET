@@ -1012,6 +1012,8 @@ $('signup').onclick=async()=>{
 $('verify').onclick=async()=>{
  const{data,error}=await supabase.auth.verifyOtp({email:$('email').value.trim(),token:$('otp').value.trim(),type:'signup'});
  if(error)return say('authMsg',error.message,true);
+ const{error:codeError}=await supabase.functions.invoke('trustbet-recovery-provision',{body:{}});
+ if(codeError){say('authMsg','Your email was verified, but secure recovery-code setup could not finish. Please contact the administrator before continuing.',true);return;}
  await profileLoad(data.user);
 };
 $('resend').onclick=async()=>{
