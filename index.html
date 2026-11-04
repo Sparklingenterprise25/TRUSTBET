@@ -1080,14 +1080,14 @@ $('logout').onclick=async()=>{
 
 /* Naira amount inputs: display thousands separators while keeping numeric values clean for calculations. */
 function formatAmountInput(field){
- const digits=String(field.value||'').replace(/\\D/g,'');
- const formatted=digits.replace(/\\B(?=(\\d{3})+(?!\\d))/g,',');
+ const digits=String(field.value||'').replace(/\D/g,'');
+ const formatted=digits.replace(/\B(?=(\d{3})+(?!\d))/g,',');
  if(field.value!==formatted){
   const oldPos=field.selectionStart??field.value.length;
-  const digitsBefore=String(field.value).slice(0,oldPos).replace(/\\D/g,'').length;
+  const digitsBefore=String(field.value).slice(0,oldPos).replace(/\D/g,'').length;
   field.value=formatted;
   let pos=0,count=0;
-  while(pos<formatted.length&&count<digitsBefore){if(/\\d/.test(formatted[pos]))count++;pos++;}
+  while(pos<formatted.length&&count<digitsBefore){if(/\d/.test(formatted[pos]))count++;pos++;}
   try{field.setSelectionRange(pos,pos);}catch{}
  }
 }
