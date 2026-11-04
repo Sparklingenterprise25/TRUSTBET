@@ -544,6 +544,11 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
    <div id="adminArea" class="hidden">
     <h3>🛠️ Admin Dashboard</h3>
     <div class="admin-section">
+     <h3>Self-Exclusion Requests</h3>
+     <button id="refreshSelfExclusion" class="secondary">Refresh requests</button>
+     <div id="adminSelfExclusion" aria-live="polite"></div>
+    </div>
+    <div class="admin-section">
      <h3>Pending deposit requests</h3>
      <p class="muted">Review requests here. Approval must be handled by your secured backend.</p>
      <button id="refreshAdminDeposits" class="secondary">Refresh requests</button>
@@ -628,17 +633,17 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
   </div>
   <div class="card account-info-box">
    <h2>🛑 Self-Exclusion</h2>
-   <p>Take a break from betting by temporarily restricting access to games for a period you choose.</p>
+   <p>Choose 30, 60, 90, or 120 days and submit a request for administrator review. Your account remains usable while the request is pending.</p>
    <div class="odds-grid" id="exclusion">
     <button class="odd-box" data-days="30">30 days</button>
     <button class="odd-box" data-days="60">60 days</button>
     <button class="odd-box" data-days="90">90 days</button>
     <button class="odd-box" data-days="120">120 days</button>
    </div>
-   <p id="exState" class="info">No active self-exclusion is shown on your account.</p>
-   <button id="activate" class="wide">Activate self-exclusion</button>
+   <p id="exState" class="info">Checking your self-exclusion request…</p>
+   <button id="activate" class="wide">Submit self-exclusion request</button>
+   <button id="cancelExclusion" class="wide danger hidden" style="background:#c43d4b;color:#fff">CANCEL</button>
    <p id="exMsg" class="msg"></p>
-   <p class="muted">Once activated, your selected exclusion period cannot be cancelled, reversed, or shortened. You will regain access when the period expires. Contact TRUSTBET support if you need assistance.</p>
   </div>
  </section>
 </div>
@@ -919,7 +924,7 @@ async function profileLoad(authUser){
  banks();render();renderHome();exStatus();updateLockNotice();
  go('home');
  await loadBankDetails();
- if(isAdmin()){await adminDeposits();await adminWithdrawals();await adminUsers();await adminPhoneApprovals();}
+ if(isAdmin()){await adminDeposits();await adminWithdrawals();await adminSelfExclusion();await adminUsers();await adminPhoneApprovals();}
  await adminInbox();
  await loadNotifications();
  subscribeNotifications();
@@ -1400,6 +1405,41 @@ function confirmAdminDecision(kind,decision){
   buttons.append(cancel,proceed);panel.append(heading,message,field,buttons);overlay.append(panel);document.body.append(overlay);field.focus();
  });
 }
+
+async function adminSelfExclusion(){
+ if(!isAdmin())return;
+ const area=$('adminSelfExclusion');area.textContent='Loading self-exclusion requests…';
+ const{data,error}=await supabase.from('self_exclusion_requests')
+  .select('id,user_id,requested_days,final_days,status,submitted_at,cancel_until')
+  .eq('status','PENDING').order('submitted_at',{ascending:true}).limit(100);
+ if(error){area.textContent='Unable to load requests: '+error.message;return;}
+ area.innerHTML='';
+ if(!data?.length){area.textContent='No pending self-exclusion requests.';return;}
+ const names=await adminProfileNames(data);
+ data.forEach(item=>{
+  const row=document.createElement('div');row.className='admin-request';
+  const info=document.createElement('div');
+  info.innerHTML='<b>Self-exclusion · '+item.requested_days+' days requested</b><br><small>User: '+escapeHtml(names.get(item.user_id)||'Name unavailable')+'<br>Submitted: '+escapeHtml(adminRequestDate(item.submitted_at))+'<br>Cancellation deadline: '+escapeHtml(adminRequestDate(item.cancel_until))+'</small>';
+  const duration=document.createElement('select');
+  [30,60,90,120].forEach(n=>{const o=document.createElement('option');o.value=String(n);o.textContent=n+' days';if(n===item.requested_days)o.selected=true;duration.append(o);});
+  const actions=document.createElement('div');actions.className='row';
+  const accept=document.createElement('button');accept.textContent='ACCEPTED';
+  const decline=document.createElement('button');decline.textContent='DECLINED';decline.className='danger';
+  accept.onclick=()=>reviewSelfExclusion(item, 'ACCEPTED', Number(duration.value),accept,decline);
+  decline.onclick=()=>reviewSelfExclusion(item, 'DECLINED', Number(duration.value),accept,decline);
+  actions.append(accept,decline);row.append(info,duration,actions);area.append(row);
+ });
+}
+async function reviewSelfExclusion(item,decision,finalDays,accept,decline){
+ if(!isAdmin())return alert('Administrator access required.');
+ if(!await confirmAdminDecision('self-exclusion',decision))return;
+ accept.disabled=true;decline.disabled=true;
+ const{error}=await supabase.rpc('review_self_exclusion_request',{p_request_id:item.id,p_decision:decision,p_final_days:finalDays});
+ if(error){alert('Self-exclusion review failed: '+error.message);accept.disabled=false;decline.disabled=false;return;}
+ alert('Self-exclusion request '+decision+'.');
+ await adminSelfExclusion();
+}
+$('refreshSelfExclusion').onclick=adminSelfExclusion;
 
 /* Admin deposit review. RPC functions must be created and permission-checked in Supabase. */
 async function adminDeposits(){
@@ -1935,31 +1975,63 @@ async function refresh(){
   .eq('id',user.id).single();
  if(!error&&data){
   profile={...profile,...data};
-  updateBalances(data.virtual_balance);exStatus();updateLockNotice();
+  updateBalances(data.virtual_balance);await exStatus();updateLockNotice();
  }
 }
-function exStatus(){
+let currentExclusionRequest=null;
+async function exStatus(){
  const until=profile?.self_exclusion_until;
  if(until&&new Date(until)>new Date()){
   $('exState').textContent='Self-exclusion active until '+new Date(until).toLocaleString();
-  $('activate').disabled=true;
+  $('activate').classList.add('hidden');$('cancelExclusion').classList.add('hidden');
+  document.querySelectorAll('#exclusion button').forEach(b=>b.disabled=true);
+  return;
+ }
+ const{data,error}=await supabase.from('self_exclusion_requests')
+  .select('id,requested_days,final_days,status,submitted_at,cancel_until,exclusion_until')
+  .eq('user_id',user.id).in('status',['PENDING','ACCEPTED','DECLINED']).order('submitted_at',{ascending:false}).limit(1).maybeSingle();
+ if(error){$('exState').textContent='Unable to check request status: '+error.message;return;}
+ currentExclusionRequest=data||null;
+ if(data?.status==='PENDING'){
+  $('exState').textContent='Request pending · '+data.requested_days+' days requested. Submitted '+new Date(data.submitted_at).toLocaleString()+'.';
+  $('activate').classList.add('hidden');
+  const canCancel=new Date(data.cancel_until)>new Date();
+  $('cancelExclusion').classList.toggle('hidden',!canCancel);
+  document.querySelectorAll('#exclusion button').forEach(b=>b.disabled=true);
+ }else if(data?.status==='ACCEPTED'){
+  $('exState').textContent='Self-exclusion accepted. Access is suspended until '+(data.exclusion_until?new Date(data.exclusion_until).toLocaleString():'the exclusion period ends')+'.';
+  $('activate').classList.add('hidden');$('cancelExclusion').classList.add('hidden');
+  document.querySelectorAll('#exclusion button').forEach(b=>b.disabled=true);
  }else{
-  $('exState').textContent='No active self-exclusion is shown on your account.';
-  $('activate').disabled=false;
+  $('exState').textContent=data?.status==='DECLINED'?'Your previous request was declined. You may submit a new request.':'No pending self-exclusion request.';
+  $('activate').classList.remove('hidden');$('activate').disabled=false;$('cancelExclusion').classList.add('hidden');
+  document.querySelectorAll('#exclusion button').forEach(b=>b.disabled=false);
  }
 }
 document.querySelectorAll('#exclusion button').forEach(b=>b.onclick=()=>{
- if(isSelfExcluded())return;
+ if(isSelfExcluded()||currentExclusionRequest?.status==='PENDING')return;
  days=Number(b.dataset.days);
  document.querySelectorAll('#exclusion button').forEach(x=>x.classList.toggle('selected',x===b));
 });
 $('activate').onclick=async()=>{
- if(isSelfExcluded())return say('exMsg','Self-exclusion is already active and cannot be changed.',true);
+ if(isSelfExcluded())return say('exMsg','Self-exclusion is already active.',true);
  if(!days)return say('exMsg','Select an exclusion period first.',true);
- if(!confirm('Activate self-exclusion for '+days+' days? This cannot be reversed early.'))return;
- const{error}=await supabase.rpc('activate_self_exclusion',{p_days:days});
+ if(!confirm('Submit a self-exclusion request for '+days+' days?'))return;
+ $('activate').disabled=true;
+ const{data,error}=await supabase.rpc('submit_self_exclusion_request',{p_days:days});
+ if(error){$('activate').disabled=false;return say('exMsg',error.message,true);}
+ say('exMsg','SELF-EXCLUSION REQUEST SUBMITTED\n\nYour self-exclusion request has been successfully submitted and is awaiting .\n\nYou can continue to log in and use all TRUSTBET features while your request will be EXECUTED before 48 hours.',false);
+ days=0;document.querySelectorAll('#exclusion button').forEach(x=>x.classList.remove('selected'));
+ await exStatus();
+};
+$('cancelExclusion').onclick=async()=>{
+ if(!currentExclusionRequest?.id)return;
+ if(!confirm('Cancel your pending self-exclusion request?'))return;
+ $('cancelExclusion').disabled=true;
+ const{error}=await supabase.rpc('cancel_self_exclusion_request',{p_request_id:currentExclusionRequest.id});
+ $('cancelExclusion').disabled=false;
  if(error)return say('exMsg',error.message,true);
- say('exMsg','Self-exclusion activated.');await refresh();
+ say('exMsg','Your self-exclusion request has been cancelled.',false);await exStatus();
 };
 
 /* Customer support chat */
