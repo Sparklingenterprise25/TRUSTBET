@@ -1315,7 +1315,7 @@ function showAdminReceipt(kind,item,decision,reason=''){
   const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
   const width=1200,pad=84,labelWidth=285,valueWidth=width-2*pad-labelWidth-28;
   const wrap=(value,max,font)=>{
-   ctx.font=font;const words=String(value??'').split(/\\s+/),out=[];let line='';
+   ctx.font=font;const words=String(value??'').split(/\s+/),out=[];let line='';
    for(const word of words){const next=line?line+' '+word:word;if(ctx.measureText(next).width>max&&line){out.push(line);line=word;}else line=next;}
    if(line)out.push(line);return out.length?out:['—'];
   };
@@ -1792,7 +1792,7 @@ function downloadUserTransactionReceipt(data){
  if(rejected)rows.push(['Rejection reason',data.rejection_reason||'No reason was provided']);
  if(data.kind==='withdrawal'&&!rejected)rows.push(['Important notice','Approval confirms review only; it is not proof that funds have arrived in your bank account.']);
  const wrap=(value,max,font)=>{
-  ctx.font=font;const words=String(value??'').split(/\\s+/),out=[];let line='';
+  ctx.font=font;const words=String(value??'').split(/\s+/),out=[];let line='';
   for(const word of words){const next=line?line+' '+word:word;if(ctx.measureText(next).width>max&&line){out.push(line);line=word;}else line=next;}
   if(line)out.push(line);return out.length?out:['—'];
  };
