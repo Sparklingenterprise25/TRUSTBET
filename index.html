@@ -588,7 +588,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
      <button type="button" id="issueWalletCredit" class="wide">Review and issue credit</button>
      <p id="walletCreditMsg" class="msg" aria-live="polite"></p>
     </div>
-    <h3>Admin Support Inbox</h3><div id="adminInbox"></div><p><a href="mailto:superhybridservices@gmail.com">Email support: superhybridservices@gmail.com</a></p><button type="button" class="copy-support-email">Copy support email</button><p><a href="https://wa.me/2347063593605" target="_blank" rel="noopener">WhatsApp support: +234 706 359 3605 · <span class="whatsapp-open-hint">Open WhatsApp app</span></a></p><button type="button" class="copy-support-whatsapp">Copy support WhatsApp number</button>
+    <h3>Admin Support Inbox</h3><div id="adminInbox"></div><div id="adminChatPanelSlot"></div><p><a href="mailto:superhybridservices@gmail.com">Email support: superhybridservices@gmail.com</a></p><button type="button" class="copy-support-email">Copy support email</button><p><a href="https://wa.me/2347063593605" target="_blank" rel="noopener">WhatsApp support: +234 706 359 3605 · <span class="whatsapp-open-hint">Open WhatsApp app</span></a></p><button type="button" class="copy-support-whatsapp">Copy support WhatsApp number</button>
    </div>
   </div>
   <div class="card account-info-box">
@@ -2148,6 +2148,11 @@ $('requestAccountDeletion').onclick=async()=>{
 };
 
 /* Customer support chat */
+function moveSupportChatPanel(target){
+ const panel=$('chatPanel');if(!panel)return;
+ if(target==='admin')$('adminChatPanelSlot').append(panel);
+ else $('chatOpen').insertAdjacentElement('afterend',panel);
+}
 function closeSupportChat(){
  if(supportIdleTimer)clearTimeout(supportIdleTimer);
  supportIdleTimer=null;$('chatPanel').classList.add('hidden');
@@ -2155,14 +2160,14 @@ function closeSupportChat(){
 function resetSupportChatIdle(){
  if(!$('chatPanel')||$('chatPanel').classList.contains('hidden'))return;
  if(supportIdleTimer)clearTimeout(supportIdleTimer);
- supportIdleTimer=setTimeout(closeSupportChat,isAdmin()?60000:10000);
+ supportIdleTimer=setTimeout(closeSupportChat,isAdmin()?300000:60000);
 }
 ['pointerdown','pointermove','touchstart','touchmove','keydown','input','scroll','wheel'].forEach(eventName=>
  $('chatPanel').addEventListener(eventName,resetSupportChatIdle,{passive:true})
 );
 $('closeChatPanel').onclick=closeSupportChat;
 $('chatOpen').onclick=async e=>{
- e.preventDefault();$('chatPanel').classList.remove('hidden');
+ e.preventDefault();moveSupportChatPanel('customer');$('chatPanel').classList.remove('hidden');
  $('chatInput').maxLength=isAdmin()?2000:1000;
  $('chatInput').placeholder=isAdmin()?'Write your reply (maximum 2,000 characters)':'Write your message (maximum 1,000 characters)';
  if($('chatCharCount'))$('chatCharCount').textContent='0 / '+(isAdmin()?2000:1000)+' characters';
@@ -2258,7 +2263,7 @@ async function adminInbox(){
   count.textContent=Number(c.admin_unread_count||0)>0?String(c.admin_unread_count):'';
   bell.append(count);d.append(identity,label,bell);
   d.onclick=async()=>{
-   conversation=c;$('chatPanel').classList.remove('hidden');
+   conversation=c;moveSupportChatPanel('admin');$('chatPanel').classList.remove('hidden');
    $('chatInput').maxLength=2000;resetSupportChatIdle();$('chatInput').placeholder='Write your reply (maximum 2,000 characters)';
    if($('chatCharCount'))$('chatCharCount').textContent=$('chatInput').value.length+' / 2,000 characters';
    if(channel)supabase.removeChannel(channel);
