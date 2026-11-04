@@ -2020,7 +2020,7 @@ $('activate').onclick=async()=>{
  $('activate').disabled=true;
  const{data,error}=await supabase.rpc('submit_self_exclusion_request',{p_days:days});
  if(error){$('activate').disabled=false;return say('exMsg',error.message,true);}
- say('exMsg','SELF-EXCLUSION REQUEST SUBMITTED\n\nYour self-exclusion request has been successfully submitted and is awaiting .\n\nYou can continue to log in and use all TRUSTBET features while your request will be EXECUTED before 48 hours.',false);
+ say('exMsg','SELF-EXCLUSION REQUEST SUBMITTED👉 Your self-exclusion request has been successfully submitted and is awaiting . You can continue to log in and use all TRUSTBET features while your request will be EXECUTED before 48 hours.',false);
  days=0;document.querySelectorAll('#exclusion button').forEach(x=>x.classList.remove('selected'));
  await exStatus();
 };
