@@ -594,15 +594,16 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
   <div class="card account-info-box">
    <h2>🎧 Customer Support</h2><p><b style="color:var(--green)">🟢 ACTIVE 24/7</b></p>
    <a class="support-link" href="#" id="chatOpen"><span class="emoji">💬</span><span><b>Live Chat</b><small>Private chat with support</small></span></a>
-   <a class="support-link" href="https://wa.me/2347063593605" target="_blank" rel="noopener"><span class="emoji">📱</span><span><b>WhatsApp</b><small>+234 706 359 3605 · <span class="whatsapp-open-hint">Open WhatsApp app</span></small></span></a><button type="button" class="copy-support-whatsapp">Copy support WhatsApp number</button>
-   <a class="support-link" href="mailto:superhybridservices@gmail.com"><span class="emoji">📧</span><span><b>Email</b><small>superhybridservices@gmail.com · <span class="email-open-hint">Open email app</span></small></span></a>
-   <button type="button" class="secondary copy-support-email">Copy support email</button>
    <div class="card hidden" id="chatPanel">
-   <h2>💬 Live Chat</h2><div id="chatMessages" class="chat-list"></div>
+   <div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><h2>💬 Live Chat</h2><button type="button" id="closeChatPanel" class="secondary" style="padding:7px 11px">Close</button></div>
+   <div id="chatMessages" class="chat-list"></div>
    <textarea id="chatInput" maxlength="1000" placeholder="Write your message (maximum 1,000 characters)"></textarea>
    <small id="chatCharCount" class="muted">0 / 1,000 characters</small>
    <button id="sendChat" class="wide">Send message</button><p id="chatMsg" class="msg"></p>
    </div>
+   <a class="support-link" href="https://wa.me/2347063593605" target="_blank" rel="noopener"><span class="emoji">📱</span><span><b>WhatsApp</b><small>+234 706 359 3605 · <span class="whatsapp-open-hint">Open WhatsApp app</span></small></span></a><button type="button" class="copy-support-whatsapp">Copy support WhatsApp number</button>
+   <a class="support-link" href="mailto:superhybridservices@gmail.com"><span class="emoji">📧</span><span><b>Email</b><small>superhybridservices@gmail.com · <span class="email-open-hint">Open email app</span></small></span></a>
+   <button type="button" class="secondary copy-support-email">Copy support email</button>
   </div>
   <div class="card account-info-box">
    <h2>🔒 Privacy Policy</h2>
@@ -2159,6 +2160,7 @@ function resetSupportChatIdle(){
 ['pointerdown','pointermove','touchstart','touchmove','keydown','input','scroll','wheel'].forEach(eventName=>
  $('chatPanel').addEventListener(eventName,resetSupportChatIdle,{passive:true})
 );
+$('closeChatPanel').onclick=closeSupportChat;
 $('chatOpen').onclick=async e=>{
  e.preventDefault();$('chatPanel').classList.remove('hidden');
  $('chatInput').maxLength=isAdmin()?2000:1000;
