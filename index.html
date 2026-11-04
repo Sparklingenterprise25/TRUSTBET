@@ -332,6 +332,10 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
 .wheel-pointer{position:absolute;z-index:2;top:7px;left:calc(50% - 10px);color:#fff3a0;font-size:23px;text-shadow:0 2px 4px #000}
 .wheel-hub{position:absolute;left:calc(50% - 22px);top:calc(50% - 22px);width:44px;height:44px;border-radius:50%;background:#f5d47a;color:#39245f;display:grid;place-items:center;font-size:10px;font-weight:1000}
 
+
+.copy-support-email{background:var(--navy)!important;color:#fff!important;border:1px solid var(--navy)!important;font-weight:800}
+.copy-support-email:hover{background:#174b88!important;color:#fff!important}
+.email-open-hint{color:#d32032!important;font-weight:800}
 </style>
 </head>
 <body>
@@ -574,7 +578,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
    <h2>🎧 Customer Support</h2><p><b style="color:var(--green)">🟢 ACTIVE 24/7</b></p>
    <a class="support-link" href="#" id="chatOpen"><span class="emoji">💬</span><span><b>Live Chat</b><small>Private chat with support</small></span></a>
    <a class="support-link" href="https://wa.me/2347063593605"><span class="emoji">📱</span><span><b>WhatsApp</b><small>Chat with our team</small></span></a>
-   <a class="support-link" href="mailto:superhybridservices@gmail.com"><span class="emoji">📧</span><span><b>Email</b><small>superhybridservices@gmail.com · Open email app</small></span></a>
+   <a class="support-link" href="mailto:superhybridservices@gmail.com"><span class="emoji">📧</span><span><b>Email</b><small>superhybridservices@gmail.com · <span class="email-open-hint">Open email app ♥️</span></small></span></a>
    <button type="button" class="secondary copy-support-email">Copy support email</button>
    <div class="card hidden" id="chatPanel">
    <h2>💬 Live Chat</h2><div id="chatMessages" class="chat-list"></div>
@@ -643,6 +647,7 @@ let user=null,profile=null,days=0,conversation=null,channel=null,game=null,suppo
 let selectedOdd=null,notificationChannel=null,activeCategory='All';
 let homeBalanceHidden=false;
 let requestRedirectTimer=null;
+let supportIdleTimer=null;
 let favourites=JSON.parse(localStorage.getItem('trustbet_favourites')||'[]');
 let played=JSON.parse(localStorage.getItem('trustbet_played')||'{}');
 
@@ -982,7 +987,7 @@ $('resend').onclick=async()=>{
 };
 $('emailMode').onclick=()=>{$('emailAuth').classList.remove('hidden');$('phoneAuth').classList.add('hidden');$('emailMode').classList.remove('secondary');$('phoneMode').classList.add('secondary');};
 $('phoneMode').onclick=()=>{$('phoneAuth').classList.remove('hidden');$('emailAuth').classList.add('hidden');$('phoneMode').classList.remove('secondary');$('emailMode').classList.add('secondary');};
-$('phoneNumber').addEventListener('input',()=>{const digits=$('phoneNumber').value.replace(/\D/g,'').slice(0,11);$('phoneNumber').value=digits.replace(/^(\d{3})(\d{0,4})(\d{0,4}).*$/,(_,a,b,c)=>[a,b,c].filter(Boolean).join(' '));});
+$('phoneNumber').addEventListener('input',()=>{const digits=$('phoneNumber').value.replace(/\D/g,'').slice(0,14);$('phoneNumber').value=digits.replace(/^(\d{3})(\d{0,4})(\d{0,7}).*$/,(_,a,b,c)=>[a,b,c].filter(Boolean).join(' '));});
 function fullPhoneNumber(){
  const code=$('phoneCountry').value;
  let digits=$('phoneNumber').value.replace(/\D/g,'');
@@ -1005,7 +1010,7 @@ $('phoneLogin').onclick=async()=>{
 $('phoneSignup').onclick=async()=>{
  try{
   const phone=fullPhoneNumber(),password=$('phonePassword').value;
-  if(!/^\d{8,}$/.test(password))return say('authMsg','Password must contain only numbers and be at least 8 digits. (Example: 12345678)',true);
+  if(password.length<8||password.length>72||!/[A-Za-z]/.test(password)||!/[0-9]/.test(password))return say('authMsg','Password must be 8–72 characters and contain at least one letter and one number.',true);
   const{data,error}=await supabase.functions.invoke('trustbet-phone-signup',{body:{phone,password}});
   if(error)return say('authMsg',error.message||'Phone registration failed.',true);
   if(data?.error)return say('authMsg',data.error,true);
@@ -1948,12 +1953,25 @@ $('activate').onclick=async()=>{
 };
 
 /* Customer support chat */
+function closeSupportChat(){
+ if(supportIdleTimer)clearTimeout(supportIdleTimer);
+ supportIdleTimer=null;$('chatPanel').classList.add('hidden');
+}
+function resetSupportChatIdle(){
+ if(!$('chatPanel')||$('chatPanel').classList.contains('hidden'))return;
+ if(supportIdleTimer)clearTimeout(supportIdleTimer);
+ supportIdleTimer=setTimeout(closeSupportChat,isAdmin()?60000:10000);
+}
+['pointerdown','pointermove','touchstart','touchmove','keydown','input','scroll','wheel'].forEach(eventName=>
+ $('chatPanel').addEventListener(eventName,resetSupportChatIdle,{passive:true})
+);
 $('chatOpen').onclick=async e=>{
  e.preventDefault();$('chatPanel').classList.remove('hidden');
  $('chatInput').maxLength=isAdmin()?2000:1000;
  $('chatInput').placeholder=isAdmin()?'Write your reply (maximum 2,000 characters)':'Write your message (maximum 1,000 characters)';
  if($('chatCharCount'))$('chatCharCount').textContent='0 / '+(isAdmin()?2000:1000)+' characters';
- try{await conversationOpen();}catch(error){say('chatMsg',error.message,true);}
+ resetSupportChatIdle();
+ try{await conversationOpen();resetSupportChatIdle();}catch(error){say('chatMsg',error.message,true);}
 };
 async function conversationOpen(){
  const{data,error}=await supabase.from('support_conversations')
@@ -2007,7 +2025,7 @@ $('sendChat').onclick=async()=>{
  $('sendChat').disabled=false;
  if(error)return say('chatMsg','Message was not sent: '+error.message,true);
  $('chatInput').value='';if($('chatCharCount'))$('chatCharCount').textContent='0 / '+limit+' characters';
- say('chatMsg','Message sent.');await chatLoad();
+ say('chatMsg','Message submitted');await chatLoad();resetSupportChatIdle();
 };
 document.querySelectorAll('.copy-support-email').forEach(button=>button.onclick=async()=>{
  const email='superhybridservices@gmail.com';
@@ -2035,7 +2053,7 @@ async function adminInbox(){
   bell.append(count);d.append(label,bell);
   d.onclick=async()=>{
    conversation=c;$('chatPanel').classList.remove('hidden');
-   $('chatInput').maxLength=2000;$('chatInput').placeholder='Write your reply (maximum 2,000 characters)';
+   $('chatInput').maxLength=2000;resetSupportChatIdle();$('chatInput').placeholder='Write your reply (maximum 2,000 characters)';
    if($('chatCharCount'))$('chatCharCount').textContent=$('chatInput').value.length+' / 2,000 characters';
    if(channel)supabase.removeChannel(channel);
    channel=supabase.channel('trustbet-admin-chat-'+c.id)
