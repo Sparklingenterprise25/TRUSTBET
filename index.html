@@ -2305,6 +2305,9 @@ $('notificationBell').onclick=async()=>{
   if(marked?.length)await loadNotifications();
  }
 };
+function notificationMessageText(message){
+ return String(message||'').replace(/₦\\s*([\\d,]+(?:\\.\\d+)?)/g,(_,raw)=>money(Number(raw.replace(/,/g,''))));
+}
 function renderNotifications(items,unreadCount=null){
  const unread=Number.isFinite(unreadCount)?unreadCount:items.filter(x=>!x.is_read).length;
  $('unreadBadge').textContent=unread;
@@ -2315,7 +2318,7 @@ function renderNotifications(items,unreadCount=null){
   const d=document.createElement('div');
   d.className='notification-item'+(!n.is_read?' unread':'');d.dataset.id=n.id;
   const b=document.createElement('b');b.textContent=n.title||'Notification';
-  const p=document.createElement('p');p.textContent=n.message||'';
+  const p=document.createElement('p');p.textContent=notificationMessageText(n.message);
   const s=document.createElement('small');s.textContent=new Date(n.created_at).toLocaleString();
   d.append(b,p,s);$('notificationList').append(d);
  });
@@ -2407,7 +2410,7 @@ function downloadUserTransactionReceipt(data){
  const rows=[
   ['Transaction type',data.kind==='deposit'?'Deposit':'Withdrawal'],
   ['Status',status],
-  ['Transaction amount','₦'+Number(data.amount||0).toLocaleString('en-NG',{minimumFractionDigits:2,maximumFractionDigits:2})],
+  ['Transaction amount',money(data.amount)],
   ['Reference',data.reference||'Not available'],
   ['Date requested',data.requested_at?new Date(data.requested_at).toLocaleString():'Not available'],
   ['Date reviewed',data.reviewed_at?new Date(data.reviewed_at).toLocaleString():'Not available']
