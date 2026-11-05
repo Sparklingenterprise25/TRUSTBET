@@ -1008,11 +1008,18 @@ $('recoverySubmit').onclick=async()=>{
   button.disabled=false;button.textContent='Reset password';
  }
 };
+function friendlyLoginError(error){
+ const message=String(error?.message||'');
+ if(/\\buser is banned\\b|\\bbanned\\b/i.test(message)){
+  return 'Login is not available for this account right now. If you have submitted a registration request, it may still be awaiting administrator review. Please wait for the administrator’s decision. If you believe your account has already been approved, please contact support.';
+ }
+ return message||'Unable to sign in. Please check your details and try again.';
+}
 $('login').onclick=async()=>{
  const button=$('login');button.disabled=true;button.textContent='Signing in…';
  try{
   const{data,error}=await supabase.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
-  if(error){say('authMsg',error.message,true);return;}  await profileLoad(data.user);
+  if(error){say('authMsg',friendlyLoginError(error),true);return;}  await profileLoad(data.user);
  }catch(error){say('authMsg','Login error: '+(error?.message||'Please try again.'),true);}
  finally{button.disabled=false;button.textContent='Sign in';}
 };
@@ -1149,7 +1156,7 @@ $('phoneLogin').onclick=async()=>{
   const phone=fullPhoneNumber(),password=$('phonePassword').value;
   if(!(/^[0-9]{8,15}$/.test(password)||/^(?=.{8,15}$)(?=[0-9]*[A-Za-z][0-9]*$)[A-Za-z0-9]+$/.test(password)))return say('authMsg','Enter a valid phone account password.',true);
   const{data,error}=await supabase.auth.signInWithPassword({phone,password});
-  if(error){say('authMsg',error.message,true);return;}
+  if(error){say('authMsg',friendlyLoginError(error),true);return;}
   await profileLoad(data.user);
  }catch(error){say('authMsg',error.message||'Phone login failed.',true);}
  finally{button.disabled=false;button.textContent='Sign in';}
