@@ -625,9 +625,8 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
     <div class="admin-section" id="adminWalletCreditSection">
      <h3 style="color:#12a875">ISSUE BONUS / COMPENSATION CREDIT</h3>
      <p class="muted">Admin-only wallet credit. Review the selected user, amount and message before confirming.</p>
-     <input id="creditUserSearch" type="search" placeholder="Search a user or select a user" autocomplete="off" aria-label="Search or select a registered user" aria-expanded="false" aria-controls="creditUserDropdown">
+     <input id="creditUserSearch" type="search" placeholder="Search a user or select a user" autocomplete="off" aria-label="Search or select a registered user" aria-expanded="false" aria-controls="creditUserSelect">
      <label for="creditUserSelect" style="display:block;margin:8px 0 5px">Select User</label><select id="creditUserSelect" size="6" aria-label="Select a registered user" style="display:block;width:100%;max-width:100%;height:auto;min-height:150px;max-height:220px;overflow-y:auto;margin:0 0 12px;padding:8px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#172b4d"><option value="">Select a user</option></select>
-     <div id="creditUserDropdown" class="hidden" role="listbox" aria-label="Registered users" style="position:relative;z-index:50;display:block;width:100%;max-height:280px;overflow-y:auto;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#172b4d;margin-top:4px;box-shadow:0 8px 20px #0002"></div>
      <button type="button" id="searchCreditUsers" class="secondary">Refresh user list</button>
      <label>Credit type</label>
      <select id="creditType" style="background-color:#000080;color:#fff"><option value="bonus">Bonus</option><option value="compensation">Compensation</option></select>
@@ -2188,12 +2187,13 @@ function updateCreditMessage(){
 if($('creditType'))$('creditType').onchange=updateCreditMessage;
 let creditRegisteredUsers=[];
 let creditUsersLoading=false;
-function selectCreditUserOptions(){
+function selectCreditUserOptions(query=''){
  const select=$('creditUserSelect');
  if(!select)return;
  const selectedId=select.value;
  select.innerHTML='<option value="">Select a user</option>';
- creditRegisteredUsers.forEach(p=>{
+ const q=String(query||'').trim().toLowerCase();
+ creditRegisteredUsers.filter(p=>!q||[p.full_name,p.email,p.phone].some(v=>String(v||'').toLowerCase().includes(q))).forEach(p=>{
   const displayName=p.full_name||p.email||p.phone||'User';
   const option=document.createElement('option');
   option.value=p.id;
@@ -2262,11 +2262,11 @@ if($('creditUserSearch')){
   const selected=$('creditUserSelect')?.selectedOptions[0];
   if(selected&&creditSearch.value===selected.textContent)creditSearch.value='';
   if(!creditRegisteredUsers.length)loadCreditRegisteredUsers();
-  else renderCreditUserDropdown();
+  else selectCreditUserOptions(creditSearch.value);
  };
  creditSearch.addEventListener('focus',openCreditUserChoices);
  creditSearch.addEventListener('click',openCreditUserChoices);
- creditSearch.addEventListener('input',renderCreditUserDropdown);
+ creditSearch.addEventListener('input',()=>selectCreditUserOptions(creditSearch.value));
  creditSearch.addEventListener('keydown',e=>{
   if(e.key==='Escape'){$('creditUserDropdown').classList.add('hidden');creditSearch.setAttribute('aria-expanded','false');}
   if(e.key==='ArrowDown'&&$('creditUserDropdown').classList.contains('hidden'))renderCreditUserDropdown();
@@ -2498,8 +2498,9 @@ async function loadWallet(){
  if(!ledger.error)(ledger.data||[]).forEach(x=>{
   const type=String(x.transaction_type||'').toLowerCase();
   if(type.includes('deposit')||type.includes('withdraw')||type.includes('bet')||type.includes('win')||type.includes('loss'))return;
-  const credit=type.includes('credit')||type.includes('won');
-  items.push({amount:x.amount,symbol:credit?'+':'−',label:credit?'WALLET CREDIT':'WALLET DEBIT',
+  const credit=type.includes('credit')||type.includes('won')||type==='bonus'||type==='adjustment';
+  const creditLabel=type==='bonus'?'BONUS CREDIT':type==='adjustment'?'COMPENSATION CREDIT':'WALLET CREDIT';
+  items.push({amount:x.amount,symbol:credit?'+':'−',label:credit?creditLabel:'WALLET DEBIT',
    color:credit?'green':'red',description:x.transaction_type||'Wallet transaction',created_at:x.created_at});
  });
  items.sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
@@ -2597,7 +2598,7 @@ $('requestAccountDeletion').onclick=async()=>{
   const heading=document.createElement('h3');heading.textContent='Final account deletion confirmation';
   const message=document.createElement('p');message.textContent='Type CONFIRM DELETION exactly to submit your request.';
   const field=document.createElement('input');field.type='text';field.placeholder='CONFIRM DELETION';field.autocomplete='off';field.autocapitalize='characters';field.spellcheck=false;field.style.cssText='width:100%;padding:13px;border:1px solid #d8e2ef;border-radius:10px;font:inherit;margin:8px 0 14px';
-  formatDeletionPhraseInput(field);
+  formatAdminConfirmationInput(field,'CONFIRM DELETION');
   const actions=document.createElement('div');actions.style.cssText='display:flex;gap:9px';
   const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Cancel';cancel.className='secondary';cancel.style.flex='1';
   const submit=document.createElement('button');submit.type='button';submit.textContent='Submit request';submit.className='danger';submit.style.flex='1';
