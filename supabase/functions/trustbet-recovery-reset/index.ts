@@ -20,8 +20,9 @@ Deno.serve(async (req: Request) => {
 
   const url = Deno.env.get("SUPABASE_URL");
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
   const pepper = Deno.env.get("TRUSTBET_RECOVERY_HASH_PEPPER");
-  if (!url || !serviceKey || !pepper) return reply({ error: "Recovery service is not configured." }, 503);
+  if (!url || !serviceKey || !anonKey || !pepper) return reply({ error: "Recovery service is not configured." }, 503);
 
   let body: { identifier?: string; code?: string; newPassword?: string };
   try { body = await req.json(); } catch { return reply({ error: "Invalid request." }, 400); }
@@ -95,5 +96,39 @@ Deno.serve(async (req: Request) => {
     return reply({ error: "Your password was changed, but recovery finalization needs administrator attention. Contact support before retrying." }, 500);
   }
 
-  return reply({ success: true, message: "Password reset successfully. You can now sign in with your new password." });
+  // Create a normal Supabase Auth session using the new password and the
+  // verified account identity. The recovery code is consumed before tokens are issued.
+  const { data: authUserData, error: authUserError } = await admin.auth.admin.getUserById(profile.id);
+  if (authUserError || !authUserData?.user) {
+    console.error("recovery_reset_session_user_lookup_failed", { code: authUserError?.code || null });
+    return reply({ success: true, message: "Password reset successfully. Please sign in with your new password." });
+  }
+
+  const publicAuth = createClient(url, anonKey, { auth: { autoRefreshToken: false, persistSession: false } });
+  const authIdentity = authUserData.user;
+  const credentials = authIdentity.email
+    ? { email: authIdentity.email, password: newPassword }
+    : authIdentity.phone
+      ? { phone: authIdentity.phone, password: newPassword }
+      : null;
+  if (!credentials) {
+    console.error("recovery_reset_session_identity_missing", { user_id: profile.id });
+    return reply({ success: true, message: "Password reset successfully. Please sign in with your new password." });
+  }
+
+  const { data: signedIn, error: signInError } = await publicAuth.auth.signInWithPassword(credentials);
+  if (signInError || !signedIn?.session) {
+    console.error("recovery_reset_session_creation_failed", { code: signInError?.code || null, status: signInError?.status || null });
+    return reply({ success: true, message: "Password reset successfully. Please sign in with your new password." });
+  }
+
+  return reply({
+    success: true,
+    message: "Password reset successfully. Signing you in…",
+    user: signedIn.user,
+    session: {
+      access_token: signedIn.session.access_token,
+      refresh_token: signedIn.session.refresh_token,
+    },
+  });
 });
