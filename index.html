@@ -2294,23 +2294,20 @@ $('notificationBell').onclick=async()=>{
  $('notificationPanel').classList.toggle('hidden');
  if(!$('notificationPanel').classList.contains('hidden')){
   await loadNotifications();
-  const ids=Array.from(document.querySelectorAll('.notification-item.unread')).map(x=>x.dataset.id);
-  if(ids.length){
-   const{data:marked,error}=await supabase.from('user_notifications')
-    .update({is_read:true})
-    .eq('user_id',user.id)
-    .in('id',ids)
-    .select('id');
-   if(error){
-    $('notificationList').insertAdjacentHTML('afterbegin','<p class="error">Unable to mark notifications as read. Please try again.</p>');
-    return;
-   }
-   if(marked?.length)await loadNotifications();
+  const{data:marked,error}=await supabase.from('user_notifications')
+   .update({is_read:true})
+   .eq('user_id',user.id)
+   .eq('is_read',false)
+   .select('id');
+  if(error){
+   $('notificationList').insertAdjacentHTML('afterbegin','<p class="error">Unable to mark notifications as read. Please try again.</p>');
+   return;
   }
+  if(marked?.length)await loadNotifications();
  }
 };
-function renderNotifications(items){
- const unread=items.filter(x=>!x.is_read).length;
+function renderNotifications(items,unreadCount=null){
+ const unread=Number.isFinite(unreadCount)?unreadCount:items.filter(x=>!x.is_read).length;
  $('unreadBadge').textContent=unread;
  $('unreadBadge').classList.toggle('hidden',!unread);
  $('notificationList').innerHTML='';
@@ -2325,11 +2322,16 @@ function renderNotifications(items){
  });
 }
 async function loadNotifications(){
- const{data,error}=await supabase.from('user_notifications')
-  .select('id,title,message,notification_type,is_read,created_at')
-  .eq('user_id',user.id).order('created_at',{ascending:false}).limit(50);
- if(error){$('notificationList').textContent='Unable to load notifications: '+error.message;return;}
- renderNotifications(data||[]);
+ const [notifications,unreadResult]=await Promise.all([
+  supabase.from('user_notifications')
+   .select('id,title,message,notification_type,is_read,created_at')
+   .eq('user_id',user.id).order('created_at',{ascending:false}).limit(50),
+  supabase.from('user_notifications')
+   .select('id',{count:'exact',head:true})
+   .eq('user_id',user.id).eq('is_read',false)
+ ]);
+ if(notifications.error){$('notificationList').textContent='Unable to load notifications: '+notifications.error.message;return;}
+ renderNotifications(notifications.data||[],unreadResult.error?null:(unreadResult.count||0));
 }
 function subscribeNotifications(){
  if(notificationChannel)supabase.removeChannel(notificationChannel);
