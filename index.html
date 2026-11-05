@@ -30,6 +30,7 @@ button:hover:not(:disabled){filter:brightness(1.06);transform:translateY(-1px);b
 button:active:not(:disabled){transform:translateY(0)}
 button:disabled{opacity:.5;cursor:not-allowed}
 button.secondary{background:#edf3fb;color:#173d70;border:1px solid #d8e5f5;box-shadow:none}
+#signup,#phoneSignup,.registration-submit{background:#12a875!important;border:1px solid #12a875!important;color:#fff!important}
 button.danger{background:linear-gradient(135deg,#b93443,#d94d5b);border-color:#b93443}
 .wide{width:100%}
 .row{display:flex;gap:9px;flex-wrap:wrap}
@@ -2764,7 +2765,7 @@ async function runRule2Signup(method){
     addLine('PHONE NUMBER',phone);addLine('PASSWORD',$('phonePassword').value);
    }
    const note=document.createElement('p');note.className='muted';note.textContent='Check that every detail is correct before submitting.';
-   const submit=document.createElement('button');submit.className='wide';submit.textContent='SUBMIT REGISTRATION';
+   const submit=document.createElement('button');submit.className='wide registration-submit';submit.textContent='SUBMIT REGISTRATION';
    submit.onclick=async()=>{
     submit.disabled=true;submit.textContent='SUBMITTING…';
     try{
