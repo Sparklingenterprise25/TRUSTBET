@@ -626,9 +626,9 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
      <h3 style="color:#12a875">ISSUE BONUS / COMPENSATION CREDIT</h3>
      <p class="muted">Admin-only wallet credit. Review the selected user, amount and message before confirming.</p>
      <input id="creditUserSearch" type="search" placeholder="Search a user or select a user" autocomplete="off" aria-label="Search or select a registered user" aria-expanded="false" aria-controls="creditUserDropdown">
+     <label for="creditUserSelect" style="display:block;margin:8px 0 5px">Select User</label><select id="creditUserSelect" size="6" aria-label="Select a registered user" style="display:block;width:100%;max-width:100%;height:auto;min-height:150px;max-height:220px;overflow-y:auto;margin:0 0 12px;padding:8px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#172b4d"><option value="">Select a user</option></select>
      <div id="creditUserDropdown" class="hidden" role="listbox" aria-label="Registered users" style="position:relative;z-index:50;display:block;width:100%;max-height:280px;overflow-y:auto;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#172b4d;margin-top:4px;box-shadow:0 8px 20px #0002"></div>
      <button type="button" id="searchCreditUsers" class="secondary">Refresh user list</button>
-     <label for="creditUserSelect" style="display:block;margin:8px 0 5px">Select User</label><select id="creditUserSelect" size="6" aria-label="Select a registered user" style="display:block;width:100%;max-width:100%;height:auto;min-height:150px;max-height:220px;overflow-y:auto;margin:0 0 12px;padding:8px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#172b4d"><option value="">Select a user</option></select>
      <label>Credit type</label>
      <select id="creditType" style="background-color:#000080;color:#fff"><option value="bonus">Bonus</option><option value="compensation">Compensation</option></select>
      <label>Amount (₦)</label><input id="creditAmount" type="text" inputmode="numeric" autocomplete="off" placeholder="Enter amount">
