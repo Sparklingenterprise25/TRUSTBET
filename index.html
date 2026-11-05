@@ -394,7 +394,11 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
  <div id="recoveryPanel" class="hidden" style="margin-top:14px;padding:14px;border:1px solid #d6deea;border-radius:12px">
   <h3>Reset your password</h3>
   <p class="muted">Enter your registered email or full phone number, your six-digit recovery code, and a new password.</p>
-  <label>Email or full phone number</label><input id="recoveryIdentifier" type="text" autocomplete="username" placeholder="name@example.com or +234...">
+  <div id="recoveryEmailFields"><label>Email address</label><input id="recoveryIdentifier" type="email" autocomplete="username" placeholder="name@example.com"></div>
+  <div id="recoveryPhoneFields" class="hidden">
+   <label>Country code</label><select id="recoveryPhoneCountry" autocomplete="country"></select>
+   <label>Phone number</label><input id="recoveryPhoneNumber" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="000 0000 0000" aria-label="Phone number">
+  </div>
   <label>Six-digit recovery code</label><input id="recoveryCode" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code">
   <label>New password</label><div class="password-field"><input id="recoveryNewPassword" type="password" minlength="8" maxlength="15" autocomplete="new-password"><button type="button" class="password-toggle" data-password-target="recoveryNewPassword" aria-label="Show password" aria-pressed="false">👁</button></div>
   <div class="row"><button id="recoverySubmit" type="button">Reset password</button><button id="recoveryCancel" type="button" class="secondary">Cancel</button></div>
@@ -983,14 +987,35 @@ async function profileLoad(authUser){
  return true;
 }
 
+// Recovery phone entry mirrors the existing country list and its exact digit/spacing rules.
+$('recoveryPhoneCountry').innerHTML=$('phoneCountry').innerHTML;
+function formatRecoveryPhoneInput(){
+ const rule=phoneNumberRules[$('recoveryPhoneCountry').value];
+ if(!rule)return;
+ const digits=$('recoveryPhoneNumber').value.replace(/\D/g,'').slice(0,rule.length);
+ $('recoveryPhoneNumber').value=groupPhoneDigits(digits,rule.groups);
+ $('recoveryPhoneNumber').maxLength=rule.length+rule.groups.length-1;
+ $('recoveryPhoneNumber').placeholder=rule.placeholder;
+ $('recoveryPhoneNumber').setAttribute('aria-label','Phone number, exactly '+rule.length+' digits required');
+}
+$('recoveryPhoneNumber').addEventListener('input',formatRecoveryPhoneInput);
+$('recoveryPhoneCountry').addEventListener('change',()=>{
+ $('recoveryPhoneNumber').value='';
+ formatRecoveryPhoneInput();
+});
 $('forgotPasswordOpen').onclick=()=>{
  const panel=$('recoveryPanel');
  panel.classList.toggle('hidden');
  if(!panel.classList.contains('hidden')){
-  const email=$('email').value.trim();
-  if(email)$('recoveryIdentifier').value=email;
-  else if(!$('phoneAuth').classList.contains('hidden')){
-   try{$('recoveryIdentifier').value=fullPhoneNumber();}catch{}
+  const isPhoneMode=!$('phoneAuth').classList.contains('hidden');
+  $('recoveryEmailFields').classList.toggle('hidden',isPhoneMode);
+  $('recoveryPhoneFields').classList.toggle('hidden',!isPhoneMode);
+  if(isPhoneMode){
+   $('recoveryPhoneCountry').value=$('phoneCountry').value;
+   $('recoveryPhoneNumber').value=$('phoneNumber').value;
+   formatRecoveryPhoneInput();
+  }else{
+   $('recoveryIdentifier').value=$('email').value.trim();
   }
  }
 };
@@ -1000,13 +1025,26 @@ $('recoveryCancel').onclick=()=>{
 };
 $('recoverySubmit').onclick=async()=>{
  const button=$('recoverySubmit');
- const identifier=$('recoveryIdentifier').value.trim();
+ const isPhoneRecovery=!$('recoveryPhoneFields').classList.contains('hidden');
+ let identifier=$('recoveryIdentifier').value.trim();
+ if(isPhoneRecovery){
+  const codePrefix=$('recoveryPhoneCountry').value;
+  const rule=phoneNumberRules[codePrefix];
+  let digits=$('recoveryPhoneNumber').value.replace(/\D/g,'');
+  const countryName=$('recoveryPhoneCountry').selectedOptions[0]?.textContent||codePrefix;
+  if(!rule||digits.length!==rule.length){
+   say('recoveryMsg',countryName+' phone numbers must contain exactly '+(rule?.length||'the required number of')+' digits.',true);
+   return;
+  }
+  if(rule.dropTrunkZero&&digits.startsWith('0'))digits=digits.slice(1);
+  identifier=codePrefix+digits;
+ }
  const code=$('recoveryCode').value.trim();
  const newPassword=$('recoveryNewPassword').value;
- const isPhoneRecovery=!identifier.includes('@');
  const validRecoveryPassword=isPhoneRecovery?/^(?=.{8,15}$)(?=[0-9]*[A-Za-z][0-9]*$)[A-Za-z0-9]+$/.test(newPassword):(newPassword.length>=8&&newPassword.length<=15);
- if(!identifier||!/^\d{6}$/.test(code)||!validRecoveryPassword){
-  say('recoveryMsg',isPhoneRecovery?'Phone passwords must be 8–15 characters: exactly one letter and all remaining characters numbers.':'Email account passwords must be 8–15 characters.',true);
+ const validIdentifier=isPhoneRecovery?/^\+\d{7,15}$/.test(identifier):/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
+ if(!validIdentifier||!/^[0-9]{6}$/.test(code)||!validRecoveryPassword){
+  say('recoveryMsg',!validRecoveryPassword?(isPhoneRecovery?'Phone passwords must be 8–15 characters: exactly one letter and all remaining characters numbers.':'Email account passwords must be 8–15 characters.'):'Enter a valid email address or complete phone number and six-digit recovery code.',true);
   return;
  }
  button.disabled=true;button.textContent='Resetting…';
@@ -1029,9 +1067,9 @@ $('recoverySubmit').onclick=async()=>{
    if(sessionError)throw sessionError;
    signedInUser=sessionData.user||data.user;
   }else{
-   const credentials=identifier.includes('@')
-    ? {email:identifier,password:newPassword}
-    : {phone:identifier,password:newPassword};
+   const credentials=isPhoneRecovery
+    ? {phone:identifier,password:newPassword}
+    : {email:identifier,password:newPassword};
    const {data:loginData,error:loginError}=await supabase.auth.signInWithPassword(credentials);
    if(loginError)throw loginError;
    signedInUser=loginData.user;
