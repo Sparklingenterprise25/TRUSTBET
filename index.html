@@ -600,6 +600,26 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
      <input id="adminUserSearch" type="search" placeholder="Search users by name or email" aria-label="Search registered users">
      <button id="refreshAdminUsers" class="secondary">Refresh users</button>
      <button id="backfillRecoveryCodes" class="secondary" type="button">Generate missing recovery codes for existing accounts</button>
+     <section id="adminWelcomeNameManager" aria-label="Homepage welcome name manager" style="position:relative;margin:16px 0;padding:15px 12px;border:1px solid transparent;border-radius:12px;background:linear-gradient(#fff,#fff) padding-box,linear-gradient(90deg,#c43d4b 0 22px,transparent 22px calc(100% - 22px),#c43d4b calc(100% - 22px)) border-box">
+      <span aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;border-radius:12px;background:linear-gradient(#c43d4b,#c43d4b) left top/22px 1px no-repeat,linear-gradient(#c43d4b,#c43d4b) left top/1px 22px no-repeat,linear-gradient(#c43d4b,#c43d4b) right top/22px 1px no-repeat,linear-gradient(#c43d4b,#c43d4b) right top/1px 22px no-repeat,linear-gradient(#c43d4b,#c43d4b) left bottom/22px 1px no-repeat,linear-gradient(#c43d4b,#c43d4b) left bottom/1px 22px no-repeat,linear-gradient(#c43d4b,#c43d4b) right bottom/22px 1px no-repeat,linear-gradient(#c43d4b,#c43d4b) right bottom/1px 22px no-repeat"></span>
+      <h3 style="margin:0 0 12px;color:#102d59">HOMEPAGE WELCOME NAME</h3>
+      <label for="welcomeNameSearch">SEARCH USERS</label>
+      <div class="row" style="align-items:center">
+       <input id="welcomeNameSearch" type="search" placeholder="Search by name or email" autocomplete="off" style="margin:6px 0">
+       <button id="welcomeNameSearchButton" type="button" class="secondary">Search user</button>
+      </div>
+      <small id="welcomeNameSearchStatus" style="display:block;margin:0 0 10px;color:#64748b"></small>
+      <label for="welcomeNameUserSelect">OR SELECT FROM ALL WEBSITE USERS</label>
+      <select id="welcomeNameUserSelect" style="margin-bottom:10px"><option value="">Select a user</option></select>
+      <div id="welcomeNameEditPanel" class="hidden" style="padding:11px;border:1px solid #e2e9f2;border-radius:9px;background:#f8fbff">
+       <strong id="welcomeNameSelectedUser" style="display:block;margin-bottom:7px;color:#102d59"></strong>
+       <label for="welcomeNameEditInput">EDIT NAME — LETTERS A–Z ONLY</label>
+       <input id="welcomeNameEditInput" type="text" maxlength="60" autocomplete="off" autocapitalize="characters" placeholder="ENTER NAME USING LETTERS ONLY" style="text-transform:uppercase;margin:6px 0">
+       <div id="welcomeNamePreview" style="font-size:12px;font-weight:900;color:#102d59;margin:0 0 8px"></div>
+       <button id="welcomeNameSaveButton" type="button" class="wide">SAVE HOMEPAGE NAME</button>
+       <small id="welcomeNameEditStatus" style="display:block;margin-top:7px;color:#64748b"></small>
+      </div>
+     </section>
      <div id="adminUsers" aria-live="polite"></div>
     </div>
     <div class="admin-section" id="adminWalletCreditSection">
@@ -1837,8 +1857,70 @@ async function adminUserAction(action,userId,extra={}){
  if(data?.error)throw new Error(data.error);
  return data;
 }
+function renderWelcomeNameManager(){
+ const select=$('welcomeNameUserSelect');if(!select)return;
+ const current=select.value;
+ select.innerHTML='<option value="">Select a user</option>';
+ adminUserCache.forEach(item=>{
+  const option=document.createElement('option');option.value=item.id;
+  option.textContent=(item.email||item.profile?.phone||item.profile?.full_name||'User')+(item.email?'':' · PHONE ACCOUNT');
+  select.append(option);
+ });
+ if(current&&adminUserCache.some(item=>item.id===current))select.value=current;
+}
+function openWelcomeNameEditor(item){
+ const panel=$('welcomeNameEditPanel'),input=$('welcomeNameEditInput'),status=$('welcomeNameEditStatus');
+ if(!item)return;
+ if(!item.email||!item.email.includes('@')){
+  panel.classList.add('hidden');status.textContent='Homepage name editing is available for email accounts only. Phone accounts remain unchanged.';
+  $('welcomeNameSearchStatus').textContent='This is a phone account. Its homepage name cannot be edited here.';
+  return;
+ }
+ $('welcomeNameUserSelect').value=item.id;
+ $('welcomeNameSelectedUser').textContent=item.email;
+ const value=String(item.profile?.dashboard_display_name||welcomeName(item.email)).trim().replace(/\\s+/g,' ').toUpperCase();
+ input.value=value;input.dataset.userId=item.id;
+ $('welcomeNamePreview').textContent='WELCOME, '+value;
+ status.textContent='Changes are silent. The user will not be notified.';
+ panel.classList.remove('hidden');
+}
+$('welcomeNameSearchButton')?.addEventListener('click',()=>{
+ const q=String($('welcomeNameSearch')?.value||'').trim().toLowerCase();
+ const status=$('welcomeNameSearchStatus');
+ if(!q){status.textContent='Enter a name or email to search.';return;}
+ const matches=adminUserCache.filter(item=>(String(item.email||'')+' '+String(item.profile?.full_name||'')+' '+String(item.profile?.phone||'')).toLowerCase().includes(q));
+ if(matches.length===1){openWelcomeNameEditor(matches[0]);status.textContent='User found.';}
+ else if(matches.length>1){status.textContent=matches.length+' users matched. Choose the correct user from the dropdown below.';}
+ else status.textContent='No matching user found.';
+});
+$('welcomeNameUserSelect')?.addEventListener('change',()=>{
+ const item=adminUserCache.find(user=>user.id===$('welcomeNameUserSelect').value);
+ if(item)openWelcomeNameEditor(item);else $('welcomeNameEditPanel').classList.add('hidden');
+});
+$('welcomeNameEditInput')?.addEventListener('input',e=>{
+ const field=e.currentTarget;
+ field.value=field.value.toUpperCase().replace(/[^A-Z ]/g,'').replace(/\\s+/g,' ').replace(/^ /,'');
+ $('welcomeNamePreview').textContent='WELCOME, '+field.value.trim();
+});
+$('welcomeNameSaveButton')?.addEventListener('click',async()=>{
+ if(!isAdmin())return;
+ const input=$('welcomeNameEditInput'),status=$('welcomeNameEditStatus'),button=$('welcomeNameSaveButton');
+ const item=adminUserCache.find(user=>user.id===input.dataset.userId);
+ const displayName=String(input.value||'').trim().replace(/\\s+/g,' ').toUpperCase();
+ if(!item||!item.email){status.textContent='Select a valid email account.';return;}
+ if(!/^[A-Z]+(?: [A-Z]+)*$/.test(displayName)||displayName.length>60){status.textContent='Use letters A–Z only, with single spaces between names.';return;}
+ button.disabled=true;status.textContent='Saving…';
+ try{
+  const result=await adminUserAction('set-welcome-name',item.id,{displayName});
+  item.profile=item.profile||{};item.profile.dashboard_display_name=result.dashboard_display_name||null;
+  $('welcomeNamePreview').textContent='WELCOME, '+displayName;
+  status.textContent='Saved silently. No user notification was sent.';
+ }catch(error){status.textContent='Could not save: '+(error.message||error);}
+ finally{button.disabled=false;}
+});
 function renderAdminUsers(){
  const area=$('adminUsers');if(!area)return;
+ renderWelcomeNameManager();
  const q=String($('adminUserSearch')?.value||'').trim().toLowerCase();
  const filtered=adminUserCache.filter(item=>{
   const name=item.profile?.full_name||'';
@@ -1864,42 +1946,6 @@ function renderAdminUsers(){
   details.append(status);
   details.style.display='block';
   info.append(name,details);
-  if(item.email&&item.email.includes('@')){
-   const welcomeEditor=document.createElement('div');
-   welcomeEditor.style.cssText='margin-top:9px;padding:10px;border:1px solid #dce5f1;border-radius:10px;background:#f8fbff';
-   const welcomeLabel=document.createElement('small');
-   welcomeLabel.style.cssText='display:block;font-weight:900;color:#334d70;margin-bottom:5px';
-   welcomeLabel.textContent='HOMEPAGE WELCOME NAME';
-   const welcomePreview=document.createElement('div');
-   welcomePreview.style.cssText='font-size:12px;font-weight:900;color:#102d59;margin-bottom:7px';
-   const currentWelcome=()=>String(item.profile?.dashboard_display_name||welcomeName(item.email)).trim().replace(/\s+/g,' ').toUpperCase();
-   welcomePreview.textContent='WELCOME, '+currentWelcome();
-   const welcomeInput=document.createElement('input');
-   welcomeInput.type='text';welcomeInput.maxLength=60;welcomeInput.autocomplete='off';
-   welcomeInput.setAttribute('aria-label','Edit homepage welcome name');
-   welcomeInput.placeholder='Enter corrected name';
-   welcomeInput.value=currentWelcome();
-   welcomeInput.style.margin='0 0 7px';
-   const welcomeActions=document.createElement('div');welcomeActions.className='row';
-   const saveWelcome=document.createElement('button');saveWelcome.type='button';saveWelcome.className='secondary';saveWelcome.textContent='Save welcome name';
-   const welcomeStatus=document.createElement('small');welcomeStatus.style.cssText='display:block;margin-top:6px;color:#64748b';
-   saveWelcome.onclick=async()=>{
-    if(!isAdmin())return;
-    const displayName=welcomeInput.value.trim().replace(/\s+/g,' ').toUpperCase();
-    if(displayName.length>60){welcomeStatus.textContent='Name must be 60 characters or fewer.';return;}
-    saveWelcome.disabled=true;welcomeStatus.textContent='Saving…';
-    try{
-     const result=await adminUserAction('set-welcome-name',item.id,{displayName});
-     item.profile=item.profile||{};
-     item.profile.dashboard_display_name=result.dashboard_display_name||null;
-     welcomeInput.value=displayName||welcomeName(item.email);
-     welcomePreview.textContent='WELCOME, '+(displayName||welcomeName(item.email));
-     welcomeStatus.textContent='Saved. No user notification was sent.';
-    }catch(error){welcomeStatus.textContent='Could not save: '+(error.message||error);}
-    finally{saveWelcome.disabled=false;}
-   };
-   welcomeActions.append(saveWelcome);welcomeEditor.append(welcomeLabel,welcomePreview,welcomeInput,welcomeActions,welcomeStatus);info.append(welcomeEditor);
-  }
   const actions=document.createElement('div');actions.className='row';
   const toggle=document.createElement('button');toggle.className='secondary';toggle.textContent=banned?'Unban':'Ban';
   toggle.onclick=async()=>{
