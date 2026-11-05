@@ -2602,7 +2602,7 @@ function openRegistrationRulesReadOnly(){
    <h4>Phone-number registration</h4>
    <ol>
     <li>User chooses Phone number registration and enters a country code, phone number and password.</li>
-    <li>On the first Create account click, the First Name and Surname fields appear. Both are compulsory and each must contain exactly one name.</li>
+    <li>FIRST NAME and LAST NAME are compulsory. Both accept letters A–Z only and automatically convert lowercase letters to uppercase while typing.</li>
     <li>Phone password must be 8–15 characters, with exactly one letter and all remaining characters numbers.</li>
     <li>User submits registration. The phone-signup process sends the registration for administrator approval.</li>
     <li>The user sees the registration-success notice, is told approval may take 30 minutes–7 hours, and is reminded to save the password.</li>
@@ -2610,14 +2610,13 @@ function openRegistrationRulesReadOnly(){
    </ol>
   </section>
   <section style="border:1px solid #d8e2ef;border-radius:12px;padding:14px">
-   <h3 style="margin-top:0;color:#b42332">RULE 2 — PROPOSED REGISTRATION PROCESS (PREVIEW ONLY · OFF)</h3>
-   <p><strong>Rule 2 is not active.</strong> The current preview is a demonstration only; it does not create accounts, submit registrations, or change Rule 1.</p>
+   <h3 style="margin-top:0;color:#b42332">RULE 2 — THREE-STAGE REGISTRATION PROCESS (ADMIN-CONTROLLED)</h3>
+   <p>Rule 2 becomes live only when an administrator selects ON. Only one rule can be active at a time.</p>
    <ol>
-    <li><strong>Choose account type:</strong> select Phone number or Email in the preview.</li>
-    <li><strong>STEP 1 — REVIEW ACCOUNT DETAILS:</strong> show the entered account details for the user to review before submission. Phone preview displays First Name, Surname, Phone number and masked Password; email preview displays Email and masked Password.</li>
-    <li><strong>STEP 2 — REGISTRATION RECEIVED:</strong> show that registration was received successfully and is awaiting administrator approval. User selects I UNDERSTAND.</li>
-    <li><strong>STEP 3 — SAVE YOUR PASSWORD:</strong> remind the user to save the password safely for login after approval. User selects CONFIRM AND FINISH.</li>
-    <li><strong>FINAL CONFIRMATION:</strong> show the existing green success confirmation explaining that registration is awaiting approval and login is available after approval. User selects CLOSE PREVIEW.</li>
+    <li><strong>CREATE ACCOUNT:</strong> the user starts the three-stage confirmation process after entering the required account details.</li>
+    <li><strong>I UNDERSTAND:</strong> the user confirms the account approval terms. Email accounts do not require administrator approval; phone accounts require administrator approval before login.</li>
+    <li><strong>PREVIEW DETAILS:</strong> the user sees the email address and password, or FIRST NAME, LAST NAME, phone number and password, before submitting.</li>
+    <li><strong>SUBMIT:</strong> email registration creates an email-verification signup and does not enter the admin approval queue. Phone registration is submitted to the existing admin phone-approval queue and remains unable to log in until approved.</li>
    </ol>
   </section>
   <p style="font-size:12px;color:#64748b;margin:14px 0 0">This reference is read-only. It does not edit registration settings or activate Rule 2.</p>
