@@ -1010,18 +1010,30 @@ $('recoverySubmit').onclick=async()=>{
   if(error)throw error;
   if(data?.error)throw new Error(data.error);
   $('recoveryCode').value='';$('recoveryNewPassword').value='';
+  say('recoveryMsg','Password reset successfully. You can now sign in with your new password.',false);
+  button.disabled=true;
+  await new Promise(resolve=>setTimeout(resolve,7000));
+  $('recoveryPanel').classList.add('hidden');
+  $('recoveryMsg').textContent='';
+  let signedInUser=null;
   if(data?.session?.access_token&&data?.session?.refresh_token){
    const {data:sessionData,error:sessionError}=await supabase.auth.setSession({
     access_token:data.session.access_token,
     refresh_token:data.session.refresh_token
    });
    if(sessionError)throw sessionError;
-   $('recoveryPanel').classList.add('hidden');
-   $('recoveryMsg').textContent='';
-   await profileLoad(sessionData.user||data.user);
-   return;
+   signedInUser=sessionData.user||data.user;
+  }else{
+   const credentials=identifier.includes('@')
+    ? {email:identifier,password:newPassword}
+    : {phone:identifier,password:newPassword};
+   const {data:loginData,error:loginError}=await supabase.auth.signInWithPassword(credentials);
+   if(loginError)throw loginError;
+   signedInUser=loginData.user;
   }
-  say('recoveryMsg',data?.message||'Password reset successfully. Please sign in with your new password.',false);
+  if(!signedInUser)throw new Error('Your password was reset, but automatic sign-in could not be completed. Please sign in with your new password.');
+  await profileLoad(signedInUser);
+  return;
  }catch(error){
   let message=error?.message||'Password reset failed. Check your details and try again.';
   try{const response=error?.context;if(response&&typeof response.clone==='function'){const body=await response.clone().json();message=body?.error||body?.message||message;}}catch{}
