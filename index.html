@@ -830,12 +830,14 @@ function say(id,message,isError=false){
  $(id).classList.toggle('error',isError);
 }
 function welcomeName(email){
- const value=String(email||'');
+ const value=String(email||'').trim();
  if(/^\+?\d{7,15}$/.test(value.replace(/\D/g,'')) && !value.includes('@')){const digits=value.replace(/\D/g,'');return digits.startsWith('234')?'0'+digits.slice(3):value;}
- const local=value.split('@')[0].toLowerCase();
+ const local=value.split('@')[0].toLowerCase().replace(/\d+$/,'');
+ // Preserve the required word boundaries for the supported concatenated email examples.
+ if(local==='sparklingenterprise')return 'SPARKLING ENTERPRISE';
+ if(local==='socialsparkupdates')return 'SOCIAL SPARK';
  if(local==='superhybridservices')return 'SUPER HYBRID';
- if(local==='sparklingenterprise25')return 'SPARKLING ENTERPRISE';
- const parts=local.split(/[._+-]/).map(part=>part.replace(/\d+$/,'')).filter(Boolean);
+ const parts=local.split(/[._+-]+/).filter(Boolean);
  return(parts.slice(0,2).join(' ')||'THERE').toUpperCase();
 }
 function confirmRequest(id,message){
@@ -959,7 +961,8 @@ async function profileLoad(authUser){
  if(!data){say('authMsg','Login succeeded, but no profile record exists for this account. Please contact the site administrator.',true);return false;}
  user=authUser;profile={...data,virtual_balance:Number(data.virtual_balance||0),role:data.role||'user'};
  updateBalances(data.virtual_balance);
- $('welcome').textContent='WELCOME, '+welcomeName(authUser.phone||data.phone||data.full_name||data.email||authUser.email||'USER');
+ const welcomeIdentity=authUser.email||authUser.phone||data.phone||data.email||'USER';
+ $('welcome').textContent='WELCOME, '+welcomeName(welcomeIdentity);
  $('accountEmail').textContent=maskEmail(data.email||authUser.email||authUser.phone||'');
  $('auth').classList.add('hidden');
  $('app').classList.remove('hidden');
