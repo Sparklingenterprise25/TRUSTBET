@@ -878,21 +878,24 @@ function banks(){
  });
 }
 
-function setupBankPicker(id){
+function setupBankPicker(id,labels={}){
+ const prompt=labels.prompt||'Select bank / provider',searchLabel=labels.search||'Search bank/provider',emptyLabel=labels.empty||'No matching bank/provider';
  const select=$(id), wrap=document.createElement('div');wrap.className='bank-picker';
  select.parentNode.insertBefore(wrap,select);wrap.append(select);
- const trigger=document.createElement('button');trigger.type='button';trigger.className='bank-picker-trigger';trigger.textContent='Select bank / provider ▾';
+ const trigger=document.createElement('button');trigger.type='button';trigger.className='bank-picker-trigger';trigger.textContent=prompt+' ▾';
  const panel=document.createElement('div');panel.className='bank-picker-panel';
- const search=document.createElement('input');search.type='search';search.className='bank-picker-search';search.placeholder='Search bank/provider';search.setAttribute('aria-label','Search bank/provider');search.autocomplete='off';
+ const search=document.createElement('input');search.type='search';search.className='bank-picker-search';search.placeholder=searchLabel;search.setAttribute('aria-label',searchLabel);search.autocomplete='off';
  const options=document.createElement('div');options.className='bank-picker-options';panel.append(search,options);wrap.append(trigger,panel);
- function renderOptions(){const q=search.value.trim().toLowerCase();options.innerHTML='';const matches=[...select.options].slice(1).filter(o=>o.textContent.toLowerCase().includes(q));if(!matches.length){const empty=document.createElement('div');empty.className='bank-picker-empty';empty.textContent='No matching bank/provider';options.append(empty);return;}matches.forEach(o=>{const b=document.createElement('button');b.type='button';b.className='bank-picker-option';b.textContent=o.textContent;b.addEventListener('click',()=>{select.value=o.value;select.dispatchEvent(new Event('change',{bubbles:true}));trigger.textContent=o.textContent+' ▾';wrap.classList.remove('open');search.value='';});options.append(b);});}
- trigger.addEventListener('click',()=>{wrap.classList.toggle('open');if(wrap.classList.contains('open')){renderOptions();search.focus();}});
+ function renderOptions(){const q=search.value.trim().toLowerCase();options.innerHTML='';const matches=[...select.options].slice(1).filter(o=>o.textContent.toLowerCase().includes(q));if(!matches.length){const empty=document.createElement('div');empty.className='bank-picker-empty';empty.textContent=emptyLabel;options.append(empty);return;}matches.forEach(o=>{const b=document.createElement('button');b.type='button';b.className='bank-picker-option';b.textContent=o.textContent;b.addEventListener('click',()=>{select.value=o.value;select.dispatchEvent(new Event('change',{bubbles:true}));trigger.textContent=o.textContent+' ▾';wrap.classList.remove('open');search.value='';});options.append(b);});}
+ trigger.addEventListener('click',()=>{wrap.classList.toggle('open');if(wrap.classList.contains('open')){renderOptions();if(labels.onOpen)labels.onOpen();search.focus();}});
  search.addEventListener('input',renderOptions);
  document.addEventListener('click',e=>{if(!wrap.contains(e.target))wrap.classList.remove('open');});
- select.addEventListener('change',()=>{trigger.textContent=(select.selectedOptions[0]?.textContent||'Select bank / provider')+' ▾';});
+ select.addEventListener('change',()=>{trigger.textContent=(select.selectedOptions[0]?.textContent||prompt)+' ▾';});
+ select.addEventListener('bankpickerrefresh',renderOptions);
  renderOptions();
 }
 setupBankPicker('depProvider');setupBankPicker('bank');
+setupBankPicker('creditUserSelect',{prompt:'Select user',search:'Search users',empty:'No matching users',onOpen:()=>{if(!creditRegisteredUsers.length&&!creditUsersLoading)loadCreditRegisteredUsers({renderSearchDropdown:false});}});
 function maskEmail(email){
  const value=String(email||''),at=value.lastIndexOf('@');
  if(at<1)return value;
@@ -2198,6 +2201,7 @@ function selectCreditUserOptions(){
   select.append(option);
  });
  if(selectedId&&creditRegisteredUsers.some(p=>p.id===selectedId))select.value=selectedId;
+ select.dispatchEvent(new Event('bankpickerrefresh'));
 }
 function renderCreditUserDropdown(){
  const input=$('creditUserSearch'),dropdown=$('creditUserDropdown'),select=$('creditUserSelect');
@@ -2226,7 +2230,7 @@ function renderCreditUserDropdown(){
  }
  dropdown.classList.remove('hidden');input.setAttribute('aria-expanded','true');
 }
-async function loadCreditRegisteredUsers(){
+async function loadCreditRegisteredUsers({renderSearchDropdown=true}={}){
  if(!isAdmin())return say('walletCreditMsg','Administrator access required.',true);
  if(creditUsersLoading)return;
  creditUsersLoading=true;
@@ -2243,11 +2247,12 @@ async function loadCreditRegisteredUsers(){
   }
   creditRegisteredUsers=all;
   selectCreditUserOptions();
-  renderCreditUserDropdown();
-  say('walletCreditMsg',all.length+' registered users loaded. Tap a name to select it.');
+  if(renderSearchDropdown)renderCreditUserDropdown();
+  say('walletCreditMsg',all.length+' registered users loaded.');
  }catch(error){
   creditRegisteredUsers=[];
-  renderCreditUserDropdown();
+  selectCreditUserOptions();
+  if(renderSearchDropdown)renderCreditUserDropdown();
   say('walletCreditMsg','Could not load registered users: '+(error.message||error),true);
  }finally{creditUsersLoading=false;}
 }
