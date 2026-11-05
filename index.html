@@ -2694,6 +2694,97 @@ $('previewRegistrationRule2').onclick=()=>{
  overlay.append(panel);document.body.append(overlay);render();
 };
 
+/* Rule 2's live three-stage signup. Rule 1 retains its existing handlers. */
+const rule1EmailSignupHandler=$('signup').onclick;
+const rule1PhoneSignupHandler=$('phoneSignup').onclick;
+async function runRule2Signup(method){
+ if(method==='Phone number' && $('phoneSignupNames').classList.contains('hidden')){
+  $('phoneSignupNames').classList.remove('hidden');
+  $('phoneFirstName').focus();
+  $('phoneSignup').textContent='Continue registration';
+  say('authMsg','Enter your compulsory FIRST NAME and LAST NAME, then continue.');
+  return;
+ }
+ let stage=0;
+ const overlay=document.createElement('div');
+ overlay.id='rule2LiveSignupOverlay';
+ overlay.style.cssText='position:fixed;inset:0;z-index:2600;background:#071a36e8;display:flex;align-items:center;justify-content:center;padding:14px;overflow:auto';
+ const panel=document.createElement('div');
+ panel.style.cssText='width:min(100%,460px);background:#fff;color:#172b4d;border-radius:16px;padding:20px;box-shadow:0 18px 55px #0007;max-height:90vh;overflow:auto';
+ const close=()=>overlay.remove();
+ const render=()=>{
+  panel.innerHTML='';
+  panel.style.background='#fff';panel.style.color='#172b4d';
+  const heading=document.createElement('h2');heading.textContent='REGISTRATION RULE 2';heading.style.color='#102d59';
+  const step=document.createElement('p');step.style.cssText='font-size:12px;font-weight:900;color:#2475d0';step.textContent='CONFIRMATION STAGE '+(stage+1)+' OF 3';
+  panel.append(heading,step);
+  if(stage===0){
+   const title=document.createElement('h3');title.textContent='CREATE ACCOUNT';
+   const copy=document.createElement('p');copy.textContent='You are about to create a TRUSTBET '+method.toLowerCase()+' account. Continue through the confirmation steps to submit your registration.';
+   const next=document.createElement('button');next.className='wide';next.textContent='CREATE ACCOUNT';next.onclick=()=>{stage=1;render();};
+   panel.append(title,copy,next);
+  }else if(stage===1){
+   const title=document.createElement('h3');title.textContent='I UNDERSTAND';
+   const copy=document.createElement('p');copy.style.lineHeight='1.6';copy.textContent=method==='Phone number'?'I understand that my phone registration will be sent to the administrator for approval. I can log in only after approval.':'I understand that my email account will be created automatically after submission and does not require administrator approval.';
+   const next=document.createElement('button');next.className='wide';next.textContent='I UNDERSTAND';next.onclick=()=>{stage=2;render();};
+   panel.append(title,copy,next);
+  }else{
+   const title=document.createElement('h3');title.textContent='PREVIEW YOUR DETAILS';
+   const details=document.createElement('div');details.style.cssText='background:#f3f6fb;border:1px solid #e2e9f2;border-radius:11px;padding:14px;line-height:1.9;font-size:13px;overflow-wrap:anywhere';
+   const addLine=(label,value)=>{const line=document.createElement('div');const strong=document.createElement('b');strong.textContent=label+': ';const span=document.createElement('span');span.textContent=value;line.append(strong,span);details.append(line);};
+   if(method==='Email'){
+    addLine('EMAIL',$('email').value.trim());addLine('PASSWORD',$('password').value);
+   }else{
+    addLine('FIRST NAME',$('phoneFirstName').value);addLine('LAST NAME',$('phoneSurname').value);
+    let phone='';try{phone=fullPhoneNumber();}catch(error){phone=error.message;}
+    addLine('PHONE NUMBER',phone);addLine('PASSWORD',$('phonePassword').value);
+   }
+   const note=document.createElement('p');note.className='muted';note.textContent='Check that every detail is correct before submitting.';
+   const submit=document.createElement('button');submit.className='wide';submit.textContent='SUBMIT REGISTRATION';
+   submit.onclick=async()=>{
+    submit.disabled=true;submit.textContent='SUBMITTING…';
+    try{
+     if(method==='Email'){
+      const email=$('email').value.trim(),password=$('password').value;
+      if(!email||!email.includes('@'))throw new Error('Enter a valid email address.');
+      if(password.length<8||password.length>15)throw new Error('Email account passwords must be 8–15 characters.');
+      const {error}=await supabase.auth.signUp({email,password});
+      if(error)throw error;
+      close();$('otpBox').classList.remove('hidden');
+      say('authMsg','Your email registration has been submitted. Enter the six-digit verification code to finish creating your account. No administrator approval is required.');
+     }else{
+      const firstName=$('phoneFirstName').value.trim().toUpperCase(),lastName=$('phoneSurname').value.trim().toUpperCase();
+      if(!/^[A-Z]+$/.test(firstName)||!/^[A-Z]+$/.test(lastName))throw new Error('FIRST NAME and LAST NAME are compulsory and must contain letters A–Z only.');
+      const phone=fullPhoneNumber(),password=$('phonePassword').value;
+      if(!/^(?=.{8,15}$)(?=[0-9]*[A-Za-z][0-9]*$)[A-Za-z0-9]+$/.test(password))throw new Error('Phone passwords must be 8–15 characters: exactly one letter and all remaining characters numbers.');
+      const {data,error}=await supabase.functions.invoke('trustbet-phone-signup',{body:{phone,password,first_name:firstName,last_name:lastName}});
+      if(error){let message=error.message||'Phone registration failed.';try{const response=error.context;if(response&&typeof response.json==='function'){const body=await response.clone().json();message=body?.error||body?.message||message;}}catch{}throw new Error(message);}
+      if(data?.error)throw new Error(data.error);
+      close();$('phoneSignupNames').classList.add('hidden');$('phoneSignup').textContent='Create account';
+      const success=document.createElement('div');success.style.cssText='background:#047857;color:#fff;font-weight:900;white-space:pre-line;padding:16px;border-radius:8px;line-height:1.6';
+      success.textContent='REGISTRATION SUBMITTED SUCCESSFULLY!\nYour account registration has been received and is awaiting administrator approval.\nYou will be able to log in once your account has been approved. Save your password safely.\nThank you for choosing TRUSTBET.';
+      const notice=document.createElement('div');notice.style.cssText='position:fixed;inset:0;z-index:2700;background:#071a36e8;display:flex;align-items:center;justify-content:center;padding:18px';
+      const card=document.createElement('div');card.style.cssText='width:min(100%,440px);background:#fff;border-radius:14px;padding:18px';const done=document.createElement('button');done.className='wide';done.textContent='CLOSE';done.onclick=()=>notice.remove();card.append(success,done);notice.append(card);document.body.append(notice);
+      $('phoneFirstName').value='';$('phoneSurname').value='';
+     }
+    }catch(error){alert(error.message||'Registration could not be submitted.');submit.disabled=false;submit.textContent='SUBMIT REGISTRATION';}
+   };
+   panel.append(title,details,note,submit);
+  }
+  const cancel=document.createElement('button');cancel.type='button';cancel.className='secondary wide';cancel.style.marginTop='9px';cancel.textContent='CANCEL';cancel.onclick=close;panel.append(cancel);
+ };
+ overlay.onclick=e=>{if(e.target===overlay)close();};
+ overlay.append(panel);document.body.append(overlay);render();
+}
+$('signup').onclick=async()=>{
+ try{const active=await readActiveRegistrationRule();if(active==='rule2')return runRule2Signup('Email');if(active==='rule1')return rule1EmailSignupHandler();say('authMsg','Registration is temporarily disabled. Please contact support.',true);}
+ catch(error){say('authMsg','Could not verify the active registration rule: '+error.message,true);}
+};
+$('phoneSignup').onclick=async()=>{
+ try{const active=await readActiveRegistrationRule();if(active==='rule2')return runRule2Signup('Phone number');if(active==='rule1')return rule1PhoneSignupHandler();say('authMsg','Registration is temporarily disabled. Please contact support.',true);}
+ catch(error){say('authMsg','Could not verify the active registration rule: '+error.message,true);}
+};
+
 /* Restore an existing authenticated session. */
 try{
  const{data:{session},error}=await supabase.auth.getSession();
