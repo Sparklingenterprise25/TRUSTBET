@@ -1009,8 +1009,19 @@ $('recoverySubmit').onclick=async()=>{
   const {data,error}=await supabase.functions.invoke('trustbet-recovery-reset',{body:{identifier,code,newPassword}});
   if(error)throw error;
   if(data?.error)throw new Error(data.error);
-  say('recoveryMsg',data?.message||'Password reset successfully. You can now sign in.',false);
   $('recoveryCode').value='';$('recoveryNewPassword').value='';
+  if(data?.session?.access_token&&data?.session?.refresh_token){
+   const {data:sessionData,error:sessionError}=await supabase.auth.setSession({
+    access_token:data.session.access_token,
+    refresh_token:data.session.refresh_token
+   });
+   if(sessionError)throw sessionError;
+   $('recoveryPanel').classList.add('hidden');
+   $('recoveryMsg').textContent='';
+   await profileLoad(sessionData.user||data.user);
+   return;
+  }
+  say('recoveryMsg',data?.message||'Password reset successfully. Please sign in with your new password.',false);
  }catch(error){
   let message=error?.message||'Password reset failed. Check your details and try again.';
   try{const response=error?.context;if(response&&typeof response.clone==='function'){const body=await response.clone().json();message=body?.error||body?.message||message;}}catch{}
