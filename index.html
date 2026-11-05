@@ -137,6 +137,8 @@ nav button.active{background:linear-gradient(135deg,#102d59,#2475d0);color:#fff;
 .chat-customer-identity{padding:10px 12px;margin:8px 0;border:1px solid #cbd9eb;border-radius:10px;background:#f2f6fc;color:#102d59;font-size:12px;line-height:1.6;overflow-wrap:anywhere}
 .chat-attachment-image{display:block;max-width:100%;max-height:240px;object-fit:contain;border-radius:8px;margin:8px 0;border:1px solid #dce7f5}
 .chat-attachment-link{display:inline-block;margin:7px 0;padding:8px 10px;border:1px solid #cbd9eb;border-radius:8px;background:#fff;color:#174b88;font-weight:800;text-decoration:none;overflow-wrap:anywhere}
+.chat-download-button{display:block;margin:5px 0 8px;padding:9px 14px;border:0;border-radius:8px;background:#dc2626;color:#fff;font-size:12px;font-weight:900;letter-spacing:.2px;cursor:pointer}
+.chat-download-button:disabled{opacity:.65;cursor:wait}
 .conversation{padding:12px;border:1px solid #e0e8f2;border-radius:9px;margin:7px 0;cursor:pointer;background:#fcfdff}
 .notification-panel{position:absolute;right:5%;top:66px;width:min(390px,90vw);max-height:70vh;overflow:auto;background:#fff;color:var(--ink);border:1px solid #dce5f1;border-radius:17px;box-shadow:0 18px 45px #102d5928;padding:15px;z-index:30}
 .notification-item{padding:12px 4px;border-bottom:1px solid var(--line)}
@@ -2724,6 +2726,20 @@ async function chatLoad(){
      const img=document.createElement('img');img.className='chat-attachment-image';img.src=signed.signedUrl;img.alt=m.attachment_name||'Customer support attachment';img.loading='lazy';d.append(img);
     }
     const link=document.createElement('a');link.className='chat-attachment-link';link.href=signed.signedUrl;link.target='_blank';link.rel='noopener';link.textContent=(m.attachment_mime==='application/pdf'?'📄 ':'📎 ')+(m.attachment_name||'View attachment')+' · '+(m.attachment_size/1048576).toFixed(2)+' MB';d.append(link);
+    const downloadButton=document.createElement('button');downloadButton.type='button';downloadButton.className='chat-download-button';downloadButton.textContent='DOWNLOAD ⬇️';
+    downloadButton.addEventListener('click',async()=>{
+     downloadButton.disabled=true;downloadButton.textContent='DOWNLOADING...';
+     try{
+      const response=await fetch(signed.signedUrl);
+      if(!response.ok)throw new Error('Download failed');
+      const blob=await response.blob();const objectUrl=URL.createObjectURL(blob);
+      const downloadLink=document.createElement('a');downloadLink.href=objectUrl;downloadLink.download=m.attachment_name||'trustbet-attachment';document.body.append(downloadLink);downloadLink.click();downloadLink.remove();
+      setTimeout(()=>URL.revokeObjectURL(objectUrl),1000);
+      downloadButton.textContent='DOWNLOAD ⬇️';
+     }catch(error){downloadButton.textContent='DOWNLOAD FAILED — RETRY';say('chatMsg','Unable to download this attachment. Please try again.',true);}
+     finally{downloadButton.disabled=false;}
+    });
+    d.append(downloadButton);
    }else{
     const unavailable=document.createElement('div');unavailable.textContent='Attachment unavailable';d.append(unavailable);
    }
