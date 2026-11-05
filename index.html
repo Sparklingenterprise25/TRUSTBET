@@ -924,9 +924,19 @@ async function loadGameOdds(){
  if(isAdmin())renderAdminOddsEditor();
  return true;
 }
+function isOddsPreviewEnvironment(){
+ const host=String(location.hostname||'').toLowerCase();
+ return host.includes('-git-trustbet-auth-recovery-dev-')||/^trustbet-[a-z0-9]+-sparklingenterprise25\\.vercel\\.app$/.test(host);
+}
 function renderAdminOddsEditor(){
  const area=$('adminGameOddsEditor');if(!area||!isAdmin())return;
  area.innerHTML='';
+ const saveButton=$('saveAdminGameOdds');
+ if(saveButton&&isOddsPreviewEnvironment()){
+  saveButton.disabled=true;
+  saveButton.textContent='SAVE DISABLED IN PREVIEW';
+  say('adminGameOddsStatus','Preview only: you can inspect and edit these fields, but saving is disabled to protect the shared live odds until you approve the changes.');
+ }
  games.forEach(g=>{
   const card=document.createElement('section');card.className='odds-admin-game';
   const title=document.createElement('h4');title.textContent=g.icon+' '+g.name;
@@ -943,6 +953,7 @@ function renderAdminOddsEditor(){
 }
 async function saveAdminGameOdds(){
  if(!isAdmin())return alert('Administrator access required.');
+ if(isOddsPreviewEnvironment())return say('adminGameOddsStatus','Saving is disabled in preview because this preview shares the live odds database. Review the layout first; approve the feature before saving live odds.',true);
  const inputs=[...document.querySelectorAll('#adminGameOddsEditor input[data-game-id]')];
  if(inputs.length!==35)return say('adminGameOddsStatus','Could not save: all 35 odds values must be present.',true);
  const updates=[];
