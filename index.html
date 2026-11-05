@@ -545,6 +545,18 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
    <h2>👤 Account</h2><p id="accountEmail"></p>
    <div id="adminArea" class="hidden">
     <h3>🛠️ Admin Dashboard</h3>
+    <div class="admin-section" id="registrationRulesAdminSection" style="border:2px solid #102d59;background:#f8fbff">
+     <h3 id="registrationRulesReadOnlyOpen" role="button" tabindex="0" aria-haspopup="dialog" aria-controls="registrationRulesReadOnlyPanel" style="background-color:#dc2626;color:#fff;padding:10px 12px;border-radius:8px;cursor:pointer">REGISTRATION RULES · PREVIEW ONLY</h3>
+          <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0">
+           <section style="border:1px solid #cbd5e1;border-radius:12px;padding:13px;background:#fff"><b>RULE 1</b><p class="muted">Email: six-digit verification, then automatic account access.<br>Phone: administrator approval required.</p><div id="rule1Status" style="font-weight:900;padding:8px;border-radius:8px;background:#fff;color:#172b4d">OFF</div><div class="row" style="margin-top:8px"><button id="rule1On" type="button">ON</button><button id="rule1Off" type="button" class="secondary">OFF</button></div></section>
+           <section style="border:1px solid #cbd5e1;border-radius:12px;padding:13px;background:#fff"><b>RULE 2</b><p class="muted">Three confirmation stages. Email: automatic account, no admin approval. Phone: administrator approval required.</p><div id="rule2Status" style="font-weight:900;padding:8px;border-radius:8px;background:#fff;color:#172b4d">OFF</div><div class="row" style="margin-top:8px"><button id="rule2On" type="button">ON</button><button id="rule2Off" type="button" class="secondary">OFF</button></div></section>
+          </div>
+          <p id="registrationRuleStatusMessage" class="muted" aria-live="polite">Loading active registration rule…</p>
+          <div class="row" style="gap:10px;flex-wrap:wrap;margin-top:12px">
+           <button id="previewRegistrationRule1" class="secondary" type="button">PREVIEW RULE 1</button>
+           <button id="previewRegistrationRule2" class="secondary" type="button">PREVIEW RULE 2</button>
+          </div>
+    </div>
     <div class="admin-section">
      <h3>Self-Exclusion Requests</h3>
      <button id="refreshSelfExclusion" class="secondary">Refresh requests</button>
@@ -572,13 +584,6 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
      <h3>Phone Registrations Awaiting Approval</h3>
      <button id="refreshPhoneApprovals" class="secondary">Refresh phone registrations</button>
      <div id="phoneApprovals" aria-live="polite"></div>
-     <h3 id="registrationRulesReadOnlyOpen" role="button" tabindex="0" aria-haspopup="dialog" aria-controls="registrationRulesReadOnlyPanel" style="background-color:#dc2626;color:#fff;padding:10px 12px;border-radius:8px;cursor:pointer">REGISTRATION RULES · PREVIEW ONLY</h3>
-     <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0">
-      <section style="border:1px solid #cbd5e1;border-radius:12px;padding:13px;background:#fff"><b>RULE 1</b><p class="muted">Email: six-digit verification, then automatic account access.<br>Phone: administrator approval required.</p><div id="rule1Status" style="font-weight:900;padding:8px;border-radius:8px;background:#fff;color:#172b4d">OFF</div><div class="row" style="margin-top:8px"><button id="rule1On" type="button">ON</button><button id="rule1Off" type="button" class="secondary">OFF</button></div></section>
-      <section style="border:1px solid #cbd5e1;border-radius:12px;padding:13px;background:#fff"><b>RULE 2</b><p class="muted">Three confirmation stages. Email: automatic account, no admin approval. Phone: administrator approval required.</p><div id="rule2Status" style="font-weight:900;padding:8px;border-radius:8px;background:#fff;color:#172b4d">OFF</div><div class="row" style="margin-top:8px"><button id="rule2On" type="button">ON</button><button id="rule2Off" type="button" class="secondary">OFF</button></div></section>
-     </div>
-     <p id="registrationRuleStatusMessage" class="muted" aria-live="polite">Loading active registration rule…</p>
-     <button id="previewRegistrationRule2" class="secondary" type="button">Preview Rule 2</button>
      <h3>Registered Users</h3>
      <input id="adminUserSearch" type="search" placeholder="Search users by name or email" aria-label="Search registered users">
      <button id="refreshAdminUsers" class="secondary">Refresh users</button>
@@ -2571,9 +2576,9 @@ async function selectRegistrationRule(rule){
  finally{buttons.forEach(b=>b.disabled=false);}
 }
 $('rule1On').onclick=()=>selectRegistrationRule('rule1');
-$('rule1Off').onclick=()=>selectRegistrationRule('rule2');
+$('rule1Off').onclick=()=>selectRegistrationRule(null);
 $('rule2On').onclick=()=>selectRegistrationRule('rule2');
-$('rule2Off').onclick=()=>selectRegistrationRule('rule1');
+$('rule2Off').onclick=()=>selectRegistrationRule(null);
 
 /* Read-only registration rules reference for administrators. */
 function openRegistrationRulesReadOnly(){
@@ -2636,6 +2641,13 @@ if(rulesHeading){
  rulesHeading.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openRegistrationRulesReadOnly();}});
 }
 
+$('previewRegistrationRule1').onclick=()=>{
+ if(!isAdmin())return alert('Administrator access required.');
+ const overlay=document.createElement('div');overlay.style.cssText='position:fixed;inset:0;z-index:2500;background:#071a36e8;display:flex;align-items:center;justify-content:center;padding:14px;overflow:auto';
+ const panel=document.createElement('div');panel.style.cssText='width:min(100%,520px);background:#fff;color:#172b4d;border-radius:16px;padding:20px;max-height:90vh;overflow:auto;line-height:1.65';
+ panel.innerHTML='<h2 style="color:#102d59">REGISTRATION RULE 1 · PREVIEW</h2><p style="font-weight:900;color:#047857">CURRENT RULE 1 PROCESS</p><section style="border:1px solid #d8e2ef;border-radius:12px;padding:14px;margin-bottom:12px"><h3>Email registration</h3><ol><li>User enters email address and password.</li><li>Website sends a six-digit verification code.</li><li>User enters the code on the signup page.</li><li>Account is created automatically. No administrator approval is required.</li></ol></section><section style="border:1px solid #d8e2ef;border-radius:12px;padding:14px"><h3>Phone registration</h3><ol><li>User enters phone number, password, FIRST NAME and LAST NAME.</li><li>Both names are compulsory, uppercase automatically, and accept letters A–Z only.</li><li>Registration is sent to the administrator approval queue.</li><li>User can log in only after administrator approval.</li></ol></section><p style="font-size:12px;color:#64748b">Preview only. This does not submit a registration or change the active rule.</p>';
+ const close=document.createElement('button');close.className='wide';close.textContent='CLOSE PREVIEW';close.onclick=()=>overlay.remove();panel.append(close);overlay.onclick=e=>{if(e.target===overlay)overlay.remove();};overlay.append(panel);document.body.append(overlay);
+};
 /* Registration Rule 2 is deliberately inactive. Preview mode never submits data. */
 const REGISTRATION_RULE_2_ENABLED = false;
 $('previewRegistrationRule2').onclick=()=>{
