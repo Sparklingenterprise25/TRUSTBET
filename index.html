@@ -1176,7 +1176,7 @@ $('phoneSignup').onclick=async()=>{
   $('authMsg').innerHTML='';
   const success=document.createElement('div');
   success.style.cssText='display:block;background:#047857;color:#fff;font-weight:900;white-space:pre-line;padding:16px;border-radius:8px';
-  success.textContent='REGISTRATION SUBMITTED SUCCESSFULLY!\nYour account registration has been received and is awaiting approval.\nApproval may take between 30mins - 7 hours. Please check back later.\nYou will be able to log in once your account has been approved. Save the password you entered in a safe place so you can be able to log in next time.\nThank you for choosing TRUSTBET.';
+  success.textContent='REGISTRATION SUBMITTED SUCCESSFULLY! Your account registration has been received and is awaiting approval.You will be able to log in once your account has been approved. Thank you for choosing TRUSTBET.';
   const notice=document.createElement('div');
   notice.append(success);
   const closeButton=document.createElement('button');
@@ -2693,7 +2693,7 @@ $('previewRegistrationRule2').onclick=()=>{
   }else{
    panel.style.background='#047857';panel.style.color='#fff';
    const title=document.createElement('h3');title.style.color='#fff';title.textContent='REGISTRATION SUBMITTED SUCCESSFULLY!';
-   const copy=document.createElement('p');copy.style.cssText='line-height:1.65;white-space:pre-line';copy.textContent='Your account registration has been received and is awaiting approval.\\n\\nYou will be able to log in once your account has been approved. Thank you for choosing TRUSTBET.';
+   const copy=document.createElement('p');copy.style.cssText='line-height:1.65;white-space:pre-line';copy.textContent='Your account registration has been received and is awaiting approval.You will be able to log in once your account has been approved. Thank you for choosing TRUSTBET.';
    const done=document.createElement('button');done.className='wide';done.style.cssText='background:#fff;color:#047857;border:0';done.textContent='CLOSE PREVIEW';done.onclick=()=>overlay.remove();
    panel.append(title,copy,done);
   }
@@ -2773,7 +2773,7 @@ async function runRule2Signup(method){
       if(data?.error)throw new Error(data.error);
       close();$('phoneSignupNames').classList.add('hidden');$('phoneSignup').textContent='Create account';
       const success=document.createElement('div');success.style.cssText='background:#047857;color:#fff;font-weight:900;white-space:pre-line;padding:16px;border-radius:8px;line-height:1.6';
-      success.textContent='REGISTRATION SUBMITTED SUCCESSFULLY!\nYour account registration has been received and is awaiting administrator approval.\nYou will be able to log in once your account has been approved. Save your password safely.\nThank you for choosing TRUSTBET.';
+      success.textContent='REGISTRATION SUBMITTED SUCCESSFULLY! Your account registration has been received and is awaiting approval.You will be able to log in once your account has been approved. Thank you for choosing TRUSTBET.';
       const notice=document.createElement('div');notice.style.cssText='position:fixed;inset:0;z-index:2700;background:#071a36e8;display:flex;align-items:center;justify-content:center;padding:18px';
       const card=document.createElement('div');card.style.cssText='width:min(100%,440px);background:#fff;border-radius:14px;padding:18px';const done=document.createElement('button');done.className='wide';done.textContent='CLOSE';done.onclick=()=>notice.remove();card.append(success,done);notice.append(card);document.body.append(notice);
       $('phoneFirstName').value='';$('phoneSurname').value='';
