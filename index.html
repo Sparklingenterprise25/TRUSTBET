@@ -572,7 +572,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
      <h3>Phone Registrations Awaiting Approval</h3>
      <button id="refreshPhoneApprovals" class="secondary">Refresh phone registrations</button>
      <div id="phoneApprovals" aria-live="polite"></div>
-     <h3 style="background-color:#dc2626;color:#fff;padding:10px 12px;border-radius:8px">Registration Rule 2 · Preview only (OFF)</h3>
+     <h3 id="registrationRulesReadOnlyOpen" role="button" tabindex="0" aria-haspopup="dialog" aria-controls="registrationRulesReadOnlyPanel" style="background-color:#dc2626;color:#fff;padding:10px 12px;border-radius:8px;cursor:pointer">REGISTRATION RULES · PREVIEW ONLY (OFF)</h3>
      <p class="muted">This is a safe demonstration. It will not create an account or change the active registration rule.</p>
      <button id="previewRegistrationRule2" class="secondary" type="button">Preview Rule 2</button>
      <h3>Registered Users</h3>
@@ -2523,6 +2523,68 @@ async function adminInbox(){
   .subscribe();
 }
 
+
+/* Read-only registration rules reference for administrators. */
+function openRegistrationRulesReadOnly(){
+ if(!isAdmin())return alert('Administrator access required.');
+ const overlay=document.createElement('div');
+ overlay.id='registrationRulesReadOnlyPanel';
+ overlay.setAttribute('role','dialog');
+ overlay.setAttribute('aria-modal','true');
+ overlay.setAttribute('aria-label','Registration rules reference');
+ overlay.style.cssText='position:fixed;inset:0;z-index:2450;background:#071a36e8;display:flex;align-items:center;justify-content:center;padding:14px;overflow:auto';
+ const panel=document.createElement('div');
+ panel.style.cssText='width:min(100%,620px);background:#fff;color:#172b4d;border-radius:16px;padding:20px;box-shadow:0 18px 55px #0007;max-height:90vh;overflow:auto;line-height:1.65';
+ panel.innerHTML=`
+  <h2 style="margin:0 0 6px;color:#102d59">REGISTRATION RULES</h2>
+  <p style="margin:0 0 16px;color:#b42332;font-weight:800">READ-ONLY REFERENCE · RULE 1 ACTIVE · RULE 2 OFF</p>
+  <section style="border:1px solid #d8e2ef;border-radius:12px;padding:14px;margin-bottom:14px">
+   <h3 style="margin-top:0;color:#047857">RULE 1 — CURRENT REGISTRATION PROCESS (ACTIVE)</h3>
+   <h4> Email registration</h4>
+   <ol>
+    <li>User chooses Email registration and enters an email address and password.</li>
+    <li>Password must be 8–15 characters.</li>
+    <li>User submits Create account and receives a six-digit email verification code.</li>
+    <li>User enters the code and verifies the email address.</li>
+    <li>The system provisions the account's recovery codes and loads the account after successful verification.</li>
+   </ol>
+   <h4>Phone-number registration</h4>
+   <ol>
+    <li>User chooses Phone number registration and enters a country code, phone number and password.</li>
+    <li>On the first Create account click, the First Name and Surname fields appear. Both are compulsory and each must contain exactly one name.</li>
+    <li>Phone password must be 8–15 characters, with exactly one letter and all remaining characters numbers.</li>
+    <li>User submits registration. The phone-signup process sends the registration for administrator approval.</li>
+    <li>The user sees the registration-success notice, is told approval may take 30 minutes–7 hours, and is reminded to save the password.</li>
+    <li>The account can be used to log in after administrator approval.</li>
+   </ol>
+  </section>
+  <section style="border:1px solid #d8e2ef;border-radius:12px;padding:14px">
+   <h3 style="margin-top:0;color:#b42332">RULE 2 — PROPOSED REGISTRATION PROCESS (PREVIEW ONLY · OFF)</h3>
+   <p><strong>Rule 2 is not active.</strong> The current preview is a demonstration only; it does not create accounts, submit registrations, or change Rule 1.</p>
+   <ol>
+    <li><strong>Choose account type:</strong> select Phone number or Email in the preview.</li>
+    <li><strong>STEP 1 — REVIEW ACCOUNT DETAILS:</strong> show the entered account details for the user to review before submission. Phone preview displays First Name, Surname, Phone number and masked Password; email preview displays Email and masked Password.</li>
+    <li><strong>STEP 2 — REGISTRATION RECEIVED:</strong> show that registration was received successfully and is awaiting administrator approval. User selects I UNDERSTAND.</li>
+    <li><strong>STEP 3 — SAVE YOUR PASSWORD:</strong> remind the user to save the password safely for login after approval. User selects CONFIRM AND FINISH.</li>
+    <li><strong>FINAL CONFIRMATION:</strong> show the existing green success confirmation explaining that registration is awaiting approval and login is available after approval. User selects CLOSE PREVIEW.</li>
+   </ol>
+  </section>
+  <p style="font-size:12px;color:#64748b;margin:14px 0 0">This reference is read-only. It does not edit registration settings or activate Rule 2.</p>
+  <button type="button" id="closeRegistrationRulesReadOnly" class="wide" style="margin-top:14px">CLOSE</button>
+ `;
+ const close=()=>overlay.remove();
+ panel.querySelector('#closeRegistrationRulesReadOnly').onclick=close;
+ overlay.onclick=e=>{if(e.target===overlay)close();};
+ const escape=e=>{if(e.key==='Escape'){close();document.removeEventListener('keydown',escape);}};
+ document.addEventListener('keydown',escape);
+ overlay.append(panel);document.body.append(overlay);
+ panel.querySelector('#closeRegistrationRulesReadOnly').focus();
+}
+const rulesHeading=$('registrationRulesReadOnlyOpen');
+if(rulesHeading){
+ rulesHeading.addEventListener('click',openRegistrationRulesReadOnly);
+ rulesHeading.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openRegistrationRulesReadOnly();}});
+}
 
 /* Registration Rule 2 is deliberately inactive. Preview mode never submits data. */
 const REGISTRATION_RULE_2_ENABLED = false;
