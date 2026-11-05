@@ -2083,6 +2083,32 @@ function formatAdminConfirmationInput(field,phrase){
  });
 }
 
+function formatDeletionConfirmationInput(field){
+ field.maxLength=16;
+ field.autocomplete='off';
+ field.autocapitalize='characters';
+ field.spellcheck=false;
+ const normalize=()=>{
+  const raw=field.value.toUpperCase();
+  const cursor=field.selectionStart??raw.length;
+  const lettersBefore=raw.slice(0,cursor).replace(/[^A-Z]/g,'').length;
+  const letters=raw.replace(/[^A-Z]/g,'').slice(0,15);
+  const value=letters.slice(0,7)+(letters.length>=7?' ':'')+letters.slice(7);
+  field.value=value;
+  const nextCursor=Math.min(value.length,lettersBefore+(lettersBefore>=7?1:0));
+  try{field.setSelectionRange(nextCursor,nextCursor);}catch{}
+ };
+ field.addEventListener('input',normalize);
+ field.addEventListener('paste',()=>setTimeout(normalize,0));
+ field.addEventListener('keydown',event=>{
+  if(event.key==='Backspace'&&field.selectionStart===8&&field.selectionEnd===8){
+   event.preventDefault();field.setSelectionRange(7,7);
+  }else if(event.key==='Delete'&&field.selectionStart===7&&field.selectionEnd===7){
+   event.preventDefault();field.setSelectionRange(8,8);
+  }
+ });
+}
+
 /* Account deletion requests */
 async function deletionAction(body){const {data,error}=await supabase.functions.invoke('trustbet-account-deletion',{body});if(error)throw error;if(data?.error)throw new Error(data.error);return data;}
 function confirmDeletionTwoWay(action,email){
@@ -2644,12 +2670,12 @@ $('requestAccountDeletion').onclick=async()=>{
   const heading=document.createElement('h3');heading.textContent='Final account deletion confirmation';
   const message=document.createElement('p');message.textContent='Type CONFIRM DELETION exactly to submit your request.';
   const field=document.createElement('input');field.type='text';field.placeholder='CONFIRM DELETION';field.autocomplete='off';field.autocapitalize='characters';field.spellcheck=false;field.style.cssText='width:100%;padding:13px;border:1px solid #d8e2ef;border-radius:10px;font:inherit;margin:8px 0 14px';
-  formatAdminConfirmationInput(field,'CONFIRM DELETION');
+  formatDeletionConfirmationInput(field);
   const actions=document.createElement('div');actions.style.cssText='display:flex;gap:9px';
   const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Cancel';cancel.className='secondary';cancel.style.flex='1';
   const submit=document.createElement('button');submit.type='button';submit.textContent='Submit request';submit.className='danger';submit.style.flex='1';
   const close=value=>{overlay.remove();resolve(value);};cancel.onclick=()=>close(false);
-  submit.onclick=()=>{if(field.value.trim()==='CONFIRM DELETION')close(true);else alert('You must type CONFIRM DELETION exactly.');};
+  submit.onclick=()=>{if(field.value==='CONFIRM DELETION')close(true);else alert('You must type CONFIRM DELETION exactly.');};
   overlay.onclick=e=>{if(e.target===overlay)close(false);};actions.append(cancel,submit);panel.append(heading,message,field,actions);overlay.append(panel);document.body.append(overlay);field.focus();
  });
  if(!typed)return;const button=$('requestAccountDeletion');button.disabled=true;
@@ -2720,7 +2746,7 @@ async function chatLoad(){
    const body=document.createElement('div');body.textContent=m.message;d.append(body);
   }
   if(m.attachment_path){
-   const {data:signed,error:signedError}=await supabase.storage.from('support-attachments').createSignedUrl(m.attachment_path,3600);
+   const {data:signed,error:signedError}=await supabase.storage.from('support-attachments').createSignedUrl(m.attachment_path,300);
    if(!signedError&&signed?.signedUrl){
     if(m.attachment_mime?.startsWith('image/')&&!['image/heic','image/heif'].includes(m.attachment_mime)){
      const img=document.createElement('img');img.className='chat-attachment-image';img.src=signed.signedUrl;img.alt=m.attachment_name||'Customer support attachment';img.loading='lazy';d.append(img);
