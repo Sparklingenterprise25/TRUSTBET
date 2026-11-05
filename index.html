@@ -2776,11 +2776,8 @@ async function chatLoad(){
  }
  $('chatMessages').scrollTop=$('chatMessages').scrollHeight;
  if(!isAdmin()&&!$('chatPanel').classList.contains('hidden')){
-  const unreadIds=(data||[]).filter(m=>m.sender_role==='admin'&&!m.read_at).map(m=>m.created_at);
-  if(unreadIds.length){
-   const{error:readError}=await supabase.from('support_messages').update({read_at:new Date().toISOString()}).eq('conversation_id',conversation.id).eq('sender_role','admin').is('read_at',null);
-   if(!readError)refreshCustomerChatNotice();
-  }
+  localStorage.setItem('trustbet-support-last-read-'+conversation.id,new Date().toISOString());
+  refreshCustomerChatNotice();
  }
 }
 $('chatInput').addEventListener('input',()=>{
@@ -2870,7 +2867,10 @@ async function refreshCustomerChatNotice(){
  const{data:conv,error}=await supabase.from('support_conversations').select('id,last_message_at').eq('user_id',user.id).eq('status','open').order('created_at',{ascending:false}).limit(1).maybeSingle();
  if(error||!conv){box.classList.add('hidden');return;}
  const{data:messages}=await supabase.from('support_messages').select('message,sender_role,created_at,read_at').eq('conversation_id',conv.id).order('created_at',{ascending:false}).limit(1);
- const{count}=await supabase.from('support_messages').select('id',{count:'exact',head:true}).eq('conversation_id',conv.id).eq('sender_role','admin').is('read_at',null);
+ let unreadQuery=supabase.from('support_messages').select('id',{count:'exact',head:true}).eq('conversation_id',conv.id).eq('sender_role','admin');
+ const lastRead=localStorage.getItem('trustbet-support-last-read-'+conv.id);
+ if(lastRead)unreadQuery=unreadQuery.gt('created_at',lastRead);
+ const{count}=await unreadQuery;
  const latest=messages?.[0];const unread=Number(count||0);
  box.classList.remove('hidden');box.classList.toggle('unread',unread>0);
  box.innerHTML='';
