@@ -2800,18 +2800,20 @@ $('sendChat').onclick=async()=>{
  let attachment=null;
  try{
   if(file){
-   const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,'_').slice(-120)||'attachment';
-   const path=conversation.id+'/'+crypto.randomUUID()+'-'+safeName;
-   const{error:uploadError}=await supabase.storage.from('support-attachments').upload(path,file,{contentType:file.type,upsert:false});
-   if(uploadError)throw uploadError;
-   attachment={attachment_path:path,attachment_name:file.name,attachment_mime:file.type,attachment_size:file.size};
+   const form=new FormData();
+   form.append('conversationId',conversation.id);
+   form.append('message',message);
+   form.append('file',file);
+   const{data,error}=await supabase.functions.invoke('trustbet-support-file-upload',{body:form});
+   if(error)throw error;
+   if(data?.error)throw new Error(data.error);
+  }else{
+   const{error}=await supabase.from('support_messages').insert({
+    conversation_id:conversation.id,sender_id:user.id,
+    sender_role:isAdmin()?'admin':'user',message
+   });
+   if(error)throw error;
   }
-  const{error}=await supabase.from('support_messages').insert({
-   conversation_id:conversation.id,sender_id:user.id,
-   sender_role:isAdmin()?'admin':'user',message:message||'Attachment',
-   ...(attachment||{})
-  });
-  if(error)throw error;
   $('chatInput').value='';$('chatAttachment').value='';$('chatAttachmentPreview').textContent='';
   if($('chatCharCount'))$('chatCharCount').textContent='0 / '+limit+' characters';
   say('chatMsg',file?'Attachment sent':'Message submitted');await chatLoad();resetSupportChatIdle();
