@@ -688,6 +688,15 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
      <small id="creditUserSearchStatus" style="display:block;margin:0 0 10px;color:#64748b"></small>
      <label for="creditUserSelect">OR SELECT FROM ALL WEBSITE USERS</label>
      <select id="creditUserSelect" style="margin:6px 0 12px"><option value="">Select a user</option></select>
+      <label>SELECT USERS FOR THIS CREDIT</label>
+      <div class="row" style="align-items:center;margin:4px 0 8px">
+       <button type="button" id="creditSelectAllUsers" class="secondary">SELECT ALL USERS</button>
+       <button type="button" id="creditClearSelectedUsers" class="secondary">CLEAR SELECTION</button>
+      </div>
+      <small id="creditSelectedCount" style="display:block;margin:0 0 8px;color:#12a875;font-weight:800">0 users selected</small>
+      <div id="creditUserChecklist" role="group" aria-label="Choose users for bonus or compensation" style="max-height:280px;overflow-y:auto;border:1px solid #d8e2ef;border-radius:12px;padding:8px;background:#fbfcff;margin-bottom:14px">
+       <p class="muted">Registered users will appear here.</p>
+      </div>
      <label>Credit type</label>
      <select id="creditType" style="background-color:#000080;color:#fff"><option value="bonus">Bonus</option><option value="compensation">Compensation</option></select>
      <label>Amount (₦)</label><input id="creditAmount" type="text" inputmode="numeric" autocomplete="off" placeholder="Enter amount">
@@ -2398,41 +2407,62 @@ function updateCreditMessage(){
 if($('creditType'))$('creditType').onchange=updateCreditMessage;
 let creditRegisteredUsers=[];
 let creditUsersLoading=false;
+let creditSelectedUserIds=new Set();
+let creditPendingBatchFingerprint='';
+let creditPendingBatchId='';
+function creditUserLabel(p){return p.full_name||p.email||p.phone||'User';}
+function updateCreditSelectionCount(){
+ const count=creditSelectedUserIds.size;
+ if($('creditSelectedCount'))$('creditSelectedCount').textContent=count.toLocaleString()+' user'+(count===1?'':'s')+' selected';
+}
+function renderCreditUserChecklist(){
+ const host=$('creditUserChecklist');if(!host)return;
+ const q=String($('creditUserSearch')?.value||'').trim().toLowerCase();
+ const filtered=creditRegisteredUsers.filter(p=>(String(p.full_name||'')+' '+String(p.email||'')+' '+String(p.phone||'')+' '+String(p.trustbet_uid||'')).toLowerCase().includes(q));
+ host.replaceChildren();
+ if(!filtered.length){
+  const empty=document.createElement('p');empty.className='muted';empty.textContent=creditRegisteredUsers.length?'No users match this search.':'Registered users will appear here.';
+  host.append(empty);updateCreditSelectionCount();return;
+ }
+ filtered.forEach(p=>{
+  const label=document.createElement('label');
+  label.style.cssText='display:flex;align-items:center;gap:10px;padding:9px 7px;border-bottom:1px solid #e8eef6;text-transform:none;font-size:13px;font-weight:650;color:#263d5c;cursor:pointer';
+  const checkbox=document.createElement('input');checkbox.type='checkbox';checkbox.checked=creditSelectedUserIds.has(p.id);checkbox.style.cssText='width:18px;height:18px;margin:0;flex:0 0 auto';
+  checkbox.addEventListener('change',()=>{
+   if(checkbox.checked)creditSelectedUserIds.add(p.id);else creditSelectedUserIds.delete(p.id);
+   creditPendingBatchFingerprint='';creditPendingBatchId='';updateCreditSelectionCount();
+  });
+  const name=document.createElement('span');name.textContent=creditUserLabel(p)+' · '+(p.email||p.phone||p.id);
+  label.append(checkbox,name);host.append(label);
+ });
+ updateCreditSelectionCount();
+}
 function selectCreditUserOptions(){
- const select=$('creditUserSelect');
- if(!select)return;
- const selectedId=select.value;
- select.innerHTML='<option value="">Select a user</option>';
+ const select=$('creditUserSelect');if(!select)return;
+ const selectedId=select.value;select.innerHTML='<option value="">Select a user</option>';
  creditRegisteredUsers.forEach(p=>{
-  const displayName=p.full_name||p.email||p.phone||'User';
-  const option=document.createElement('option');
-  option.value=p.id;
-  option.textContent=displayName+' · '+(p.email||p.phone||p.id);
-  select.append(option);
+  const option=document.createElement('option');option.value=p.id;
+  option.textContent=creditUserLabel(p)+' · '+(p.email||p.phone||p.id);select.append(option);
  });
  if(selectedId&&creditRegisteredUsers.some(p=>p.id===selectedId))select.value=selectedId;
+ renderCreditUserChecklist();
 }
-async function loadCreditRegisteredUsers({renderSearchDropdown=true}={}){
+async function loadCreditRegisteredUsers(){
  if(!isAdmin())return say('walletCreditMsg','Administrator access required.',true);
  if(creditUsersLoading)return;
- creditUsersLoading=true;
- say('walletCreditMsg','Loading all registered users...');
+ creditUsersLoading=true;say('walletCreditMsg','Loading all registered users...');
  try{
   const all=[];let from=0;const pageSize=500;
   while(true){
-   const{data,error}=await supabase.from('profiles').select('id,full_name,email,phone').order('full_name',{ascending:true}).range(from,from+pageSize-1);
-   if(error)throw error;
-   all.push(...(data||[]));
-   if(!data||data.length<pageSize)break;
-   from+=pageSize;
+   const{data,error}=await supabase.from('profiles').select('id,full_name,email,phone,trustbet_uid,role').eq('role','user').order('full_name',{ascending:true}).range(from,from+pageSize-1);
+   if(error)throw error;all.push(...(data||[]));
+   if(!data||data.length<pageSize)break;from+=pageSize;
   }
-  creditRegisteredUsers=all;
-  selectCreditUserOptions();
-  $('creditUserSearchStatus').textContent=all.length+' registered users loaded.';
-  say('walletCreditMsg',all.length+' registered users loaded.');
+  creditRegisteredUsers=all;selectCreditUserOptions();
+  $('creditUserSearchStatus').textContent=all.length.toLocaleString()+' registered users loaded.';
+  say('walletCreditMsg',all.length.toLocaleString()+' registered users loaded.');
  }catch(error){
-  creditRegisteredUsers=[];
-  selectCreditUserOptions();
+  creditRegisteredUsers=[];selectCreditUserOptions();
   $('creditUserSearchStatus').textContent='Could not load registered users.';
   say('walletCreditMsg','Could not load registered users: '+(error.message||error),true);
  }finally{creditUsersLoading=false;}
@@ -2440,32 +2470,63 @@ async function loadCreditRegisteredUsers({renderSearchDropdown=true}={}){
 $('searchCreditUsers')?.addEventListener('click',()=>{
  const q=String($('creditUserSearch')?.value||'').trim().toLowerCase(),status=$('creditUserSearchStatus');
  if(!creditRegisteredUsers.length){status.textContent='Loading registered users...';loadCreditRegisteredUsers();return;}
- if(!q){status.textContent='Enter a name, email or phone number to search.';return;}
- const matches=creditRegisteredUsers.filter(p=>(String(p.full_name||'')+' '+String(p.email||'')+' '+String(p.phone||'')).toLowerCase().includes(q));
- if(matches.length===1){$('creditUserSelect').value=matches[0].id;status.textContent='User found and selected.';say('walletCreditMsg','Selected: '+(matches[0].full_name||matches[0].email||matches[0].phone||'User'));}
- else if(matches.length>1){status.textContent=matches.length+' users matched. Choose the correct user from the dropdown below.';}
+ if(!q){status.textContent=creditRegisteredUsers.length+' users available. Use the checkboxes or Select All Users.';renderCreditUserChecklist();return;}
+ const matches=creditRegisteredUsers.filter(p=>(String(p.full_name||'')+' '+String(p.email||'')+' '+String(p.phone||'')+' '+String(p.trustbet_uid||'')).toLowerCase().includes(q));
+ if(matches.length===1){
+  creditSelectedUserIds.add(matches[0].id);$('creditUserSelect').value=matches[0].id;
+  status.textContent='User found and added to selection.';say('walletCreditMsg','Added: '+creditUserLabel(matches[0]));
+  creditPendingBatchFingerprint='';creditPendingBatchId='';
+ }else if(matches.length>1)status.textContent=matches.length+' users match. Select the required users below.';
  else status.textContent='No matching user found.';
+ renderCreditUserChecklist();
+});
+$('creditUserSearch')?.addEventListener('input',renderCreditUserChecklist);
+$('creditSelectAllUsers')?.addEventListener('click',()=>{
+ if(!creditRegisteredUsers.length){loadCreditRegisteredUsers();return;}
+ creditSelectedUserIds=new Set(creditRegisteredUsers.map(p=>p.id));
+ creditPendingBatchFingerprint='';creditPendingBatchId='';renderCreditUserChecklist();
+ say('walletCreditMsg','All '+creditRegisteredUsers.length.toLocaleString()+' registered users selected.');
+});
+$('creditClearSelectedUsers')?.addEventListener('click',()=>{
+ creditSelectedUserIds.clear();creditPendingBatchFingerprint='';creditPendingBatchId='';renderCreditUserChecklist();
 });
 $('creditUserSelect')?.addEventListener('focus',()=>{if(!creditRegisteredUsers.length&&!creditUsersLoading)loadCreditRegisteredUsers();});
 $('creditUserSelect')?.addEventListener('change',()=>{
  const p=creditRegisteredUsers.find(item=>item.id===$('creditUserSelect').value);
- if(p)say('walletCreditMsg','Selected: '+(p.full_name||p.email||p.phone||'User'));
+ if(p){creditSelectedUserIds.add(p.id);creditPendingBatchFingerprint='';creditPendingBatchId='';renderCreditUserChecklist();say('walletCreditMsg','Added to selection: '+creditUserLabel(p));}
 });
+function newCreditBatchId(){
+ if(globalThis.crypto?.randomUUID)return globalThis.crypto.randomUUID();
+ return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c==='x'?r:(r&3|8)).toString(16);});
+}
 if($('issueWalletCredit'))$('issueWalletCredit').onclick=async()=>{
  if(!isAdmin())return say('walletCreditMsg','Administrator access required.',true);
- const userId=$('creditUserSelect').value,amount=readAmountInput('creditAmount'),type=$('creditType').value,message=TRUSTBET_CREDIT_MESSAGES[type];
- if(!userId)return say('walletCreditMsg','Select a user first.',true);
+ const userIds=Array.from(creditSelectedUserIds).sort(),amount=readAmountInput('creditAmount'),type=$('creditType').value,message=TRUSTBET_CREDIT_MESSAGES[type];
+ if(!userIds.length)return say('walletCreditMsg','Select at least one user first.',true);
  if(!Number.isSafeInteger(amount)||amount<=0)return say('walletCreditMsg','Enter a valid positive whole-number amount.',true);
- const target=$('creditUserSelect').selectedOptions[0]?.textContent||'selected user';
- if(!await confirmAdminDecision('wallet credit','approve'))return;
+ const total=amount*userIds.length;
+ if(!Number.isSafeInteger(total))return say('walletCreditMsg','The total bulk credit is too large.',true);
+ const fingerprint=JSON.stringify([userIds,amount,type,message]);
+ if(fingerprint!==creditPendingBatchFingerprint){creditPendingBatchFingerprint=fingerprint;creditPendingBatchId=newCreditBatchId();}
+ const ok=await confirmAdminDecision(type+' credit to '+userIds.length+' users (₦'+total.toLocaleString()+')','approve');
+ if(!ok)return;
  $('issueWalletCredit').disabled=true;
- const{data,error}=await supabase.rpc('admin_issue_wallet_credit',{p_user_id:userId,p_amount:amount,p_credit_type:type,p_message:message});
- $('issueWalletCredit').disabled=false;
- if(error)return say('walletCreditMsg','Credit failed: '+error.message,true);
- $('creditAmount').value='';
- say('walletCreditMsg','Credit successfully issued. New wallet balance: '+money(data?.balance||0));
+ say('walletCreditMsg','Sending ₦'+amount.toLocaleString()+' to '+userIds.length.toLocaleString()+' users. Please wait...');
+ try{
+  const{data,error}=await supabase.rpc('admin_issue_bulk_wallet_credit',{
+   p_batch_id:creditPendingBatchId,p_user_ids:userIds,p_amount:amount,p_credit_type:type,p_message:message
+  });
+  if(error)throw error;
+  creditSelectedUserIds.clear();creditPendingBatchFingerprint='';creditPendingBatchId='';
+  $('creditAmount').value='';$('creditUserSelect').value='';
+  renderCreditUserChecklist();
+  say('walletCreditMsg',(data?.duplicate?'This bulk credit was already processed. ':'Successfully credited ')+Number(data?.recipient_count||userIds.length).toLocaleString()+' users. Total sent: '+money(data?.total_amount||total)+'.');
+ }catch(error){
+  say('walletCreditMsg','Bulk credit failed: '+(error.message||error)+'. You can safely retry; duplicate protection is active.',true);
+ }finally{$('issueWalletCredit').disabled=false;}
 };
 if($('creditMessage'))updateCreditMessage();
+loadCreditRegisteredUsers();
 
 /* Notifications */
 $('closeNotifications').onclick=()=>$('notificationPanel').classList.add('hidden');
