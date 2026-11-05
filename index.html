@@ -1010,7 +1010,7 @@ $('recoverySubmit').onclick=async()=>{
 };
 function friendlyLoginError(error){
  const message=String(error?.message||'');
- if(/\\buser is banned\\b|\\bbanned\\b/i.test(message)){
+ if(/\buser is banned\b|\bbanned\b/i.test(message)){
   return 'Login is not available for this account right now. If you have submitted a registration request, it may still be awaiting administrator review. Please wait for the administrator’s decision. If you believe your account has already been approved, please contact support.';
  }
  return message||'Unable to sign in. Please check your details and try again.';
