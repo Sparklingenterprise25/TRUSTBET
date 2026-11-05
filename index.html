@@ -380,7 +380,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
    <option value="+1">+1 🇺🇸 United States</option>
   </select>
   <label>Phone number</label><input id="phoneNumber" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="13" placeholder="000 0000 0000" aria-label="Phone number">
-  <div id="phoneSignupNames" class="hidden"><label>First Name</label><input id="phoneFirstName" type="text" maxlength="60" autocomplete="given-name" placeholder="Enter first name"><label>Surname</label><input id="phoneSurname" type="text" maxlength="60" autocomplete="family-name" placeholder="Enter surname"><small class="muted">Both names are compulsory for phone-number registration.</small></div>
+  <div id="phoneSignupNames" class="hidden"><label for="phoneFirstName"><b>FIRST NAME</b></label><input id="phoneFirstName" type="text" maxlength="60" autocomplete="given-name" autocapitalize="characters" spellcheck="false" placeholder="Enter first name"><label for="phoneSurname"><b>LAST NAME</b></label><input id="phoneSurname" type="text" maxlength="60" autocomplete="family-name" autocapitalize="characters" spellcheck="false" placeholder="Enter last name"><small class="muted">Both names are compulsory. Letters A–Z only.</small></div>
   <label style="display:block;font-size:12px!important;font-weight:700!important;color:#16a34a!important;text-transform:none!important;">Enter Password (Only one letter, all other characters MUST BE numbers) e.g. T6574321</label><div class="password-field"><input id="phonePassword" type="password" inputmode="text" pattern="[A-Za-z0-9]*" maxlength="15" autocomplete="current-password"><button type="button" class="password-toggle" data-password-target="phonePassword" aria-label="Show password" aria-pressed="false">👁</button></div>
   <div class="row"><button id="phoneLogin">Sign in</button><button id="phoneSignup" class="secondary">Create account</button></div>
   <div id="phoneOtpBox" class="hidden">
@@ -1109,6 +1109,20 @@ function formatPhoneInput(){
  $('phoneNumber').setAttribute('aria-label','Phone number, '+rule.length+' digits required');
 }
 $('phoneNumber').addEventListener('input',formatPhoneInput);
+function forceAlphabeticUppercase(input){
+ input.addEventListener('input',()=>{
+  const start=input.selectionStart;
+  const before=input.value;
+  const after=before.replace(/[^A-Za-z]/g,'').toUpperCase();
+  if(before!==after){
+   const removed=before.length-after.length;
+   input.value=after;
+   try{const pos=Math.max(0,(start||after.length)-removed);input.setSelectionRange(pos,pos);}catch{}
+  }
+ });
+}
+forceAlphabeticUppercase($('phoneFirstName'));
+forceAlphabeticUppercase($('phoneSurname'));
 $('phoneCountry').addEventListener('change',formatPhoneInput);
 function fullPhoneNumber(){
  const code=$('phoneCountry').value,rule=phoneRule();
@@ -1135,9 +1149,9 @@ $('phoneSignup').onclick=async()=>{
  const namesPanel=$('phoneSignupNames');
  if(namesPanel.classList.contains('hidden')){namesPanel.classList.remove('hidden');$('phoneFirstName').focus();$('phoneSignup').textContent='Submit registration';return;}
  try{
-  const firstName=$('phoneFirstName').value.trim().replace(/\s+/g,' '),surname=$('phoneSurname').value.trim().replace(/\s+/g,' ');
-  if(!firstName||!surname)return say('authMsg','Enter both your first name and surname to create a phone account.',true);
-  if(firstName.split(/\s+/).length!==1||surname.split(/\s+/).length!==1)return say('authMsg','Enter only one first name and one surname.',true);
+  const firstName=$('phoneFirstName').value.trim().toUpperCase(),surname=$('phoneSurname').value.trim().toUpperCase();
+  if(!firstName||!surname)return say('authMsg','Enter both FIRST NAME and LAST NAME to create a phone account.',true);
+  if(!/^[A-Z]+$/.test(firstName)||!/^[A-Z]+$/.test(surname))return say('authMsg','FIRST NAME and LAST NAME must contain letters A–Z only. Numbers, spaces and special characters are not accepted.',true);
   const phone=fullPhoneNumber(),password=$('phonePassword').value;
   if(!/^(?=.{8,15}$)(?=[0-9]*[A-Za-z][0-9]*$)[A-Za-z0-9]+$/.test(password))return say('authMsg','Phone passwords must be 8–15 characters: exactly one letter and all remaining characters numbers.',true);
   const{data,error}=await supabase.functions.invoke('trustbet-phone-signup',{body:{phone,password,first_name:firstName,last_name:surname}});
