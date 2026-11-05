@@ -127,6 +127,7 @@ nav button.active{background:linear-gradient(135deg,#102d59,#2475d0);color:#fff;
 .bubble{padding:10px;border-radius:12px;background:#f1f0f0;border:1px solid #e5e5e5;margin:7px;max-width:88%;font-size:13px;overflow-wrap:anywhere}
 .bubble.user-message{background:#dcf8c6;border-color:#c6e8ad;color:#17351b}
 .bubble.admin-message{background:#f1f0f0;border-color:#e3e3e3;color:#263238}
+.chat-sender-label{font-size:10px;font-weight:800;letter-spacing:.35px;color:#174b88;margin-bottom:5px;text-transform:uppercase}
 .bubble.mine{margin-left:auto}.bubble small{display:block;color:var(--muted)}
 .chat-attachment-tools{display:flex;flex-direction:column;gap:6px;margin:9px 0}
 .chat-attachment-tools input[type=file]{width:100%;font-size:12px;padding:8px;background:#f7faff;border:1px solid #dce7f5;border-radius:9px}
@@ -2710,6 +2711,9 @@ async function chatLoad(){
  $('chatMessages').innerHTML='';
  for(const m of (data||[])){
   const d=document.createElement('div');const senderIsAdmin=isAdmin()?(m.sender_id===user.id):(m.sender_id!==user.id);d.className='bubble '+(senderIsAdmin?'admin-message':'user-message')+(m.sender_id===user.id?' mine':'');
+  if(senderIsAdmin&&!isAdmin()){
+   const senderLabel=document.createElement('div');senderLabel.className='chat-sender-label';senderLabel.textContent='TRUSTBET CUSTOMER SUPPORT';d.append(senderLabel);
+  }
   if(m.message&&m.message!=='Attachment'){
    const body=document.createElement('div');body.textContent=m.message;d.append(body);
   }
