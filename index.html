@@ -170,7 +170,6 @@ footer{text-align:center;padding:24px 24px 90px;color:var(--muted);font-size:12p
 .admin-receipt .receipt-line{display:flex;justify-content:space-between;gap:12px;padding:11px 13px;margin:0 0 8px;border:0;border-radius:9px;background:#f5f8fc;font-size:13px}
 .admin-receipt .receipt-line span:first-child{color:#78869c}
 .admin-receipt .receipt-line strong{text-align:right;overflow-wrap:anywhere}
-.admin-receipt .receipt-note{font-size:11px;color:#78869c;line-height:1.5;margin:16px 0}
 .admin-receipt-actions{display:flex;gap:8px;margin-top:14px}
 .admin-receipt-actions button{flex:1}
 @media print{body>*:not(#adminReceiptOverlay){display:none!important}#adminReceiptOverlay{position:static;display:block!important;background:#fff;padding:0}.admin-receipt{box-shadow:none;border:1px solid #ccc;width:100%;max-width:none}.admin-receipt-actions{display:none!important}}
@@ -1663,7 +1662,7 @@ function showAdminReceipt(kind,item,decision,reason=''){
   ...(kind==='deposit'?[['Provider',item.provider_name||'Not provided'],['Depositor account name',item.depositor_account_name||'Not provided']]:[['Bank',item.bank_name||'Not provided'],['Account name',item.account_name||'Not provided'],['Account number',item.account_number||'Not provided']]),
   ...(reason?[['Reason',reason]]:[])
  ];
- overlay.innerHTML='<div class="admin-receipt" role="dialog" aria-modal="true" aria-label="Administrator transaction decision receipt"><h2>TRUSTBET</h2><p class="receipt-sub">TRANSACTION DECISION RECEIPT</p><div class="receipt-status '+(decision==='reject'?'declined':'')+'">'+status+'</div>'+lines.map(([k,v])=>'<div class="receipt-line"><span>'+escapeHtml(k)+'</span><strong>'+escapeHtml(v)+'</strong></div>').join('')+'<p class="receipt-note">This receipt confirms the administrator decision on this request. A withdrawal approval does not itself confirm that the bank transfer has been completed.</p><div class="admin-receipt-actions"><button type="button" id="receiptPng">Download PNG</button><button type="button" id="receiptPrint" class="secondary">Print / Save PDF</button><button type="button" id="receiptClose" class="secondary">Close</button></div></div>';
+ overlay.innerHTML='<div class="admin-receipt" role="dialog" aria-modal="true" aria-label="Administrator transaction decision receipt"><h2>TRUSTBET</h2><p class="receipt-sub">TRANSACTION DECISION RECEIPT</p><div class="receipt-status '+(decision==='reject'?'declined':'')+'">'+status+'</div>'+lines.map(([k,v])=>'<div class="receipt-line"><span>'+escapeHtml(k)+'</span><strong>'+escapeHtml(v)+'</strong></div>').join('')+'<div class="admin-receipt-actions"><button type="button" id="receiptPng">Download PNG</button><button type="button" id="receiptPrint" class="secondary">Print / Save PDF</button><button type="button" id="receiptClose" class="secondary">Close</button></div></div>';
  overlay.classList.remove('hidden');overlay.setAttribute('aria-hidden','false');
  $('receiptClose').onclick=()=>{overlay.classList.add('hidden');overlay.setAttribute('aria-hidden','true');};
  $('receiptPrint').onclick=()=>window.print();
@@ -2403,7 +2402,6 @@ function downloadUserTransactionReceipt(data){
   rows.push(['Bank',data.bank_name||'Not provided'],['Account name',data.account_name||'Not provided'],['Account number',data.account_number||'Not provided']);
  }
  if(rejected)rows.push(['Rejection reason',data.rejection_reason||'No reason was provided']);
- if(data.kind==='withdrawal'&&!rejected)rows.push(['Important notice','Approval confirms review only; it is not proof that funds have arrived in your bank account.']);
  const wrap=(value,max,font)=>{
   ctx.font=font;const words=String(value??'').split(/\s+/),out=[];let line='';
   for(const word of words){const next=line?line+' '+word:word;if(ctx.measureText(next).width>max&&line){out.push(line);line=word;}else line=next;}
