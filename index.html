@@ -584,9 +584,10 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
     <div class="admin-section" id="adminWalletCreditSection">
      <h3 style="color:#12a875">ISSUE BONUS / COMPENSATION CREDIT</h3>
      <p class="muted">Admin-only wallet credit. Review the selected user, amount and message before confirming.</p>
-     <input id="creditUserSearch" type="search" placeholder="Search user by name, email or phone">
-     <button type="button" id="searchCreditUsers" class="secondary">Search users</button>
-     <select id="creditUserSelect"><option value="">Select a user</option></select>
+     <input id="creditUserSearch" type="search" placeholder="Search a user or select a user" autocomplete="off" aria-label="Search or select a registered user" aria-expanded="false" aria-controls="creditUserDropdown">
+     <div id="creditUserDropdown" class="hidden" role="listbox" aria-label="Registered users" style="max-height:240px;overflow-y:auto;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#172b4d;margin-top:4px"></div>
+     <button type="button" id="searchCreditUsers" class="secondary">Refresh user list</button>
+     <select id="creditUserSelect" hidden><option value="">Select a user</option></select>
      <label>Credit type</label>
      <select id="creditType"><option value="bonus">Bonus</option><option value="compensation">Compensation</option></select>
      <label>Amount (₦)</label><input id="creditAmount" type="text" inputmode="numeric" autocomplete="off" placeholder="Enter amount">
@@ -1979,18 +1980,72 @@ function updateCreditMessage(){
  $('creditMessage').value=TRUSTBET_CREDIT_MESSAGES[type];
 }
 if($('creditType'))$('creditType').onchange=updateCreditMessage;
-if($('searchCreditUsers'))$('searchCreditUsers').onclick=async()=>{
+let creditRegisteredUsers=[];
+let creditUsersLoading=false;
+function renderCreditUserDropdown(){
+ const input=$('creditUserSearch'),dropdown=$('creditUserDropdown'),select=$('creditUserSelect');
+ if(!input||!dropdown||!select)return;
+ const q=input.value.trim().toLowerCase();
+ const matches=creditRegisteredUsers.filter(p=>[p.full_name,p.email,p.phone].some(v=>String(v||'').toLowerCase().includes(q)));
+ dropdown.innerHTML='';
+ if(!matches.length){
+  const empty=document.createElement('div');empty.textContent=creditUsersLoading?'Loading registered users...':'No matching registered users found.';
+  empty.style.cssText='padding:12px;color:#64748b';dropdown.append(empty);
+ }else{
+  matches.forEach(p=>{
+   const option=document.createElement('button');option.type='button';option.setAttribute('role','option');
+   option.style.cssText='display:block;width:100%;text-align:left;background:#fff;color:#172b4d;border:0;border-bottom:1px solid #e2e8f0;padding:11px 12px;border-radius:0;cursor:pointer';
+   const displayName=p.full_name||p.email||p.phone||'User';
+   option.textContent=displayName+' · '+(p.email||p.phone||p.id);
+   option.onmousedown=e=>e.preventDefault();
+   option.onclick=()=>{
+    const item=document.createElement('option');item.value=p.id;item.textContent=displayName+' · '+(p.email||p.phone||p.id);
+    select.innerHTML='';select.append(item);select.value=p.id;
+    input.value=displayName+' · '+(p.email||p.phone||p.id);
+    dropdown.classList.add('hidden');input.setAttribute('aria-expanded','false');
+    say('walletCreditMsg','Selected: '+displayName);
+   };
+   dropdown.append(option);
+  });
+ }
+ dropdown.classList.remove('hidden');input.setAttribute('aria-expanded','true');
+}
+async function loadCreditRegisteredUsers(){
  if(!isAdmin())return say('walletCreditMsg','Administrator access required.',true);
- const q=$('creditUserSearch').value.trim();
- if(q.length<2)return say('walletCreditMsg','Enter at least 2 characters to search.',true);
- say('walletCreditMsg','Searching users...');
- const safe=q.replace(/[,%_]/g,' ');
- const{data,error}=await supabase.from('profiles').select('id,full_name,email,phone').or('full_name.ilike.%'+safe+'%,email.ilike.%'+safe+'%,phone.ilike.%'+safe+'%').limit(30);
- if(error)return say('walletCreditMsg','Could not search users: '+error.message,true);
- const select=$('creditUserSelect');select.innerHTML='<option value="">Select a user</option>';
- (data||[]).forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=(p.full_name||p.email||p.phone||'User')+' · '+(p.email||p.phone||p.id);select.append(o);});
- say('walletCreditMsg',(data||[]).length+' matching users found.');
-};
+ if(creditUsersLoading)return;
+ creditUsersLoading=true;
+ renderCreditUserDropdown();
+ say('walletCreditMsg','Loading all registered users...');
+ try{
+  const all=[];let from=0;const pageSize=500;
+  while(true){
+   const{data,error}=await supabase.from('profiles').select('id,full_name,email,phone').order('full_name',{ascending:true}).range(from,from+pageSize-1);
+   if(error)throw error;
+   all.push(...(data||[]));
+   if(!data||data.length<pageSize)break;
+   from+=pageSize;
+  }
+  creditRegisteredUsers=all;
+  renderCreditUserDropdown();
+  say('walletCreditMsg',all.length+' registered users loaded. Tap a name to select it.');
+ }catch(error){
+  creditRegisteredUsers=[];
+  renderCreditUserDropdown();
+  say('walletCreditMsg','Could not load registered users: '+(error.message||error),true);
+ }finally{creditUsersLoading=false;}
+}
+if($('creditUserSearch')){
+ $('creditUserSearch').onfocus=()=>{if(!creditRegisteredUsers.length)loadCreditRegisteredUsers();else renderCreditUserDropdown();};
+ $('creditUserSearch').oninput=()=>renderCreditUserDropdown();
+ $('creditUserSearch').onkeydown=e=>{if(e.key==='Escape'){$('creditUserDropdown').classList.add('hidden');$('creditUserSearch').setAttribute('aria-expanded','false');}};
+}
+if($('searchCreditUsers'))$('searchCreditUsers').onclick=loadCreditRegisteredUsers;
+document.addEventListener('click',e=>{
+ const input=$('creditUserSearch'),dropdown=$('creditUserDropdown');
+ if(input&&dropdown&&!input.contains(e.target)&&!dropdown.contains(e.target)){
+  dropdown.classList.add('hidden');input.setAttribute('aria-expanded','false');
+ }
+});
 if($('issueWalletCredit'))$('issueWalletCredit').onclick=async()=>{
  if(!isAdmin())return say('walletCreditMsg','Administrator access required.',true);
  const userId=$('creditUserSelect').value,amount=readAmountInput('creditAmount'),type=$('creditType').value,message=TRUSTBET_CREDIT_MESSAGES[type];
