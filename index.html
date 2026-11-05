@@ -961,8 +961,10 @@ async function profileLoad(authUser){
  if(!data){say('authMsg','Login succeeded, but no profile record exists for this account. Please contact the site administrator.',true);return false;}
  user=authUser;profile={...data,virtual_balance:Number(data.virtual_balance||0),role:data.role||'user'};
  updateBalances(data.virtual_balance);
- const welcomeIdentity=authUser.email||authUser.phone||data.phone||data.email||'USER';
- $('welcome').textContent='WELCOME, '+welcomeName(welcomeIdentity);
+ const welcomeDisplayName=authUser.email
+  ?(String(data.dashboard_display_name||'').trim().replace(/\s+/g,' ').toUpperCase()||welcomeName(authUser.email))
+  :welcomeName(authUser.phone||data.phone||'USER');
+ $('welcome').textContent='WELCOME, '+welcomeDisplayName;
  $('accountEmail').textContent=maskEmail(data.email||authUser.email||authUser.phone||'');
  $('auth').classList.add('hidden');
  $('app').classList.remove('hidden');
@@ -1790,9 +1792,9 @@ async function reviewWithdrawal(id,decision,approveButton,rejectButton){
 
 /* Admin registered-user management */
 let adminUserCache=[];
-async function adminUserAction(action,userId){
+async function adminUserAction(action,userId,extra={}){
  if(!isAdmin())throw new Error('Administrator access required.');
- const{data,error}=await supabase.functions.invoke('admin-users',{body:{action,userId}});
+ const{data,error}=await supabase.functions.invoke('admin-users',{body:{action,userId,...extra}});
  if(error)throw error;
  if(data?.error)throw new Error(data.error);
  return data;
@@ -1802,7 +1804,8 @@ function renderAdminUsers(){
  const q=String($('adminUserSearch')?.value||'').trim().toLowerCase();
  const filtered=adminUserCache.filter(item=>{
   const name=item.profile?.full_name||'';
-  return (name+' '+item.email+' '+(item.profile?.phone||'')).toLowerCase().includes(q);
+  const welcome=item.email?(item.profile?.dashboard_display_name||welcomeName(item.email)):'';
+  return (name+' '+welcome+' '+item.email+' '+(item.profile?.phone||'')).toLowerCase().includes(q);
  });
  area.innerHTML='';
  if(!filtered.length){area.textContent=q?'No users match that search.':'No registered users found.';return;}
@@ -1823,6 +1826,42 @@ function renderAdminUsers(){
   details.append(status);
   details.style.display='block';
   info.append(name,details);
+  if(item.email&&item.email.includes('@')){
+   const welcomeEditor=document.createElement('div');
+   welcomeEditor.style.cssText='margin-top:9px;padding:10px;border:1px solid #dce5f1;border-radius:10px;background:#f8fbff';
+   const welcomeLabel=document.createElement('small');
+   welcomeLabel.style.cssText='display:block;font-weight:900;color:#334d70;margin-bottom:5px';
+   welcomeLabel.textContent='HOMEPAGE WELCOME NAME';
+   const welcomePreview=document.createElement('div');
+   welcomePreview.style.cssText='font-size:12px;font-weight:900;color:#102d59;margin-bottom:7px';
+   const currentWelcome=()=>String(item.profile?.dashboard_display_name||welcomeName(item.email)).trim().replace(/\s+/g,' ').toUpperCase();
+   welcomePreview.textContent='WELCOME, '+currentWelcome();
+   const welcomeInput=document.createElement('input');
+   welcomeInput.type='text';welcomeInput.maxLength=60;welcomeInput.autocomplete='off';
+   welcomeInput.setAttribute('aria-label','Edit homepage welcome name');
+   welcomeInput.placeholder='Enter corrected name';
+   welcomeInput.value=currentWelcome();
+   welcomeInput.style.margin='0 0 7px';
+   const welcomeActions=document.createElement('div');welcomeActions.className='row';
+   const saveWelcome=document.createElement('button');saveWelcome.type='button';saveWelcome.className='secondary';saveWelcome.textContent='Save welcome name';
+   const welcomeStatus=document.createElement('small');welcomeStatus.style.cssText='display:block;margin-top:6px;color:#64748b';
+   saveWelcome.onclick=async()=>{
+    if(!isAdmin())return;
+    const displayName=welcomeInput.value.trim().replace(/\s+/g,' ').toUpperCase();
+    if(displayName.length>60){welcomeStatus.textContent='Name must be 60 characters or fewer.';return;}
+    saveWelcome.disabled=true;welcomeStatus.textContent='Saving…';
+    try{
+     const result=await adminUserAction('set-welcome-name',item.id,{displayName});
+     item.profile=item.profile||{};
+     item.profile.dashboard_display_name=result.dashboard_display_name||null;
+     welcomeInput.value=displayName||welcomeName(item.email);
+     welcomePreview.textContent='WELCOME, '+(displayName||welcomeName(item.email));
+     welcomeStatus.textContent='Saved. No user notification was sent.';
+    }catch(error){welcomeStatus.textContent='Could not save: '+(error.message||error);}
+    finally{saveWelcome.disabled=false;}
+   };
+   welcomeActions.append(saveWelcome);welcomeEditor.append(welcomeLabel,welcomePreview,welcomeInput,welcomeActions,welcomeStatus);info.append(welcomeEditor);
+  }
   const actions=document.createElement('div');actions.className='row';
   const toggle=document.createElement('button');toggle.className='secondary';toggle.textContent=banned?'Unban':'Ban';
   toggle.onclick=async()=>{
