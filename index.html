@@ -205,6 +205,23 @@ footer{text-align:center;padding:24px 24px 90px;color:var(--muted);font-size:12p
 .admin-bank-editor input{background:#fff;color:var(--ink);margin-bottom:7px}
 .bank-note{color:#d5e6fb;font-size:11px;line-height:1.5;margin:10px 0 0}
 .admin-section{border:1px solid #102d59;border-radius:12px;padding:14px;margin:17px 0 19px;background:#f8fbff}
+.odds-admin-panel{border:1px solid #cbd9eb;background:linear-gradient(180deg,#fff,#f7faff);box-shadow:0 8px 24px #102d5910}
+.odds-admin-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.odds-admin-heading h3{margin:0;color:#102d59;letter-spacing:.5px}
+.odds-admin-heading p{margin:7px 0 12px}
+.odds-admin-count{padding:7px 10px;border-radius:999px;background:#eaf2fd;color:#174b88;font-size:10px;font-weight:900;letter-spacing:.8px;white-space:nowrap}
+.odds-admin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.odds-admin-game{min-width:0;padding:13px;border:1px solid #dce6f2;border-radius:12px;background:#fff}
+.odds-admin-game h4{margin:0 0 10px;color:#173d70;font-size:14px}
+.odds-admin-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.odds-admin-field{min-width:0}
+.odds-admin-field label{display:block;font-size:10px;letter-spacing:.35px;margin:0 0 4px}
+.odds-admin-field input{margin:0;padding:10px 9px;font-size:15px;min-width:0}
+.odds-admin-actions{display:flex;gap:9px;margin-top:13px}
+.odds-admin-actions button{flex:1}
+#adminGameOddsStatus{margin:10px 0 0;min-height:18px}
+@media(max-width:560px){.odds-admin-grid{grid-template-columns:1fr}.odds-admin-actions{flex-direction:column}.odds-admin-actions button{width:100%}}
+
 .admin-support-notice{border:2px solid #d62839;border-radius:12px;padding:12px 14px;margin:10px 0;background:#fffafa;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .admin-support-notice .support-notice-text{flex:1;min-width:0}.admin-support-preview{display:block;color:#53647c;font-size:12px;line-height:1.4;margin-top:5px;overflow-wrap:anywhere}.admin-support-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:5px;font-size:11px;color:#78869c}.admin-support-notice.has-unread{background:#fff5f5;border-color:#d62839}.admin-support-notice:not(.has-unread){border-color:#dce5f0;background:#fff}.customer-chat-notice{display:flex;align-items:center;gap:9px;margin:7px 0 12px;padding:10px 12px;border:1px solid #d9e5f3;border-radius:12px;background:#f7faff;color:#173d70;font-size:12px;line-height:1.4}.customer-chat-notice.unread{border-color:#e6a1a8;background:#fff7f7}.customer-chat-notice .notice-count{flex-shrink:0;min-width:21px;height:21px;padding:0 6px;border-radius:20px;background:#d62839;color:#fff;font-size:11px;font-weight:900;display:grid;place-items:center}.customer-chat-notice .notice-preview{min-width:0;flex:1;overflow-wrap:anywhere}.customer-chat-notice .notice-time{display:block;color:#78869c;font-size:10px;margin-top:2px}
 .admin-support-bell{display:inline-flex;align-items:center;gap:5px;flex-shrink:0;font-size:20px;line-height:1}
@@ -577,6 +594,12 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
    <h2>👤 Account</h2><p id="accountEmail"></p>
    <div id="adminArea" class="hidden">
     <h3>🛠️ Admin Dashboard</h3>
+    <div class="admin-section odds-admin-panel" id="adminGameOddsPanel">
+     <div class="odds-admin-heading"><div><h3>GAME ODDS CONTROL</h3><p class="muted">Manage every selection across all 10 games. Saved odds update the customer game screens and the secure betting calculation.</p></div><span class="odds-admin-count">10 GAMES</span></div>
+     <div id="adminGameOddsEditor" class="odds-admin-grid"><p class="muted">Loading current odds…</p></div>
+     <div class="odds-admin-actions"><button id="saveAdminGameOdds" type="button">SAVE ALL ODDS</button><button id="refreshAdminGameOdds" type="button" class="secondary">REFRESH</button></div>
+     <p id="adminGameOddsStatus" class="muted" role="status" aria-live="polite">Changes are not active until you save.</p>
+    </div>
     <div class="admin-section" id="registrationRulesAdminSection" style="border:2px solid #102d59;background:#f8fbff">
      <h3 id="registrationRulesReadOnlyOpen" role="button" tabindex="0" aria-haspopup="dialog" aria-controls="registrationRulesReadOnlyPanel" style="background-color:#dc2626;color:#fff;padding:10px 12px;border-radius:8px;cursor:pointer">REGISTRATION RULES · PREVIEW ONLY</h3>
           <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0">
@@ -885,6 +908,70 @@ const games=[
 {id:'penalty_shootout',name:'Penalty Shootout',icon:'⚽',cat:'Sports',count:5,odds:[['🔥 HIGH',20.5],['😎 MEDIUM',9.5],['😌 LOW',4.6],['🥹 OOPS',2.6],['💎 SPECIAL ODDS',100,true]]}
 ];
 
+async function loadGameOdds(){
+ const {data,error}=await supabase.rpc('get_trustbet_game_odds');
+ if(error)throw error;
+ if(!Array.isArray(data)||data.length!==35)throw new Error('The saved odds list is incomplete.');
+ games.forEach(g=>{
+  const rows=data.filter(row=>row.game_id===g.id).sort((a,b)=>Number(a.sort_order||0)-Number(b.sort_order||0));
+  if(!rows.length)throw new Error('Odds are missing for '+g.name+'.');
+  g.odds.splice(0,g.odds.length,...rows.map(row=>[
+   row.selection_label,
+   Number(row.odds_multiplier),
+   row.selection_key==='SPECIAL ODDS'
+  ]));
+ });
+ if(isAdmin())renderAdminOddsEditor();
+ return true;
+}
+function renderAdminOddsEditor(){
+ const area=$('adminGameOddsEditor');if(!area||!isAdmin())return;
+ area.innerHTML='';
+ games.forEach(g=>{
+  const card=document.createElement('section');card.className='odds-admin-game';
+  const title=document.createElement('h4');title.textContent=g.icon+' '+g.name;
+  const options=document.createElement('div');options.className='odds-admin-options';
+  g.odds.forEach(odd=>{
+   const key=String(odd[0]).replace(/[^A-Z ]/g,'').trim().replace(/\\s+/g,' ').toUpperCase();
+   const field=document.createElement('div');field.className='odds-admin-field';
+   const label=document.createElement('label');label.textContent=odd[0]+' · MULTIPLIER';
+   const input=document.createElement('input');input.type='number';input.inputMode='decimal';input.min='0.01';input.max='1000';input.step='0.01';input.required=true;input.value=Number(odd[1]).toString();input.dataset.gameId=g.id;input.dataset.selectionKey=key;input.setAttribute('aria-label',g.name+' '+odd[0]+' odds multiplier');
+   field.append(label,input);options.append(field);
+  });
+  card.append(title,options);area.append(card);
+ });
+}
+async function saveAdminGameOdds(){
+ if(!isAdmin())return alert('Administrator access required.');
+ const inputs=[...document.querySelectorAll('#adminGameOddsEditor input[data-game-id]')];
+ if(inputs.length!==35)return say('adminGameOddsStatus','Could not save: all 35 odds values must be present.',true);
+ const updates=[];
+ for(const input of inputs){
+  const value=Number(input.value);
+  if(!Number.isFinite(value)||value<=0||value>1000)return say('adminGameOddsStatus','Enter a valid multiplier greater than 0 and no more than 1000 for every option.',true);
+  updates.push({game_id:input.dataset.gameId,selection_key:input.dataset.selectionKey,odds_multiplier:value});
+ }
+ const save=$('saveAdminGameOdds'),refresh=$('refreshAdminGameOdds');
+ save.disabled=true;refresh.disabled=true;save.textContent='SAVING…';
+ say('adminGameOddsStatus','Saving odds securely…');
+ try{
+  const {data,error}=await supabase.rpc('admin_update_trustbet_game_odds',{p_updates:updates});
+  if(error)throw error;
+  if(!data||data.success!==true||Number(data.updated)!==35)throw new Error('The server did not confirm all 35 odds updates.');
+  await loadGameOdds();
+  const stamp=data.updated_at?new Date(data.updated_at).toLocaleString():'just now';
+  say('adminGameOddsStatus','Saved successfully · 35 odds across 10 games · Updated '+stamp+'. Customer game screens and new bet calculations now use these values.');
+ }catch(error){say('adminGameOddsStatus','Save failed: '+(error.message||error),true);}
+ finally{save.disabled=false;refresh.disabled=false;save.textContent='SAVE ALL ODDS';}
+}
+$('saveAdminGameOdds').onclick=saveAdminGameOdds;
+$('refreshAdminGameOdds').onclick=async()=>{
+ const button=$('refreshAdminGameOdds');button.disabled=true;
+ try{await loadGameOdds();say('adminGameOddsStatus','Current saved odds loaded. Unsaved edits were replaced.');}
+ catch(error){say('adminGameOddsStatus','Could not refresh odds: '+(error.message||error),true);}
+ finally{button.disabled=false;}
+};
+
 const money=n=>'₦'+Number(n||0).toLocaleString('en-NG',{maximumFractionDigits:0});
 
 function say(id,message,isError=false){
@@ -1039,6 +1126,7 @@ async function profileLoad(authUser){
  $('adminBankEditor').classList.toggle('hidden',!isAdmin());
  banks();render();renderHome();exStatus();updateLockNotice();
  go('home');
+ try{await loadGameOdds();}catch(error){console.error('Could not load saved game odds:',error);}
  await loadBankDetails();
  if(isAdmin()){await refreshRegistrationRuleControls();await adminDeposits();await adminWithdrawals();await adminSelfExclusion();await adminAccountDeletionRequests();await adminUsers();await adminPhoneApprovals();}
  await adminInbox();
