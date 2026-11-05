@@ -206,7 +206,7 @@ footer{text-align:center;padding:24px 24px 90px;color:var(--muted);font-size:12p
 .bank-note{color:#d5e6fb;font-size:11px;line-height:1.5;margin:10px 0 0}
 .admin-section{border:1px solid #102d59;border-radius:12px;padding:14px;margin:17px 0 19px;background:#f8fbff}
 .admin-support-notice{border:2px solid #d62839;border-radius:12px;padding:12px 14px;margin:10px 0;background:#fffafa;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.admin-support-notice .support-notice-text{flex:1;min-width:0}
+.admin-support-notice .support-notice-text{flex:1;min-width:0}.admin-support-preview{display:block;color:#53647c;font-size:12px;line-height:1.4;margin-top:5px;overflow-wrap:anywhere}.admin-support-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:5px;font-size:11px;color:#78869c}.admin-support-notice.has-unread{background:#fff5f5;border-color:#d62839}.admin-support-notice:not(.has-unread){border-color:#dce5f0;background:#fff}.customer-chat-notice{display:flex;align-items:center;gap:9px;margin:7px 0 12px;padding:10px 12px;border:1px solid #d9e5f3;border-radius:12px;background:#f7faff;color:#173d70;font-size:12px;line-height:1.4}.customer-chat-notice.unread{border-color:#e6a1a8;background:#fff7f7}.customer-chat-notice .notice-count{flex-shrink:0;min-width:21px;height:21px;padding:0 6px;border-radius:20px;background:#d62839;color:#fff;font-size:11px;font-weight:900;display:grid;place-items:center}.customer-chat-notice .notice-preview{min-width:0;flex:1;overflow-wrap:anywhere}.customer-chat-notice .notice-time{display:block;color:#78869c;font-size:10px;margin-top:2px}
 .admin-support-bell{display:inline-flex;align-items:center;gap:5px;flex-shrink:0;font-size:20px;line-height:1}
 .admin-support-bell-count{color:#d00000;font-size:14px;font-weight:900;min-width:12px;text-align:center}
 .account-info-box{border:1px solid #102d59;border-radius:12px;padding:16px;margin:18px 0 22px;background:#f8fbff}
@@ -672,7 +672,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
   </div>
   <div class="card account-info-box">
    <h2>🎧 Customer Support</h2><p><b style="color:var(--green)">🟢 ACTIVE 24/7</b></p>
-   <a class="support-link" href="#" id="chatOpen"><span class="emoji">💬</span><span><b>Live Chat</b><small>Private chat with support</small></span></a>
+   <a class="support-link" href="#" id="chatOpen"><span class="emoji">💬</span><span><b>Live Chat</b><small>Private chat with support</small></span></a><div id="customerChatNotice" class="customer-chat-notice hidden" aria-live="polite"></div>
    <button type="button" id="openLiveChatButton" class="wide" style="background:#102d59;border:1px solid #102d59;color:#fff;margin:0 0 8px" onclick="document.getElementById('chatOpen').click()">Open Live Chat</button>
    <div class="card hidden" id="chatPanel">
    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><h2>💬 Live Chat</h2><button type="button" id="closeChatPanel" class="secondary" style="padding:7px 11px">Close</button></div>
@@ -2733,7 +2733,7 @@ async function chatLoad(){
  const retentionDays=isAdmin()?365:7;
  const visibleAfter=new Date(Date.now()-retentionDays*24*60*60*1000).toISOString();
  const{data,error}=await supabase.from('support_messages')
-  .select('sender_id,message,created_at,read_at,attachment_path,attachment_name,attachment_mime,attachment_size')
+  .select('sender_id,sender_role,message,created_at,read_at,attachment_path,attachment_name,attachment_mime,attachment_size')
   .eq('conversation_id',conversation.id).gte('created_at',visibleAfter).order('created_at');
  if(error)return say('chatMsg',error.message,true);
  $('chatMessages').innerHTML='';
@@ -2775,6 +2775,13 @@ async function chatLoad(){
   d.append(s);$('chatMessages').append(d);
  }
  $('chatMessages').scrollTop=$('chatMessages').scrollHeight;
+ if(!isAdmin()&&!$('chatPanel').classList.contains('hidden')){
+  const unreadIds=(data||[]).filter(m=>m.sender_role==='admin'&&!m.read_at).map(m=>m.created_at);
+  if(unreadIds.length){
+   const{error:readError}=await supabase.from('support_messages').update({read_at:new Date().toISOString()}).eq('conversation_id',conversation.id).eq('sender_role','admin').is('read_at',null);
+   if(!readError)refreshCustomerChatNotice();
+  }
+ }
 }
 $('chatInput').addEventListener('input',()=>{
  const limit=isAdmin()?2000:1000;
@@ -2848,8 +2855,38 @@ async function loadSupportCustomerIdentity(customerId){
  ];
  box.textContent=lines.join('  |  ');
 }
+let customerSupportNoticeChannel=null;
+function formatSupportNoticeTime(value){
+ if(!value)return '';
+ const date=new Date(value);if(Number.isNaN(date.getTime()))return '';
+ const seconds=Math.max(0,Math.floor((Date.now()-date.getTime())/1000));
+ if(seconds<60)return 'Just now';if(seconds<3600)return Math.floor(seconds/60)+' min ago';
+ if(seconds<86400)return Math.floor(seconds/3600)+' hr ago';
+ return date.toLocaleDateString();
+}
+async function refreshCustomerChatNotice(){
+ if(isAdmin()||!user?.id)return;
+ const box=$('customerChatNotice');if(!box)return;
+ const{data:conv,error}=await supabase.from('support_conversations').select('id,last_message_at').eq('user_id',user.id).eq('status','open').order('created_at',{ascending:false}).limit(1).maybeSingle();
+ if(error||!conv){box.classList.add('hidden');return;}
+ const{data:messages}=await supabase.from('support_messages').select('message,sender_role,created_at,read_at').eq('conversation_id',conv.id).order('created_at',{ascending:false}).limit(1);
+ const{count}=await supabase.from('support_messages').select('id',{count:'exact',head:true}).eq('conversation_id',conv.id).eq('sender_role','admin').is('read_at',null);
+ const latest=messages?.[0];const unread=Number(count||0);
+ box.classList.remove('hidden');box.classList.toggle('unread',unread>0);
+ box.innerHTML='';
+ const badge=document.createElement('span');badge.className='notice-count';badge.textContent=unread>99?'99+':String(unread);badge.setAttribute('aria-label',unread+' unread support messages');
+ const preview=document.createElement('span');preview.className='notice-preview';
+ const strong=document.createElement('b');strong.textContent=unread?'New support reply':'Latest support chat';preview.append(strong);
+ const line=document.createElement('span');line.textContent=latest?(latest.message&&latest.message!=='Attachment'?latest.message:'📎 Attachment'):'Your private support conversation';preview.append(document.createElement('br'),line);
+ const time=document.createElement('small');time.className='notice-time';time.textContent=formatSupportNoticeTime(latest?.created_at||conv.last_message_at);preview.append(time);
+ box.append(badge,preview);
+ if(customerSupportNoticeChannel)supabase.removeChannel(customerSupportNoticeChannel);
+ customerSupportNoticeChannel=supabase.channel('trustbet-customer-support-notice-'+conv.id)
+  .on('postgres_changes',{event:'*',schema:'public',table:'support_messages',filter:'conversation_id=eq.'+conv.id},()=>refreshCustomerChatNotice())
+  .subscribe();
+}
 async function adminInbox(){
- if(!isAdmin())return;
+ if(!isAdmin()){await refreshCustomerChatNotice();return;}
  const{data,error}=await supabase.from('support_conversations')
   .select('id,user_id,subject,status,admin_unread_count,last_message_at')
   .order('last_message_at',{ascending:false});
@@ -2867,11 +2904,22 @@ async function adminInbox(){
    const accountType=data.email?'EMAIL ACCOUNT':'PHONE ACCOUNT';
    identity.textContent='UID: '+(data.trustbet_uid??'Unavailable')+' · '+String(accountName).toUpperCase()+' · '+accountType+(data.phone?' · '+data.phone:'')+(data.email?' · '+data.email:'');
   }).catch(()=>{identity.textContent='CUSTOMER DETAILS UNAVAILABLE';});
+  const preview=document.createElement('div');preview.className='admin-support-preview';preview.textContent='Loading latest message…';
+  const meta=document.createElement('div');meta.className='admin-support-meta';
+  const time=document.createElement('span');time.textContent=formatSupportNoticeTime(c.last_message_at)||'No recent activity';
+  const unreadMeta=document.createElement('span');unreadMeta.textContent=Number(c.admin_unread_count||0)>0?'Unread conversation':'No unread messages';
+  meta.append(time,unreadMeta);d.classList.toggle('has-unread',Number(c.admin_unread_count||0)>0);
+  supabase.from('support_messages').select('message,sender_role,created_at').eq('conversation_id',c.id).order('created_at',{ascending:false}).limit(1).maybeSingle().then(({data:lastMessage})=>{
+   if(!lastMessage){preview.textContent='No messages yet';return;}
+   const who=lastMessage.sender_role==='admin'?'Admin: ':'Customer: ';
+   preview.textContent=who+(lastMessage.message&&lastMessage.message!=='Attachment'?lastMessage.message:'📎 Attachment');
+   time.textContent=formatSupportNoticeTime(lastMessage.created_at);
+  }).catch(()=>{preview.textContent='Latest message unavailable';});
   const bell=document.createElement('span');bell.className='admin-support-bell';bell.setAttribute('aria-label','Unread support notifications');
   bell.textContent='🔔';
   const count=document.createElement('span');count.className='admin-support-bell-count';
   count.textContent=Number(c.admin_unread_count||0)>0?String(c.admin_unread_count):'';
-  bell.append(count);d.append(identity,label,bell);
+  bell.append(count);d.append(identity,label,preview,meta,bell);
   d.onclick=async()=>{
    conversation=c;moveSupportChatPanel('admin');$('chatPanel').classList.remove('hidden');
    await loadSupportCustomerIdentity(c.user_id);
