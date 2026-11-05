@@ -932,7 +932,7 @@ function renderAdminOddsEditor(){
   const title=document.createElement('h4');title.textContent=g.icon+' '+g.name;
   const options=document.createElement('div');options.className='odds-admin-options';
   g.odds.forEach(odd=>{
-   const key=String(odd[0]).replace(/[^A-Z ]/g,'').trim().replace(/\\s+/g,' ').toUpperCase();
+   const key=String(odd[0]).replace(/[^A-Z ]/g,'').trim().toUpperCase();
    const field=document.createElement('div');field.className='odds-admin-field';
    const label=document.createElement('label');label.textContent=odd[0]+' · MULTIPLIER';
    const input=document.createElement('input');input.type='number';input.inputMode='decimal';input.min='0.01';input.max='1000';input.step='0.01';input.required=true;input.value=Number(odd[1]).toString();input.dataset.gameId=g.id;input.dataset.selectionKey=key;input.setAttribute('aria-label',g.name+' '+odd[0]+' odds multiplier');
