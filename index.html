@@ -126,6 +126,13 @@ nav button.active{background:linear-gradient(135deg,#102d59,#2475d0);color:#fff;
 .chat-list{max-height:300px;overflow:auto;border:1px solid #e0e8f2;border-radius:13px;padding:10px;background:#fcfdff}
 .bubble{padding:10px;border-radius:10px;background:#eef4fc;border:1px solid #e0eaf6;margin:7px;max-width:88%;font-size:13px}
 .mine{margin-left:auto;background:#e4eefb}.bubble small{display:block;color:var(--muted)}
+.chat-attachment-tools{display:flex;flex-direction:column;gap:6px;margin:9px 0}
+.chat-attachment-tools input[type=file]{width:100%;font-size:12px;padding:8px;background:#f7faff;border:1px solid #dce7f5;border-radius:9px}
+.chat-attachment-tools small{color:var(--muted);font-size:11px}
+.chat-attachment-preview{font-size:12px;color:#174b88;overflow-wrap:anywhere}
+.chat-customer-identity{padding:10px 12px;margin:8px 0;border:1px solid #cbd9eb;border-radius:10px;background:#f2f6fc;color:#102d59;font-size:12px;line-height:1.6;overflow-wrap:anywhere}
+.chat-attachment-image{display:block;max-width:100%;max-height:240px;object-fit:contain;border-radius:8px;margin:8px 0;border:1px solid #dce7f5}
+.chat-attachment-link{display:inline-block;margin:7px 0;padding:8px 10px;border:1px solid #cbd9eb;border-radius:8px;background:#fff;color:#174b88;font-weight:800;text-decoration:none;overflow-wrap:anywhere}
 .conversation{padding:12px;border:1px solid #e0e8f2;border-radius:9px;margin:7px 0;cursor:pointer;background:#fcfdff}
 .notification-panel{position:absolute;right:5%;top:66px;width:min(390px,90vw);max-height:70vh;overflow:auto;background:#fff;color:var(--ink);border:1px solid #dce5f1;border-radius:17px;box-shadow:0 18px 45px #102d5928;padding:15px;z-index:30}
 .notification-item{padding:12px 4px;border-bottom:1px solid var(--line)}
@@ -663,9 +670,15 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
    <button type="button" id="openLiveChatButton" class="wide" style="background:#102d59;border:1px solid #102d59;color:#fff;margin:0 0 8px" onclick="document.getElementById('chatOpen').click()">Open Live Chat</button>
    <div class="card hidden" id="chatPanel">
    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><h2>💬 Live Chat</h2><button type="button" id="closeChatPanel" class="secondary" style="padding:7px 11px">Close</button></div>
+   <div id="chatCustomerIdentity" class="chat-customer-identity hidden"></div>
    <div id="chatMessages" class="chat-list"></div>
    <textarea id="chatInput" maxlength="1000" placeholder="Write your message (maximum 1,000 characters)"></textarea>
    <small id="chatCharCount" class="muted">0 / 1,000 characters</small>
+   <div class="chat-attachment-tools">
+    <input id="chatAttachment" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/heic,image/heif,application/pdf" aria-label="Attach a photo or PDF">
+    <small>Photos and PDF only · Maximum 10 MB per upload</small>
+    <span id="chatAttachmentPreview" class="chat-attachment-preview"></span>
+   </div>
    <button id="sendChat" class="wide">Send message</button><p id="chatMsg" class="msg"></p>
    </div>
    <a class="support-link" href="https://wa.me/2347063593605" target="_blank" rel="noopener"><span class="emoji">📱</span><span><b>WhatsApp</b><small>+234 706 359 3605 · <span class="whatsapp-open-hint">Open WhatsApp app</span></small></span></a><button type="button" class="copy-support-whatsapp">Copy support WhatsApp number</button>
@@ -2687,17 +2700,30 @@ async function chatLoad(){
  const retentionDays=isAdmin()?365:7;
  const visibleAfter=new Date(Date.now()-retentionDays*24*60*60*1000).toISOString();
  const{data,error}=await supabase.from('support_messages')
-  .select('sender_id,message,created_at,read_at')
+  .select('sender_id,message,created_at,read_at,attachment_path,attachment_name,attachment_mime,attachment_size')
   .eq('conversation_id',conversation.id).gte('created_at',visibleAfter).order('created_at');
  if(error)return say('chatMsg',error.message,true);
  $('chatMessages').innerHTML='';
- (data||[]).forEach(m=>{
+ for(const m of (data||[])){
   const d=document.createElement('div');d.className='bubble '+(m.sender_id===user.id?'mine':'');
-  d.textContent=m.message;
+  if(m.message&&m.message!=='Attachment'){
+   const body=document.createElement('div');body.textContent=m.message;d.append(body);
+  }
+  if(m.attachment_path){
+   const {data:signed,error:signedError}=await supabase.storage.from('support-attachments').createSignedUrl(m.attachment_path,3600);
+   if(!signedError&&signed?.signedUrl){
+    if(m.attachment_mime?.startsWith('image/')&&!['image/heic','image/heif'].includes(m.attachment_mime)){
+     const img=document.createElement('img');img.className='chat-attachment-image';img.src=signed.signedUrl;img.alt=m.attachment_name||'Customer support attachment';img.loading='lazy';d.append(img);
+    }
+    const link=document.createElement('a');link.className='chat-attachment-link';link.href=signed.signedUrl;link.target='_blank';link.rel='noopener';link.textContent=(m.attachment_mime==='application/pdf'?'📄 ':'📎 ')+(m.attachment_name||'View attachment')+' · '+(m.attachment_size/1048576).toFixed(2)+' MB';d.append(link);
+   }else{
+    const unavailable=document.createElement('div');unavailable.textContent='Attachment unavailable';d.append(unavailable);
+   }
+  }
   const s=document.createElement('small');
   s.textContent=new Date(m.created_at).toLocaleString()+(m.sender_id===user.id?(m.read_at?' · Read':' · Sent'):'');
   d.append(s);$('chatMessages').append(d);
- });
+ }
  $('chatMessages').scrollTop=$('chatMessages').scrollHeight;
 }
 $('chatInput').addEventListener('input',()=>{
@@ -2705,20 +2731,42 @@ $('chatInput').addEventListener('input',()=>{
  if($('chatInput').value.length>limit)$('chatInput').value=$('chatInput').value.slice(0,limit);
  if($('chatCharCount'))$('chatCharCount').textContent=$('chatInput').value.length+' / '+limit+' characters';
 });
+const supportAllowedMimeTypes=['image/jpeg','image/png','image/webp','image/gif','image/heic','image/heif','application/pdf'];
+$('chatAttachment').addEventListener('change',()=>{
+ const file=$('chatAttachment').files?.[0];
+ $('chatAttachmentPreview').textContent=file?file.name+' · '+(file.size/1048576).toFixed(2)+' MB':'';
+});
 $('sendChat').onclick=async()=>{
  const limit=isAdmin()?2000:1000;
  const message=$('chatInput').value.trim();
- if(!message||!conversation)return;
+ const file=$('chatAttachment').files?.[0]||null;
+ if(!message&&!file)return;
+ if(!conversation)return say('chatMsg','Open a support conversation first.',true);
  if(message.length>limit)return say('chatMsg','Message limit is '+limit+' characters.',true);
+ if(file&&(!supportAllowedMimeTypes.includes(file.type)||file.size>10485760||file.size===0)){
+  return say('chatMsg',file.size>10485760?'File exceeds the 10 MB upload limit.':'Only photos and PDF files are allowed.',true);
+ }
  $('sendChat').disabled=true;
- const{error}=await supabase.from('support_messages').insert({
-  conversation_id:conversation.id,sender_id:user.id,
-  sender_role:isAdmin()?'admin':'user',message
- });
- $('sendChat').disabled=false;
- if(error)return say('chatMsg','Message was not sent: '+error.message,true);
- $('chatInput').value='';if($('chatCharCount'))$('chatCharCount').textContent='0 / '+limit+' characters';
- say('chatMsg','Message submitted');await chatLoad();resetSupportChatIdle();
+ let attachment=null;
+ try{
+  if(file){
+   const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,'_').slice(-120)||'attachment';
+   const path=conversation.id+'/'+crypto.randomUUID()+'-'+safeName;
+   const{error:uploadError}=await supabase.storage.from('support-attachments').upload(path,file,{contentType:file.type,upsert:false});
+   if(uploadError)throw uploadError;
+   attachment={attachment_path:path,attachment_name:file.name,attachment_mime:file.type,attachment_size:file.size};
+  }
+  const{error}=await supabase.from('support_messages').insert({
+   conversation_id:conversation.id,sender_id:user.id,
+   sender_role:isAdmin()?'admin':'user',message:message||'Attachment',
+   ...(attachment||{})
+  });
+  if(error)throw error;
+  $('chatInput').value='';$('chatAttachment').value='';$('chatAttachmentPreview').textContent='';
+  if($('chatCharCount'))$('chatCharCount').textContent='0 / '+limit+' characters';
+  say('chatMsg',file?'Attachment sent':'Message submitted');await chatLoad();resetSupportChatIdle();
+ }catch(error){say('chatMsg','Message or attachment was not sent: '+(error.message||error),true);}
+ finally{$('sendChat').disabled=false;}
 };
 document.querySelectorAll('.password-toggle').forEach(button=>button.onclick=()=>{const field=$(button.dataset.passwordTarget);const reveal=field.type==='password';field.type=reveal?'text':'password';button.textContent=reveal?'🙈':'👁';button.setAttribute('aria-label',reveal?'Hide password':'Show password');button.setAttribute('aria-pressed',String(reveal));});
 document.querySelectorAll('.copy-support-whatsapp').forEach(button=>button.onclick=async()=>{const number='+234 706 359 3605';try{if(navigator.clipboard&&window.isSecureContext)await navigator.clipboard.writeText(number);else{const field=document.createElement('textarea');field.value=number;field.readOnly=true;field.style.position='fixed';field.style.opacity='0';document.body.append(field);field.select();const ok=document.execCommand('copy');field.remove();if(!ok)throw new Error('Copy failed');}button.textContent='WhatsApp number copied';setTimeout(()=>button.textContent='Copy support WhatsApp number',1800);}catch(error){button.textContent='Copy failed — select number above';}});
