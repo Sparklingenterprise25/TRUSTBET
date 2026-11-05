@@ -1175,8 +1175,14 @@ $('phoneSignup').onclick=async()=>{
   $('phoneSignup').textContent='Create account';
   $('authMsg').innerHTML='';
   const success=document.createElement('div');
-  success.style.cssText='display:block;background:#047857;color:#fff;font-weight:900;white-space:pre-line;padding:16px;border-radius:8px';
-  success.textContent='REGISTRATION SUBMITTED SUCCESSFULLY! Your account registration has been received and is awaiting approval.You will be able to log in once your account has been approved. Thank you for choosing TRUSTBET.';
+  success.style.cssText='display:block;background:#047857;color:#fff;padding:16px;border-radius:8px';
+  const successTitle=document.createElement('h3');
+  successTitle.style.cssText='margin:0 0 12px;font-weight:900';
+  successTitle.textContent='REGISTRATION SUBMITTED SUCCESSFULLY!';
+  const successMessage=document.createElement('p');
+  successMessage.style.cssText='margin:0;font-weight:600;white-space:pre-line';
+  successMessage.textContent='Your account registration has been received and is awaiting approval.\\n\\nApproval may take between 30mins - 7 hours. Please check back later.\\n\\nYou will be able to log in once your account has been approved. Save the password you entered in a safe place so you can be able to log in next time.\\n\\nThank you for choosing TRUSTBET.';
+  success.append(successTitle,successMessage);
   const notice=document.createElement('div');
   notice.append(success);
   const closeButton=document.createElement('button');
