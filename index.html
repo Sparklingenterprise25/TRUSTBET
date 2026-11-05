@@ -2306,7 +2306,7 @@ $('notificationBell').onclick=async()=>{
  }
 };
 function notificationMessageText(message){
- return String(message||'').replace(/₦\\s*([\\d,]+(?:\\.\\d+)?)/g,(_,raw)=>money(Number(raw.replace(/,/g,''))));
+ return String(message||'').replace(/₦\s*([\d,]+(?:\.\d+)?)/g,(_,raw)=>money(Number(raw.replace(/,/g,''))));
 }
 function renderNotifications(items,unreadCount=null){
  const unread=Number.isFinite(unreadCount)?unreadCount:items.filter(x=>!x.is_read).length;
