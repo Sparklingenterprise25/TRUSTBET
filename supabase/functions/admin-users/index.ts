@@ -77,7 +77,9 @@ Deno.serve(async (req: Request) => {
       if (targetAuthError) return reply({ error: targetAuthError.message }, 500);
       if (!targetAuth.user?.email) return reply({ error: "Welcome-name corrections are available only for email accounts." }, 400);
       const displayName = String(body.displayName ?? "").trim().replace(/\s+/g, " ").toUpperCase();
-      if (displayName.length > 60) return reply({ error: "The welcome name must be 60 characters or fewer." }, 400);
+      if (displayName.length > 60 || !/^[A-Z]+(?: [A-Z]+)*$/.test(displayName)) {
+        return reply({ error: "The welcome name must contain letters A–Z only, with single spaces between names, and be 60 characters or fewer." }, 400);
+      }
       const { data: updated, error: updateError } = await admin
         .from("profiles")
         .update({ dashboard_display_name: displayName || null })
