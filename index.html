@@ -2772,8 +2772,10 @@ async function runRule2Signup(method){
       if(error){let message=error.message||'Phone registration failed.';try{const response=error.context;if(response&&typeof response.json==='function'){const body=await response.clone().json();message=body?.error||body?.message||message;}}catch{}throw new Error(message);}
       if(data?.error)throw new Error(data.error);
       close();$('phoneSignupNames').classList.add('hidden');$('phoneSignup').textContent='Create account';
-      const success=document.createElement('div');success.style.cssText='background:#047857;color:#fff;font-weight:900;white-space:pre-line;padding:16px;border-radius:8px;line-height:1.6';
-      success.textContent='REGISTRATION SUBMITTED SUCCESSFULLY! Your account registration has been received and is awaiting approval.You will be able to log in once your account has been approved. Thank you for choosing TRUSTBET.';
+      const success=document.createElement('div');success.style.cssText='background:#047857;color:#fff;padding:16px;border-radius:8px;line-height:1.6';
+      const successTitle=document.createElement('h3');successTitle.style.cssText='color:#fff;font-weight:900;margin:0 0 8px';successTitle.textContent='REGISTRATION SUBMITTED SUCCESSFULLY!';
+      const successMessage=document.createElement('p');successMessage.style.cssText='margin:0';successMessage.textContent='Your account registration has been received and is awaiting approval.You will be able to log in once your account has been approved. Thank you for choosing TRUSTBET.';
+      success.append(successTitle,successMessage);
       const notice=document.createElement('div');notice.style.cssText='position:fixed;inset:0;z-index:2700;background:#071a36e8;display:flex;align-items:center;justify-content:center;padding:18px';
       const card=document.createElement('div');card.style.cssText='width:min(100%,440px);background:#fff;border-radius:14px;padding:18px';const done=document.createElement('button');done.className='wide';done.textContent='CLOSE';done.onclick=()=>notice.remove();card.append(success,done);notice.append(card);document.body.append(notice);
       $('phoneFirstName').value='';$('phoneSurname').value='';
