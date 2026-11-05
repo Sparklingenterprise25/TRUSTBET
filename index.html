@@ -913,6 +913,12 @@ function maskEmail(email){
  if(local.length<=4)return '*'.repeat(local.length)+'@'+value.slice(at+1);
  return local.slice(0,Math.min(9,local.length-2))+'*****'+local.slice(-2)+'@'+value.slice(at+1);
 }
+function maskPhoneNumber(phone){
+ const value=String(phone||'');
+ const positions=[...value].map((char,index)=>/\d/.test(char)?index:-1).filter(index=>index>=0);
+ const masked=new Set(positions.slice(-4));
+ return [...value].map((char,index)=>masked.has(index)?'*':char).join('');
+}
 function escapeHtml(value){
  return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
@@ -1000,9 +1006,10 @@ async function profileLoad(authUser){
  updateBalances(data.virtual_balance);
  const welcomeDisplayName=authUser.email
   ?(String(data.dashboard_display_name||'').trim().replace(/\s+/g,' ').toUpperCase()||welcomeName(authUser.email))
-  :welcomeName(authUser.phone||data.phone||'USER');
+  :maskPhoneNumber(authUser.phone||data.phone||'USER');
  $('welcome').textContent='WELCOME, '+welcomeDisplayName;
- $('accountEmail').textContent=maskEmail(data.email||authUser.email||authUser.phone||'');
+ const accountEmailValue=data.email||authUser.email||'';
+ $('accountEmail').textContent=accountEmailValue?maskEmail(accountEmailValue):maskPhoneNumber(authUser.phone||data.phone||'');
  $('auth').classList.add('hidden');
  $('app').classList.remove('hidden');
  $('notificationBell').classList.remove('hidden');
@@ -1618,6 +1625,13 @@ async function adminProfileNames(requests){
  if(error){console.warn('Could not load requester names:',error.message);return new Map();}
  return new Map((data||[]).map(x=>[x.id,(x.full_name||'').trim()]));
 }
+async function adminProfilePhones(requests){
+ const ids=[...new Set((requests||[]).map(x=>x.user_id).filter(Boolean))];
+ if(!ids.length)return new Map();
+ const{data,error}=await supabase.from('profiles').select('id,phone').in('id',ids);
+ if(error){console.warn('Could not load requester phone numbers:',error.message);return new Map();}
+ return new Map((data||[]).map(x=>[x.id,x.phone||'']));
+}
 function adminRequestDate(value){return value?new Date(value).toLocaleString():'Date unavailable';}
 function adminRequestNameEditor(kind,item,field,label,refresh){
  if(!isAdmin())return null;
@@ -1657,6 +1671,7 @@ function showAdminReceipt(kind,item,decision,reason=''){
   ['Amount',money(item.amount)],
   ['Reference',item.tracking_code||'Not available'],
   ['User',item.user_name||'Name unavailable'],
+  ...(item.user_phone?[['User phone',item.user_phone]]:[]),
   ['Date submitted',adminRequestDate(item.created_at)],
   ['Decision date',new Date().toLocaleString()],
   ...(kind==='deposit'?[['Provider',item.provider_name||'Not provided'],['Depositor account name',item.depositor_account_name||'Not provided']]:[['Bank',item.bank_name||'Not provided'],['Account name',item.account_name||'Not provided'],['Account number',item.account_number||'Not provided']]),
@@ -1737,11 +1752,11 @@ async function adminSelfExclusion(){
  if(error){area.textContent='Unable to load requests: '+error.message;return;}
  area.innerHTML='';
  if(!data?.length){area.textContent='No pending self-exclusion requests.';return;}
- const names=await adminProfileNames(data);
+ const names=await adminProfileNames(data),phones=await adminProfilePhones(data);
  data.forEach(item=>{
   const row=document.createElement('div');row.className='admin-request';
   const info=document.createElement('div');
-  info.innerHTML='<b>Self-exclusion · '+item.requested_days+' days requested</b><br><small>User: '+escapeHtml(names.get(item.user_id)||'Name unavailable')+'<br>Submitted: '+escapeHtml(adminRequestDate(item.submitted_at))+'<br>Cancellation deadline: '+escapeHtml(adminRequestDate(item.cancel_until))+'</small>';
+  info.innerHTML='<b>Self-exclusion · '+item.requested_days+' days requested</b><br><small>User: '+escapeHtml(names.get(item.user_id)||'Name unavailable')+'<br>Phone: '+escapeHtml(phones.get(item.user_id)||'Not available')+'<br>Submitted: '+escapeHtml(adminRequestDate(item.submitted_at))+'<br>Cancellation deadline: '+escapeHtml(adminRequestDate(item.cancel_until))+'</small>';
   const duration=document.createElement('select');
   [30,60,90,120].forEach(n=>{const o=document.createElement('option');o.value=String(n);o.textContent=n+' days';if(n===item.requested_days)o.selected=true;duration.append(o);});
   const actions=document.createElement('div');actions.className='row';
@@ -1774,9 +1789,10 @@ async function adminDeposits(){
  if(error){area.textContent='Unable to load requests: '+error.message;return;}
  area.innerHTML='';
  if(!data?.length){area.textContent='No pending deposit requests.';return;}
- const names=await adminProfileNames(data);
+ const names=await adminProfileNames(data),phones=await adminProfilePhones(data);
  data.forEach(item=>{
   item.user_name=names.get(item.user_id)||'Name unavailable';
+  item.user_phone=phones.get(item.user_id)||'';
   window.__trustbetDepositRequests=window.__trustbetDepositRequests||{};window.__trustbetDepositRequests[item.id]=item;
   const row=document.createElement('div');row.className='admin-request';
   const info=document.createElement('div');
@@ -1784,6 +1800,7 @@ async function adminDeposits(){
    '<br><small>Depositor account name: '+escapeHtml(item.depositor_account_name||'Not provided')+
    '<br>Reference: '+escapeHtml(item.tracking_code||'No reference')+
    '<br>User: '+escapeHtml(names.get(item.user_id)||'Name unavailable')+
+   '<br>Phone: '+escapeHtml(item.user_phone||'Not available')+
    '<br>Date: '+escapeHtml(adminRequestDate(item.created_at))+'</small>';
   const nameEditor=adminRequestNameEditor('deposit',item,'depositor_account_name','Depositor account name',adminDeposits);
   const status=document.createElement('span');status.className='status-pill';status.textContent=String(item.status||'pending').toUpperCase();
@@ -1825,9 +1842,10 @@ async function adminWithdrawals(){
  if(error){area.textContent='Unable to load requests: '+error.message;return;}
  area.innerHTML='';
  if(!data?.length){area.textContent='No pending withdrawal requests.';return;}
- const names=await adminProfileNames(data);
+ const names=await adminProfileNames(data),phones=await adminProfilePhones(data);
  data.forEach(item=>{
   item.user_name=names.get(item.user_id)||'Name unavailable';
+  item.user_phone=phones.get(item.user_id)||'';
   window.__trustbetWithdrawalRequests=window.__trustbetWithdrawalRequests||{};window.__trustbetWithdrawalRequests[item.id]=item;
   const row=document.createElement('div');row.className='admin-request';
   const info=document.createElement('div');
@@ -1835,6 +1853,7 @@ async function adminWithdrawals(){
    '<br><small>Account name: '+escapeHtml(item.account_name||'')+' · Account number: '+escapeHtml(item.account_number||'')+
    '<br>Reference: '+escapeHtml(item.tracking_code||'No reference')+
    '<br>User: '+escapeHtml(names.get(item.user_id)||'Name unavailable')+
+   '<br>Phone: '+escapeHtml(item.user_phone||'Not available')+
    '<br>Date: '+escapeHtml(adminRequestDate(item.created_at))+'</small>';
   const nameEditor=adminRequestNameEditor('withdrawal',item,'account_name','Bank account name',adminWithdrawals);
   const status=document.createElement('span');status.className='status-pill';status.textContent=String(item.status||'pending').toUpperCase();
@@ -2068,11 +2087,12 @@ function confirmDeletionTwoWay(action,email){
  try{
   const data=await deletionAction({action:'list'});const requests=Array.isArray(data.requests)?data.requests:[];
   area.innerHTML='';if(!requests.length){area.textContent='No pending account deletion requests.';return;}
+  const phones=await adminProfilePhones(requests);
   requests.forEach(request=>{
    const row=document.createElement('div');row.className='admin-request';const info=document.createElement('div');
    const name=document.createElement('b');name.textContent=request.full_name||'Name not provided';
    const details=document.createElement('small');details.style.display='block';
-   details.textContent=(request.email||'No email')+' · Account ID: '+request.user_id+' · Requested: '+new Date(request.submitted_at).toLocaleString()+' · PENDING';
+   details.textContent=(request.email||'No email')+' · Phone: '+(phones.get(request.user_id)||'Not available')+' · Account ID: '+request.user_id+' · Requested: '+new Date(request.submitted_at).toLocaleString()+' · PENDING';
    info.append(name,details);const actions=document.createElement('div');actions.className='row';
    const approve=document.createElement('button');approve.textContent='APPROVE';approve.className='danger';
    const reject=document.createElement('button');reject.textContent='REJECT';reject.className='secondary';
