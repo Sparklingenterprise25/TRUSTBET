@@ -3,6 +3,16 @@
 -- onboarding paths create future welcome bonus entries as credits.
 -- Front-end code already renders transaction types containing "credit" in green.
 
+alter table public.wallet_transactions
+  drop constraint wallet_transactions_transaction_type_check;
+
+alter table public.wallet_transactions
+  add constraint wallet_transactions_transaction_type_check
+  check (transaction_type = any (array[
+    'deposit'::text, 'withdrawal'::text, 'bet'::text, 'payout'::text,
+    'bonus'::text, 'bonus credit'::text, 'adjustment'::text, 'win'::text
+  ]));
+
 update public.wallet_transactions
 set transaction_type = 'bonus credit'
 where transaction_type = 'bonus'
