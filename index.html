@@ -594,6 +594,14 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
     </div>
     <div class="admin-section">
      <h3>Phone Registrations Awaiting Approval</h3>
+     <label for="phoneApprovalSearch">SEARCH PENDING PHONE REGISTRATIONS</label>
+     <div class="row" style="align-items:center">
+      <input id="phoneApprovalSearch" type="search" placeholder="Search by name or phone number" autocomplete="off" style="margin:6px 0" aria-label="Search pending phone registrations">
+      <button id="searchPhoneApprovals" type="button" class="secondary">Search user</button>
+     </div>
+     <small id="phoneApprovalSearchStatus" style="display:block;margin:0 0 10px;color:#64748b"></small>
+     <label for="phoneApprovalUserSelect">OR SELECT FROM PENDING PHONE REGISTRATIONS</label>
+     <select id="phoneApprovalUserSelect" style="margin:6px 0 12px"><option value="">Select a pending registration</option></select>
      <button id="refreshPhoneApprovals" class="secondary">Refresh phone registrations</button>
      <div id="phoneApprovals" aria-live="polite"></div>
      <h3>Registered Users</h3>
@@ -625,9 +633,14 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
     <div class="admin-section" id="adminWalletCreditSection">
      <h3 style="color:#12a875">ISSUE BONUS / COMPENSATION CREDIT</h3>
      <p class="muted">Admin-only wallet credit. Review the selected user, amount and message before confirming.</p>
-     <input id="creditUserSearch" type="search" placeholder="Search a user or select a user" autocomplete="off" aria-label="Search or select a registered user" aria-expanded="false" aria-controls="creditUserSelect">
-     <label for="creditUserSelect" style="display:block;margin:8px 0 5px">Select User</label><select id="creditUserSelect" size="6" aria-label="Select a registered user" style="display:block;width:100%;max-width:100%;height:auto;min-height:150px;max-height:220px;overflow-y:auto;margin:0 0 12px;padding:8px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#172b4d"><option value="">Select a user</option></select>
-     <button type="button" id="searchCreditUsers" class="secondary">Refresh user list</button>
+     <label for="creditUserSearch">SEARCH USERS</label>
+     <div class="row" style="align-items:center">
+      <input id="creditUserSearch" type="search" placeholder="Search by name, email or phone" autocomplete="off" style="margin:6px 0" aria-label="Search registered users">
+      <button id="searchCreditUsers" type="button" class="secondary">Search user</button>
+     </div>
+     <small id="creditUserSearchStatus" style="display:block;margin:0 0 10px;color:#64748b"></small>
+     <label for="creditUserSelect">OR SELECT FROM ALL WEBSITE USERS</label>
+     <select id="creditUserSelect" style="margin:6px 0 12px"><option value="">Select a user</option></select>
      <label>Credit type</label>
      <select id="creditType" style="background-color:#000080;color:#fff"><option value="bonus">Bonus</option><option value="compensation">Compensation</option></select>
      <label>Amount (₦)</label><input id="creditAmount" type="text" inputmode="numeric" autocomplete="off" placeholder="Enter amount">
@@ -894,7 +907,6 @@ function setupBankPicker(id,labels={}){
  renderOptions();
 }
 setupBankPicker('depProvider');setupBankPicker('bank');
-setupBankPicker('creditUserSelect',{prompt:'Select user',search:'Search users',empty:'No matching users',onOpen:()=>{if(!creditRegisteredUsers.length&&!creditUsersLoading)loadCreditRegisteredUsers({renderSearchDropdown:false});}});
 function maskEmail(email){
  const value=String(email||''),at=value.lastIndexOf('@');
  if(at<1)return value;
@@ -2136,6 +2148,7 @@ async function confirmPhoneDecision(id,decision){
   actions.append(cancel,proceed);panel.append(heading,message,field,actions);overlay.append(panel);document.body.append(overlay);field.focus();
  });
 }
+let phoneApprovalCache=[];
 async function adminPhoneApprovals(){
  if(!isAdmin())return;
  const area=$('phoneApprovals');if(!area)return;
@@ -2144,10 +2157,17 @@ async function adminPhoneApprovals(){
  try{
   const result=await phoneAdminAction('list');
   const pending=(result.accounts||[]).filter(x=>x.account_approval_status==='pending');
+  phoneApprovalCache=pending;
+  const select=$('phoneApprovalUserSelect'),current=select?.value||'';
+  if(select){
+   select.innerHTML='<option value="">Select a pending registration</option>';
+   pending.forEach(item=>{const option=document.createElement('option');option.value=item.id;option.textContent=(item.full_name||'Name not provided')+' · '+(item.phone||'Phone unavailable');select.append(option);});
+   if(current&&pending.some(item=>item.id===current))select.value=current;
+  }
   area.innerHTML='';
   if(!pending.length){area.textContent='No phone registrations are awaiting approval.';return;}
   pending.forEach(item=>{
-   const row=document.createElement('div');row.className='admin-request';
+   const row=document.createElement('div');row.className='admin-request';row.dataset.userId=item.id;row.id='phone-approval-'+item.id;
    const info=document.createElement('div');
    const name=document.createElement('b');name.textContent=item.full_name||'Name not provided';
    const detail=document.createElement('small');detail.style.display='block';
@@ -2174,6 +2194,18 @@ async function adminPhoneApprovals(){
  finally{if(button)button.disabled=false;}
 }
 $('refreshPhoneApprovals').onclick=adminPhoneApprovals;
+$('searchPhoneApprovals')?.addEventListener('click',()=>{
+ const q=String($('phoneApprovalSearch')?.value||'').trim().toLowerCase(),status=$('phoneApprovalSearchStatus');
+ if(!q){status.textContent='Enter a name or phone number to search.';return;}
+ const matches=phoneApprovalCache.filter(item=>(String(item.full_name||'')+' '+String(item.phone||'')).toLowerCase().includes(q));
+ if(matches.length===1){$('phoneApprovalUserSelect').value=matches[0].id;$('phone-approval-'+matches[0].id)?.scrollIntoView({behavior:'smooth',block:'center'});status.textContent='Pending registration found.';}
+ else if(matches.length>1){status.textContent=matches.length+' registrations matched. Choose the correct user from the dropdown below.';}
+ else status.textContent='No matching pending phone registration found.';
+});
+$('phoneApprovalUserSelect')?.addEventListener('change',()=>{
+ const id=$('phoneApprovalUserSelect').value;
+ if(id){$('phone-approval-'+id)?.scrollIntoView({behavior:'smooth',block:'center'});$('phoneApprovalSearchStatus').textContent='Selected pending registration. Use its Approve or Reject buttons below.';}
+});
 
 /* Secure administrator wallet credits */
 const TRUSTBET_CREDIT_MESSAGES={
@@ -2187,13 +2219,12 @@ function updateCreditMessage(){
 if($('creditType'))$('creditType').onchange=updateCreditMessage;
 let creditRegisteredUsers=[];
 let creditUsersLoading=false;
-function selectCreditUserOptions(query=''){
+function selectCreditUserOptions(){
  const select=$('creditUserSelect');
  if(!select)return;
  const selectedId=select.value;
  select.innerHTML='<option value="">Select a user</option>';
- const q=String(query||'').trim().toLowerCase();
- creditRegisteredUsers.filter(p=>!q||[p.full_name,p.email,p.phone].some(v=>String(v||'').toLowerCase().includes(q))).forEach(p=>{
+ creditRegisteredUsers.forEach(p=>{
   const displayName=p.full_name||p.email||p.phone||'User';
   const option=document.createElement('option');
   option.value=p.id;
@@ -2201,40 +2232,11 @@ function selectCreditUserOptions(query=''){
   select.append(option);
  });
  if(selectedId&&creditRegisteredUsers.some(p=>p.id===selectedId))select.value=selectedId;
- select.dispatchEvent(new Event('bankpickerrefresh'));
-}
-function renderCreditUserDropdown(){
- const input=$('creditUserSearch'),dropdown=$('creditUserDropdown'),select=$('creditUserSelect');
- if(!input||!dropdown||!select)return;
- const q=input.value.trim().toLowerCase();
- const matches=creditRegisteredUsers.filter(p=>[p.full_name,p.email,p.phone].some(v=>String(v||'').toLowerCase().includes(q)));
- dropdown.innerHTML='';
- if(!matches.length){
-  const empty=document.createElement('div');empty.textContent=creditUsersLoading?'Loading registered users...':'No matching registered users found.';
-  empty.style.cssText='padding:12px;color:#64748b';dropdown.append(empty);
- }else{
-  matches.forEach(p=>{
-   const option=document.createElement('button');option.type='button';option.setAttribute('role','option');
-   option.style.cssText='display:block;width:100%;text-align:left;background:#fff;color:#172b4d;border:0;border-bottom:1px solid #e2e8f0;padding:11px 12px;border-radius:0;cursor:pointer';
-   const displayName=p.full_name||p.email||p.phone||'User';
-   option.textContent=displayName+' · '+(p.email||p.phone||p.id);
-   option.onmousedown=e=>e.preventDefault();
-   option.onclick=()=>{
-    select.value=p.id;
-    input.value=displayName+' · '+(p.email||p.phone||p.id);
-    dropdown.classList.add('hidden');input.setAttribute('aria-expanded','false');
-    say('walletCreditMsg','Selected: '+displayName);
-   };
-   dropdown.append(option);
-  });
- }
- dropdown.classList.remove('hidden');input.setAttribute('aria-expanded','true');
 }
 async function loadCreditRegisteredUsers({renderSearchDropdown=true}={}){
  if(!isAdmin())return say('walletCreditMsg','Administrator access required.',true);
  if(creditUsersLoading)return;
  creditUsersLoading=true;
- renderCreditUserDropdown();
  say('walletCreditMsg','Loading all registered users...');
  try{
   const all=[];let from=0;const pageSize=500;
@@ -2247,44 +2249,28 @@ async function loadCreditRegisteredUsers({renderSearchDropdown=true}={}){
   }
   creditRegisteredUsers=all;
   selectCreditUserOptions();
-  if(renderSearchDropdown)renderCreditUserDropdown();
+  $('creditUserSearchStatus').textContent=all.length+' registered users loaded.';
   say('walletCreditMsg',all.length+' registered users loaded.');
  }catch(error){
   creditRegisteredUsers=[];
   selectCreditUserOptions();
-  if(renderSearchDropdown)renderCreditUserDropdown();
+  $('creditUserSearchStatus').textContent='Could not load registered users.';
   say('walletCreditMsg','Could not load registered users: '+(error.message||error),true);
  }finally{creditUsersLoading=false;}
 }
-if($('creditUserSearch')){
- const creditSearch=$('creditUserSearch');
- const openCreditUserChoices=()=>{
-  const selected=$('creditUserSelect')?.selectedOptions[0];
-  if(selected&&creditSearch.value===selected.textContent)creditSearch.value='';
-  if(!creditRegisteredUsers.length)loadCreditRegisteredUsers();
-  else selectCreditUserOptions(creditSearch.value);
- };
- creditSearch.addEventListener('focus',openCreditUserChoices);
- creditSearch.addEventListener('click',openCreditUserChoices);
- creditSearch.addEventListener('input',()=>selectCreditUserOptions(creditSearch.value));
- creditSearch.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){$('creditUserDropdown').classList.add('hidden');creditSearch.setAttribute('aria-expanded','false');}
-  if(e.key==='ArrowDown'&&$('creditUserDropdown').classList.contains('hidden'))renderCreditUserDropdown();
- });
-}
-if($('creditUserSelect'))$('creditUserSelect').addEventListener('change',()=>{
- const select=$('creditUserSelect'),p=creditRegisteredUsers.find(item=>item.id===select.value);
- if(!p){$('creditUserSearch').value='';return;}
- const displayName=p.full_name||p.email||p.phone||'User';
- $('creditUserSearch').value=displayName+' · '+(p.email||p.phone||p.id);
- say('walletCreditMsg','Selected: '+displayName);
+$('searchCreditUsers')?.addEventListener('click',()=>{
+ const q=String($('creditUserSearch')?.value||'').trim().toLowerCase(),status=$('creditUserSearchStatus');
+ if(!creditRegisteredUsers.length){status.textContent='Loading registered users...';loadCreditRegisteredUsers();return;}
+ if(!q){status.textContent='Enter a name, email or phone number to search.';return;}
+ const matches=creditRegisteredUsers.filter(p=>(String(p.full_name||'')+' '+String(p.email||'')+' '+String(p.phone||'')).toLowerCase().includes(q));
+ if(matches.length===1){$('creditUserSelect').value=matches[0].id;status.textContent='User found and selected.';say('walletCreditMsg','Selected: '+(matches[0].full_name||matches[0].email||matches[0].phone||'User'));}
+ else if(matches.length>1){status.textContent=matches.length+' users matched. Choose the correct user from the dropdown below.';}
+ else status.textContent='No matching user found.';
 });
-if($('searchCreditUsers'))$('searchCreditUsers').onclick=loadCreditRegisteredUsers;
-document.addEventListener('click',e=>{
- const input=$('creditUserSearch'),dropdown=$('creditUserDropdown');
- if(input&&dropdown&&!input.contains(e.target)&&!dropdown.contains(e.target)){
-  dropdown.classList.add('hidden');input.setAttribute('aria-expanded','false');
- }
+$('creditUserSelect')?.addEventListener('focus',()=>{if(!creditRegisteredUsers.length&&!creditUsersLoading)loadCreditRegisteredUsers();});
+$('creditUserSelect')?.addEventListener('change',()=>{
+ const p=creditRegisteredUsers.find(item=>item.id===$('creditUserSelect').value);
+ if(p)say('walletCreditMsg','Selected: '+(p.full_name||p.email||p.phone||'User'));
 });
 if($('issueWalletCredit'))$('issueWalletCredit').onclick=async()=>{
  if(!isAdmin())return say('walletCreditMsg','Administrator access required.',true);
