@@ -926,7 +926,7 @@ async function loadGameOdds(){
 }
 function isOddsPreviewEnvironment(){
  const host=String(location.hostname||'').toLowerCase();
- return host.includes('-git-trustbet-auth-recovery-dev-')||/^trustbet-[a-z0-9]+-sparklingenterprise25\\.vercel\\.app$/.test(host);
+ return host.startsWith('trustbet-')&&host.endsWith('-sparklingenterprise25.vercel.app');
 }
 function renderAdminOddsEditor(){
  const area=$('adminGameOddsEditor');if(!area||!isAdmin())return;
