@@ -2672,6 +2672,7 @@ function resetSupportChatIdle(){
 $('closeChatPanel').onclick=closeSupportChat;
 $('chatOpen').onclick=async e=>{
  e.preventDefault();moveSupportChatPanel('customer');$('chatPanel').classList.remove('hidden');
+ $('chatCustomerIdentity').classList.add('hidden');
  $('chatInput').maxLength=isAdmin()?2000:1000;
  $('chatInput').placeholder=isAdmin()?'Write your reply (maximum 2,000 characters)':'Write your message (maximum 1,000 characters)';
  if($('chatCharCount'))$('chatCharCount').textContent='0 / '+(isAdmin()?2000:1000)+' characters';
@@ -2778,6 +2779,24 @@ document.querySelectorAll('.copy-support-email').forEach(button=>button.onclick=
   button.textContent='Email copied';setTimeout(()=>button.textContent='Copy support email',1800);
  }catch(error){button.textContent='Copy failed — select email above';}
 });
+async function loadSupportCustomerIdentity(customerId){
+ const box=$('chatCustomerIdentity');
+ if(!isAdmin()){box.classList.add('hidden');return;}
+ box.classList.remove('hidden');box.textContent='Loading customer account details…';
+ const{data,error}=await supabase.from('profiles')
+  .select('full_name,first_name,last_name,phone,email,trustbet_uid')
+  .eq('id',customerId).maybeSingle();
+ if(error||!data){box.textContent='Customer account details are unavailable.';return;}
+ const name=data.full_name||[data.first_name,data.last_name].filter(Boolean).join(' ')||'Name not provided';
+ const lines=[
+  'CUSTOMER UID: '+(data.trustbet_uid??'Unavailable'),
+  'FULL NAME: '+name,
+  'ACCOUNT TYPE: '+(data.email?'EMAIL':'PHONE'),
+  'PHONE: '+(data.phone||'Not available'),
+  'EMAIL: '+(data.email||'Not available')
+ ];
+ box.textContent=lines.join('  |  ');
+}
 async function adminInbox(){
  if(!isAdmin())return;
  const{data,error}=await supabase.from('support_conversations')
@@ -2791,12 +2810,12 @@ async function adminInbox(){
   label.textContent=c.subject+' · '+c.status+' · Unread '+(c.admin_unread_count||0);
   const identity=document.createElement('div');identity.className='support-account-identity';identity.style.cssText='font-weight:900;color:#102d59;margin-bottom:6px;overflow-wrap:anywhere';
   identity.textContent='Loading account details…';
-  supabase.from('profiles').select('*').eq('id',c.user_id).maybeSingle().then(({data})=>{
-   const accountEmail=data?.email||'Phone-only account';
-   const accountName=data?.full_name||data?.name||data?.display_name||'Name not provided';
-   const accountPhone=data?.phone||'';
-   identity.textContent='MESSAGE FROM '+accountEmail+' · '+String(accountName).toUpperCase()+(accountPhone?' · '+accountPhone:'');
-  }).catch(()=>{identity.textContent='MESSAGE FROM account ID '+c.user_id;});
+  supabase.from('profiles').select('full_name,first_name,last_name,phone,email,trustbet_uid').eq('id',c.user_id).maybeSingle().then(({data,error:profileError})=>{
+   if(profileError||!data){identity.textContent='CUSTOMER DETAILS UNAVAILABLE';return;}
+   const accountName=data.full_name||[data.first_name,data.last_name].filter(Boolean).join(' ')||'Name not provided';
+   const accountType=data.email?'EMAIL ACCOUNT':'PHONE ACCOUNT';
+   identity.textContent='UID: '+(data.trustbet_uid??'Unavailable')+' · '+String(accountName).toUpperCase()+' · '+accountType+(data.phone?' · '+data.phone:'')+(data.email?' · '+data.email:'');
+  }).catch(()=>{identity.textContent='CUSTOMER DETAILS UNAVAILABLE';});
   const bell=document.createElement('span');bell.className='admin-support-bell';bell.setAttribute('aria-label','Unread support notifications');
   bell.textContent='🔔';
   const count=document.createElement('span');count.className='admin-support-bell-count';
@@ -2804,6 +2823,7 @@ async function adminInbox(){
   bell.append(count);d.append(identity,label,bell);
   d.onclick=async()=>{
    conversation=c;moveSupportChatPanel('admin');$('chatPanel').classList.remove('hidden');
+   await loadSupportCustomerIdentity(c.user_id);
    $('chatInput').maxLength=2000;resetSupportChatIdle();$('chatInput').placeholder='Write your reply (maximum 2,000 characters)';
    if($('chatCharCount'))$('chatCharCount').textContent=$('chatInput').value.length+' / 2,000 characters';
    if(channel)supabase.removeChannel(channel);
