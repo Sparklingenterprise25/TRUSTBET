@@ -396,7 +396,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
   <p class="muted">Enter your registered email or full phone number, your six-digit recovery code, and a new password.</p>
   <label>Email or full phone number</label><input id="recoveryIdentifier" type="text" autocomplete="username" placeholder="name@example.com or +234...">
   <label>Six-digit recovery code</label><input id="recoveryCode" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code">
-  <label>New password</label><input id="recoveryNewPassword" type="password" minlength="8" maxlength="15" autocomplete="new-password">
+  <label>New password</label><div class="password-field"><input id="recoveryNewPassword" type="password" minlength="8" maxlength="15" autocomplete="new-password"><button type="button" class="password-toggle" data-password-target="recoveryNewPassword" aria-label="Show password" aria-pressed="false">👁</button></div>
   <div class="row"><button id="recoverySubmit" type="button">Reset password</button><button id="recoveryCancel" type="button" class="secondary">Cancel</button></div>
   <p id="recoveryMsg" class="msg"></p>
  </div>
@@ -1012,7 +1012,9 @@ $('recoverySubmit').onclick=async()=>{
   say('recoveryMsg',data?.message||'Password reset successfully. You can now sign in.',false);
   $('recoveryCode').value='';$('recoveryNewPassword').value='';
  }catch(error){
-  say('recoveryMsg',error?.message||'Password reset failed. Check your details and try again.',true);
+  let message=error?.message||'Password reset failed. Check your details and try again.';
+  try{const response=error?.context;if(response&&typeof response.clone==='function'){const body=await response.clone().json();message=body?.error||body?.message||message;}}catch{}
+  say('recoveryMsg',message,true);
  }finally{
   button.disabled=false;button.textContent='Reset password';
  }
