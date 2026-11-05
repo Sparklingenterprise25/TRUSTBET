@@ -358,6 +358,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
 .copy-support-whatsapp{background:var(--navy)!important;color:#fff!important;border:1px solid var(--navy)!important;font-weight:800}
 .copy-support-whatsapp:hover{background:#174b88!important;color:#fff!important}
 .whatsapp-open-hint{color:#d32032!important;font-weight:800}
+.admin-inbox-toolbar{display:flex;flex-direction:column;gap:2px;margin:8px 0}.admin-inbox-toolbar input{margin:0 0 5px;background:#fff}.admin-inbox-summary{font-size:11px;color:#64748b;font-weight:800}.admin-inbox-viewport,#adminInboxViewport{max-height:430px;overflow-y:auto;overscroll-behavior:contain;border:1px solid #dce5f1;border-radius:12px;padding:5px 10px;background:#f8fbff}#adminInbox{min-height:40px}.admin-inbox-card-content{flex:1;min-width:0}.admin-inbox-pagination{display:flex;align-items:center;justify-content:center;gap:12px;padding:10px 0 3px;font-size:12px;font-weight:800;color:#53647c}.admin-inbox-pagination button{padding:8px 12px;font-size:11px}.admin-inbox-empty{padding:22px 10px;text-align:center;color:#718096;font-size:13px}
 </style>
 </head>
 <body>
@@ -667,7 +668,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
      <button type="button" id="issueWalletCredit" class="wide">Review and issue credit</button>
      <p id="walletCreditMsg" class="msg" aria-live="polite"></p>
     </div>
-    <h3>Admin Support Inbox</h3><div id="adminInbox"></div><div id="adminChatPanelSlot"></div><p><a href="mailto:superhybridservices@gmail.com">Email support: superhybridservices@gmail.com</a></p><button type="button" class="copy-support-email">Copy support email</button><p><a href="https://wa.me/2347063593605" target="_blank" rel="noopener">WhatsApp support: +234 706 359 3605 · <span class="whatsapp-open-hint">Open WhatsApp app</span></a></p><button type="button" class="copy-support-whatsapp">Copy support WhatsApp number</button>
+    <h3>Admin Support Inbox</h3><div class="admin-inbox-toolbar"><input id="adminInboxSearch" type="search" placeholder="Search by UID, name, phone or email" aria-label="Search support conversations"><span id="adminInboxSummary" class="admin-inbox-summary">Loading conversations…</span></div><div id="adminInboxViewport"><div id="adminInbox"></div></div><div id="adminInboxPagination" class="admin-inbox-pagination"></div><div id="adminChatPanelSlot"></div><p><a href="mailto:superhybridservices@gmail.com">Email support: superhybridservices@gmail.com</a></p><button type="button" class="copy-support-email">Copy support email</button><p><a href="https://wa.me/2347063593605" target="_blank" rel="noopener">WhatsApp support: +234 706 359 3605 · <span class="whatsapp-open-hint">Open WhatsApp app</span></a></p><button type="button" class="copy-support-whatsapp">Copy support WhatsApp number</button>
    </div>
   </div>
   <div class="card account-info-box">
@@ -2885,41 +2886,75 @@ async function refreshCustomerChatNotice(){
   .on('postgres_changes',{event:'*',schema:'public',table:'support_messages',filter:'conversation_id=eq.'+conv.id},()=>refreshCustomerChatNotice())
   .subscribe();
 }
+let adminInboxPage=1;
+let adminInboxSearchBound=false;
+let adminInboxRenderToken=0;
+const ADMIN_INBOX_PAGE_SIZE=10;
 async function adminInbox(){
  if(!isAdmin()){await refreshCustomerChatNotice();return;}
+ const renderToken=++adminInboxRenderToken;
  const{data,error}=await supabase.from('support_conversations')
   .select('id,user_id,subject,status,admin_unread_count,last_message_at')
   .order('last_message_at',{ascending:false});
  if(error){$('adminInbox').textContent=error.message;return;}
- $('adminInbox').innerHTML='';
- (data||[]).forEach(c=>{
+ const conversations=data||[];
+ const userIds=[...new Set(conversations.map(c=>c.user_id).filter(Boolean))];
+ let profiles=[];
+ if(userIds.length){
+  const result=await supabase.from('profiles')
+   .select('id,full_name,first_name,last_name,phone,email,trustbet_uid')
+   .in('id',userIds);
+  if(result.error){$('adminInbox').textContent='Unable to load customer account details: '+result.error.message;return;}
+  profiles=result.data||[];
+ }
+ const profileById=new Map(profiles.map(p=>[p.id,p]));
+ const rows=await Promise.all(conversations.map(async c=>{
+  const profile=profileById.get(c.user_id)||null;
+  const{data:lastMessage}=await supabase.from('support_messages')
+   .select('message,sender_role,created_at').eq('conversation_id',c.id)
+   .order('created_at',{ascending:false}).limit(1).maybeSingle();
+  const accountName=profile?(profile.full_name||[profile.first_name,profile.last_name].filter(Boolean).join(' ')||'Name not provided'):'Customer details unavailable';
+  return {conversation:c,profile,lastMessage,accountName,
+   uid:profile?.trustbet_uid==null?'':String(profile.trustbet_uid),
+   searchText:[profile?.trustbet_uid,accountName,profile?.phone,profile?.email,c.subject,c.status].filter(Boolean).join(' ').toLowerCase()};
+ }));
+ if(renderToken!==adminInboxRenderToken)return;
+ rows.sort((a,b)=>{
+  const unreadDiff=Number(b.conversation.admin_unread_count||0)-Number(a.conversation.admin_unread_count||0);
+  if(unreadDiff)return unreadDiff;
+  return new Date(b.conversation.last_message_at||0)-new Date(a.conversation.last_message_at||0);
+ });
+ const search=$('adminInboxSearch');
+ if(!adminInboxSearchBound&&search){
+  search.addEventListener('input',()=>{adminInboxPage=1;adminInbox();});
+  adminInboxSearchBound=true;
+ }
+ const query=(search?.value||'').trim().toLowerCase();
+ const filtered=rows.filter(row=>!query||row.searchText.includes(query));
+ const totalPages=Math.max(1,Math.ceil(filtered.length/ADMIN_INBOX_PAGE_SIZE));
+ adminInboxPage=Math.min(Math.max(1,adminInboxPage),totalPages);
+ const startIndex=(adminInboxPage-1)*ADMIN_INBOX_PAGE_SIZE;
+ const pageRows=filtered.slice(startIndex,startIndex+ADMIN_INBOX_PAGE_SIZE);
+ const list=$('adminInbox');list.innerHTML='';
+ const summary=$('adminInboxSummary');
+ if(summary)summary.textContent=filtered.length+' conversation'+(filtered.length===1?'':'s')+' · '+rows.filter(r=>Number(r.conversation.admin_unread_count||0)>0).length+' unread';
+ pageRows.forEach(({conversation:c,profile,lastMessage,accountName})=>{
   const d=document.createElement('div');d.className='conversation admin-support-notice';
-  const label=document.createElement('span');label.className='support-notice-text';
-  label.textContent=c.subject+' · '+c.status+' · Unread '+(c.admin_unread_count||0);
-  const identity=document.createElement('div');identity.className='support-account-identity';identity.style.cssText='font-weight:900;color:#102d59;margin-bottom:6px;overflow-wrap:anywhere';
-  identity.textContent='Loading account details…';
-  supabase.from('profiles').select('full_name,first_name,last_name,phone,email,trustbet_uid').eq('id',c.user_id).maybeSingle().then(({data,error:profileError})=>{
-   if(profileError||!data){identity.textContent='CUSTOMER DETAILS UNAVAILABLE';return;}
-   const accountName=data.full_name||[data.first_name,data.last_name].filter(Boolean).join(' ')||'Name not provided';
-   const accountType=data.email?'EMAIL ACCOUNT':'PHONE ACCOUNT';
-   identity.textContent='UID: '+(data.trustbet_uid??'Unavailable')+' · '+String(accountName).toUpperCase()+' · '+accountType+(data.phone?' · '+data.phone:'')+(data.email?' · '+data.email:'');
-  }).catch(()=>{identity.textContent='CUSTOMER DETAILS UNAVAILABLE';});
-  const preview=document.createElement('div');preview.className='admin-support-preview';preview.textContent='Loading latest message…';
+  const content=document.createElement('div');content.className='admin-inbox-card-content';
+  const identity=document.createElement('div');identity.className='support-account-identity';
+  identity.style.cssText='font-weight:900;color:#102d59;margin-bottom:6px;overflow-wrap:anywhere';
+  identity.textContent='UID: '+(profile?.trustbet_uid??'Unavailable')+' · '+String(accountName).toUpperCase()+' · '+(profile?.email?'EMAIL ACCOUNT':'PHONE ACCOUNT')+(profile?.phone?' · '+profile.phone:'')+(profile?.email?' · '+profile.email:'');
+  const label=document.createElement('div');label.className='support-notice-text';
+  label.textContent=(c.subject||'Support conversation')+' · '+(c.status||'')+' · Unread '+(c.admin_unread_count||0);
+  const preview=document.createElement('div');preview.className='admin-support-preview';
+  preview.textContent=!lastMessage?'No messages yet':(lastMessage.sender_role==='admin'?'Admin: ':'Customer: ')+(lastMessage.message&&lastMessage.message!=='Attachment'?lastMessage.message:'📎 Attachment');
   const meta=document.createElement('div');meta.className='admin-support-meta';
-  const time=document.createElement('span');time.textContent=formatSupportNoticeTime(c.last_message_at)||'No recent activity';
+  const time=document.createElement('span');time.textContent=formatSupportNoticeTime(lastMessage?.created_at||c.last_message_at)||'No recent activity';
   const unreadMeta=document.createElement('span');unreadMeta.textContent=Number(c.admin_unread_count||0)>0?'Unread conversation':'No unread messages';
-  meta.append(time,unreadMeta);d.classList.toggle('has-unread',Number(c.admin_unread_count||0)>0);
-  supabase.from('support_messages').select('message,sender_role,created_at').eq('conversation_id',c.id).order('created_at',{ascending:false}).limit(1).maybeSingle().then(({data:lastMessage})=>{
-   if(!lastMessage){preview.textContent='No messages yet';return;}
-   const who=lastMessage.sender_role==='admin'?'Admin: ':'Customer: ';
-   preview.textContent=who+(lastMessage.message&&lastMessage.message!=='Attachment'?lastMessage.message:'📎 Attachment');
-   time.textContent=formatSupportNoticeTime(lastMessage.created_at);
-  }).catch(()=>{preview.textContent='Latest message unavailable';});
-  const bell=document.createElement('span');bell.className='admin-support-bell';bell.setAttribute('aria-label','Unread support notifications');
-  bell.textContent='🔔';
-  const count=document.createElement('span');count.className='admin-support-bell-count';
-  count.textContent=Number(c.admin_unread_count||0)>0?String(c.admin_unread_count):'';
-  bell.append(count);d.append(identity,label,preview,meta,bell);
+  meta.append(time,unreadMeta);content.append(identity,label,preview,meta);
+  const bell=document.createElement('span');bell.className='admin-support-bell';bell.setAttribute('aria-label','Unread support notifications');bell.textContent='🔔';
+  const count=document.createElement('span');count.className='admin-support-bell-count';count.textContent=Number(c.admin_unread_count||0)>0?String(c.admin_unread_count):'';bell.append(count);
+  d.classList.toggle('has-unread',Number(c.admin_unread_count||0)>0);d.append(content,bell);
   d.onclick=async()=>{
    conversation=c;moveSupportChatPanel('admin');$('chatPanel').classList.remove('hidden');
    await loadSupportCustomerIdentity(c.user_id);
@@ -2938,8 +2973,23 @@ async function adminInbox(){
    if(countReadError)return say('chatMsg','Unable to clear support alert: '+countReadError.message,true);
    c.admin_unread_count=0;await adminInbox();await chatLoad();
   };
-  $('adminInbox').append(d);
+  list.append(d);
  });
+ if(!pageRows.length){
+  const empty=document.createElement('div');empty.className='admin-inbox-empty';
+  empty.textContent=query?'No support conversations match your search.':'No support conversations yet.';
+  list.append(empty);
+ }
+ const pagination=$('adminInboxPagination');
+ if(pagination){
+  pagination.innerHTML='';
+  const info=document.createElement('span');info.textContent='Page '+adminInboxPage+' of '+totalPages;
+  const previous=document.createElement('button');previous.type='button';previous.className='secondary';previous.textContent='Previous';previous.disabled=adminInboxPage<=1;
+  previous.onclick=()=>{adminInboxPage--;adminInbox();};
+  const next=document.createElement('button');next.type='button';next.className='secondary';next.textContent='Next';next.disabled=adminInboxPage>=totalPages;
+  next.onclick=()=>{adminInboxPage++;adminInbox();};
+  pagination.append(previous,info,next);
+ }
  if(supportAdminChannel)supabase.removeChannel(supportAdminChannel);
  supportAdminChannel=supabase.channel('trustbet-admin-support-inbox')
   .on('postgres_changes',{event:'INSERT',schema:'public',table:'support_messages'},adminInbox)
