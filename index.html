@@ -1784,8 +1784,15 @@ function renderAdminUsers(){
   const name=document.createElement('b');name.textContent=item.profile?.full_name||'Name not provided';
   const details=document.createElement('small');
   const created=item.created_at?new Date(item.created_at).toLocaleString():'Unknown';
-  const banned=item.banned_until&&new Date(item.banned_until)>new Date();
-  details.textContent=(item.email||item.profile?.phone||'Phone account')+' · Joined: '+created+' · '+(banned?'BANNED':'ACTIVE');
+  const approvalStatus=String(item.profile?.account_approval_status||'').toLowerCase();
+  const joined=approvalStatus==='pending';
+  const banned=!joined&&(approvalStatus==='rejected'||(item.banned_until&&new Date(item.banned_until)>new Date()));
+  const status=document.createElement('span');
+  status.textContent=joined?' 🟡 JOINED':banned?' ❤️ BANNED 🚫':' 💚 ACTIVE';
+  status.style.color=joined?'#b77900':banned?'#dc2626':'#12a875';
+  status.style.fontWeight='900';
+  details.textContent=(item.email||item.profile?.phone||'Phone account')+' · Joined: '+created+' ·';
+  details.append(status);
   details.style.display='block';
   info.append(name,details);
   const actions=document.createElement('div');actions.className='row';
