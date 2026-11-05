@@ -2410,6 +2410,7 @@ let creditUsersLoading=false;
 let creditSelectedUserIds=new Set();
 let creditPendingBatchFingerprint='';
 let creditPendingBatchId='';
+let creditSelectAllAfterLoad=false;
 function creditUserLabel(p){return p.full_name||p.email||p.phone||'User';}
 function updateCreditSelectionCount(){
  const count=creditSelectedUserIds.size;
@@ -2459,6 +2460,10 @@ async function loadCreditRegisteredUsers(){
    if(!data||data.length<pageSize)break;from+=pageSize;
   }
   creditRegisteredUsers=all;selectCreditUserOptions();
+  if(creditSelectAllAfterLoad){
+   creditSelectAllAfterLoad=false;creditSelectedUserIds=new Set(creditRegisteredUsers.map(p=>p.id));
+   renderCreditUserChecklist();say('walletCreditMsg','All '+creditRegisteredUsers.length.toLocaleString()+' registered users selected.');
+  }
   $('creditUserSearchStatus').textContent=all.length.toLocaleString()+' registered users loaded.';
   say('walletCreditMsg',all.length.toLocaleString()+' registered users loaded.');
  }catch(error){
@@ -2482,7 +2487,7 @@ $('searchCreditUsers')?.addEventListener('click',()=>{
 });
 $('creditUserSearch')?.addEventListener('input',renderCreditUserChecklist);
 $('creditSelectAllUsers')?.addEventListener('click',()=>{
- if(!creditRegisteredUsers.length){loadCreditRegisteredUsers();return;}
+ if(!creditRegisteredUsers.length){creditSelectAllAfterLoad=true;loadCreditRegisteredUsers();return;}
  creditSelectedUserIds=new Set(creditRegisteredUsers.map(p=>p.id));
  creditPendingBatchFingerprint='';creditPendingBatchId='';renderCreditUserChecklist();
  say('walletCreditMsg','All '+creditRegisteredUsers.length.toLocaleString()+' registered users selected.');
@@ -2526,7 +2531,6 @@ if($('issueWalletCredit'))$('issueWalletCredit').onclick=async()=>{
  }finally{$('issueWalletCredit').disabled=false;}
 };
 if($('creditMessage'))updateCreditMessage();
-loadCreditRegisteredUsers();
 
 /* Notifications */
 $('closeNotifications').onclick=()=>$('notificationPanel').classList.add('hidden');
