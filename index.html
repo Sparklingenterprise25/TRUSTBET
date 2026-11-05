@@ -585,7 +585,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
      <h3 style="color:#12a875">ISSUE BONUS / COMPENSATION CREDIT</h3>
      <p class="muted">Admin-only wallet credit. Review the selected user, amount and message before confirming.</p>
      <input id="creditUserSearch" type="search" placeholder="Search a user or select a user" autocomplete="off" aria-label="Search or select a registered user" aria-expanded="false" aria-controls="creditUserDropdown">
-     <div id="creditUserDropdown" class="hidden" role="listbox" aria-label="Registered users" style="max-height:240px;overflow-y:auto;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#172b4d;margin-top:4px"></div>
+     <div id="creditUserDropdown" class="hidden" role="listbox" aria-label="Registered users" style="position:relative;z-index:50;display:block;width:100%;max-height:280px;overflow-y:auto;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#172b4d;margin-top:4px;box-shadow:0 8px 20px #0002"></div>
      <button type="button" id="searchCreditUsers" class="secondary">Refresh user list</button>
      <select id="creditUserSelect" hidden><option value="">Select a user</option></select>
      <label>Credit type</label>
@@ -2035,9 +2035,20 @@ async function loadCreditRegisteredUsers(){
  }finally{creditUsersLoading=false;}
 }
 if($('creditUserSearch')){
- $('creditUserSearch').onfocus=()=>{if(!creditRegisteredUsers.length)loadCreditRegisteredUsers();else renderCreditUserDropdown();};
- $('creditUserSearch').oninput=()=>renderCreditUserDropdown();
- $('creditUserSearch').onkeydown=e=>{if(e.key==='Escape'){$('creditUserDropdown').classList.add('hidden');$('creditUserSearch').setAttribute('aria-expanded','false');}};
+ const creditSearch=$('creditUserSearch');
+ const openCreditUserChoices=()=>{
+  const selected=$('creditUserSelect')?.selectedOptions[0];
+  if(selected&&creditSearch.value===selected.textContent)creditSearch.value='';
+  if(!creditRegisteredUsers.length)loadCreditRegisteredUsers();
+  else renderCreditUserDropdown();
+ };
+ creditSearch.addEventListener('focus',openCreditUserChoices);
+ creditSearch.addEventListener('click',openCreditUserChoices);
+ creditSearch.addEventListener('input',renderCreditUserDropdown);
+ creditSearch.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){$('creditUserDropdown').classList.add('hidden');creditSearch.setAttribute('aria-expanded','false');}
+  if(e.key==='ArrowDown'&&$('creditUserDropdown').classList.contains('hidden'))renderCreditUserDropdown();
+ });
 }
 if($('searchCreditUsers'))$('searchCreditUsers').onclick=loadCreditRegisteredUsers;
 document.addEventListener('click',e=>{
