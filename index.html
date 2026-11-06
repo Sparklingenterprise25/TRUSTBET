@@ -2801,7 +2801,7 @@ function addWalletItem(container,item){
  label.className='tx-label '+(item.color==='green'?'tx-green':'tx-red');
  label.textContent=item.label;
  main.append(amount,label);
- const desc=document.createElement('div');desc.className='tx-description';
+ const desc=document.createElement('div');desc.className='tx-description'+(item.descriptionColor==='green'?' tx-green':'');
  desc.textContent=item.description||'Transaction';
  const date=document.createElement('div');date.className='tx-date';date.textContent=dateText(item.created_at);
  row.append(main,desc);if(item.created_at)row.append(date);
@@ -2895,7 +2895,7 @@ async function loadWallet(){
   supabase.from('deposit_requests').select('amount,status,tracking_code,provider_name,depositor_account_name,created_at,reviewed_at,rejection_reason').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50),
   supabase.from('withdrawal_requests').select('amount,status,bank_name,account_name,account_number,tracking_code,created_at,reviewed_at,rejection_reason').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50),
   supabase.from('demo_bets').select('id,game_id,bet_amount,outcome,payout,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50),
-  supabase.from('wallet_transactions').select('transaction_type,amount,balance_after,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50)
+  supabase.from('wallet_transactions').select('transaction_type,amount,balance_after,description,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50)
  ]);
  const items=[],errors=[deposits,withdrawals,bets,ledger].filter(x=>x.error);
  if(!bets.error){
@@ -2934,7 +2934,13 @@ async function loadWallet(){
  });
  if(!ledger.error)(ledger.data||[]).forEach(x=>{
   const type=String(x.transaction_type||'').toLowerCase();
-  if(type.includes('deposit')||type.includes('withdraw')||type.includes('bet')||type.includes('win')||type.includes('loss'))return;
+  if(type.includes('deposit')){
+   if(String(x.description||'').toLowerCase().startsWith('paystack deposit')){
+    items.push({amount:x.amount,symbol:'+',label:'BANK TRANSFER',color:'green',description:'BANK TRANSFER',descriptionColor:'green',created_at:x.created_at});
+   }
+   return;
+  }
+  if(type.includes('withdraw')||type.includes('bet')||type.includes('win')||type.includes('loss'))return;
   const credit=type.includes('credit')||type.includes('won')||type==='bonus'||type==='adjustment';
   const creditLabel=type==='bonus'?'BONUS CREDIT':type==='adjustment'?'COMPENSATION CREDIT':'WALLET CREDIT';
   items.push({amount:x.amount,symbol:credit?'+':'−',label:credit?creditLabel:'WALLET DEBIT',
