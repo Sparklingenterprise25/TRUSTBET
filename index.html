@@ -618,6 +618,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
     <label for="paystackEmail">Email for Paystack receipt</label>
     <input id="paystackEmail" type="email" maxlength="254" autocomplete="email" placeholder="Enter your email address">
     <button type="button" id="paystackCheckoutBtn" class="paystack-checkout-btn wide">Continue to secure Paystack checkout <span aria-hidden="true">→</span></button>
+    <button type="button" id="paystackVerifyBtn" class="secondary wide hidden" style="margin-top:9px">Check payment status</button>
     <p id="paystackMsg" class="paystack-message" role="status" aria-live="polite">Select a payment method on the Paystack checkout page. If bank transfer is available for this transaction, Paystack will display its transfer instructions there.</p>
     <div class="paystack-trust-note">✓ Encrypted checkout &nbsp; · &nbsp; ✓ Payment verification &nbsp; · &nbsp; ✓ Automatic wallet update</div>
    </div>
@@ -1610,6 +1611,27 @@ async function startPaystackCheckout(){
 }
 $('paystackCheckoutBtn').addEventListener('click',startPaystackCheckout);
 
+let paystackPendingReference=null;
+async function checkPaystackStatus(reference=paystackPendingReference){
+ if(!reference)return;
+ const verifyButton=$('paystackVerifyBtn');verifyButton.disabled=true;verifyButton.textContent='Checking Paystack…';
+ try{
+  const{data,error}=await supabase.functions.invoke('paystack-payments',{body:{action:'verify',reference}});
+  if(error)throw error;
+  if(data?.success){
+   paystackPendingReference=null;verifyButton.classList.add('hidden');
+   say('paystackMsg','Payment confirmed! Your TRUSTBET wallet has been credited.');
+   await loadWallet();
+  }else{
+   say('paystackMsg',data?.message||'Paystack has not confirmed this payment yet. Try checking again shortly.');
+   verifyButton.classList.remove('hidden');
+  }
+ }catch(error){
+  say('paystackMsg',error?.message||'Unable to check payment status right now. Please try again.',true);
+  verifyButton.classList.remove('hidden');
+ }finally{verifyButton.disabled=false;verifyButton.textContent='Check payment status';}
+}
+$('paystackVerifyBtn').addEventListener('click',()=>checkPaystackStatus());
 async function handlePaystackReturn(){
  const params=new URLSearchParams(window.location.search);
  const reference=params.get('reference')||params.get('trxref');
@@ -1619,18 +1641,8 @@ async function handlePaystackReturn(){
  window.history.replaceState({},document.title,cleanUrl);
  go('deposit');
  say('paystackMsg','Checking your Paystack payment securely…');
- try{
-  const{data,error}=await supabase.functions.invoke('paystack-payments',{body:{action:'verify',reference}});
-  if(error)throw error;
-  if(data?.success){
-   say('paystackMsg','Payment confirmed! Your TRUSTBET wallet has been credited.');
-   await loadWallet();
-  }else{
-   say('paystackMsg',data?.message||'Payment is not confirmed yet. If you completed the transfer, allow a short time for Paystack to confirm it. Your wallet will update after verification.');
-  }
- }catch(error){
-  say('paystackMsg',error?.message||'We could not confirm this payment yet. Please refresh your wallet shortly or contact support if you were charged.',true);
- }
+ paystackPendingReference=reference;
+ await checkPaystackStatus(reference);
 }
 
 async function dailyRequestTotal(table){
