@@ -112,6 +112,12 @@ nav button.active{background:linear-gradient(135deg,#102d59,#2475d0);color:#fff;
 #gameStage .game-animation-number span{animation:diceTumble 1.4s ease-in-out infinite}
 #gameStage .game-animation-number i:nth-of-type(1){animation:diceTumble 1.4s ease-in-out .2s infinite}
 #gameStage .game-animation-number i:nth-of-type(2){animation:diceTumble 1.4s ease-in-out .4s infinite}
+/* Fit the lucky wheel artwork fully inside the compact game stage. */
+#gameStage .lucky-stage{inset:0;width:100%;height:100%;overflow:hidden}
+#gameStage .lucky-wheel{width:66px;height:66px;border-width:4px;font-size:10px;box-sizing:border-box}
+#gameStage .wheel-pointer{top:1px;left:calc(50% - 6px);font-size:14px;line-height:1}
+#gameStage .wheel-hub{left:calc(50% - 12px);top:calc(50% - 12px);width:24px;height:24px;font-size:6px}
+
 .game:hover{transform:translateY(-3px);border-color:#bdd0e8;box-shadow:0 12px 23px #102d5913}
 .game-icon{display:grid;place-items:center;width:48px;height:48px;border-radius:14px;background:linear-gradient(145deg,#e8f0fb,#d9e7f8);font-size:26px}
 .game h3{margin:13px 0 5px;font-size:16px}
