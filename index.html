@@ -1784,16 +1784,26 @@ $('bet').onclick=async()=>{
   });
   if(error)throw error;
   if(!data||data.success!==true)throw new Error('The betting service did not return a valid result.');
+  const normalizeOddLabel=value=>String(value||'').replace(/[^A-Z ]/gi,'').trim().replace(/\s+/g,' ').toUpperCase();
+  if(data.winning_selection){
+   settledWinningSelection=normalizeOddLabel(data.winning_selection);
+   const winningIndex=game.odds.findIndex(option=>normalizeOddLabel(option[0])===settledWinningSelection);
+   if(winningIndex<0)throw new Error('The server returned an unknown winning selection.');
+   [...$('oddsGrid').querySelectorAll('.odd-box')].forEach((box,index)=>box.classList.toggle('winning-odd',index===winningIndex));
+  }else{
+   settledWinningSelection=null;
+   $('oddsGrid').querySelectorAll('.odd-box').forEach(box=>box.classList.remove('winning-odd'));
+  }
   profile.virtual_balance=Number(data.balance||0);
   profile.bonus_restricted=!!data.bonus_restricted;
   updateBalances(profile.virtual_balance);
   const panel=document.createElement('div');
   panel.className='result-panel '+(data.won?'win':'lost');
   const title=document.createElement('strong');
-  title.textContent=data.won?'WIN':(Number(data.payout)>0?'PARTIAL RETURN':'YOU LOST!');
+  title.textContent=data.won?'WIN':(data.winning_selection==null?'NO WIN THIS ROUND':(Number(data.payout)>0?'PARTIAL RETURN':'YOU LOST!'));
   const detail=document.createElement('div');detail.className='result-detail';
   const winningLabel=game.odds.find(option=>normalizeOddLabel(option[0])===settledWinningSelection)?.[0]||data.winning_selection;
-  detail.textContent='Winning odd: '+winningLabel+' · '+data.outcome+' · '+(Number(data.payout)>0?'Payout: '+money(data.payout):'Stake lost: '+money(stake))+' · Wallet: '+money(data.balance);
+  detail.textContent=(winningLabel?'Winning odd: '+winningLabel:'No listed odd won this round')+' · '+data.outcome+' · '+(Number(data.payout)>0?'Payout: '+money(data.payout):'Stake lost: '+money(stake))+' · Wallet: '+money(data.balance);
   panel.append(title,detail);
   const againRow=document.createElement('div');againRow.className='play-again-row';
   const again=document.createElement('button');again.className='play-again';again.textContent='Play Again';
