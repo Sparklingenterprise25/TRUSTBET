@@ -2804,7 +2804,7 @@ function addWalletItem(container,item){
  const desc=document.createElement('div');desc.className='tx-description'+(item.descriptionColor==='green'?' tx-green':'');
  desc.textContent=item.description||'Transaction';
  const date=document.createElement('div');date.className='tx-date';date.textContent=dateText(item.created_at);
- row.append(main,desc);if(item.created_at)row.append(date);
+ row.append(main);if(item.description)row.append(desc);if(item.created_at)row.append(date);
  if(item.receiptData){
   const receiptButton=document.createElement('button');
   receiptButton.type='button';receiptButton.className='secondary transaction-receipt-download';
@@ -2936,7 +2936,7 @@ async function loadWallet(){
   const type=String(x.transaction_type||'').toLowerCase();
   if(type.includes('deposit')){
    if(String(x.description||'').toLowerCase().startsWith('paystack deposit')){
-    items.push({amount:x.amount,symbol:'+',label:'BANK TRANSFER',color:'green',description:'BANK TRANSFER',descriptionColor:'green',created_at:x.created_at});
+    items.push({amount:x.amount,symbol:'+',label:'BANK TRANSFER',color:'green',description:'',created_at:x.created_at});
    }
    return;
   }
