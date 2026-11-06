@@ -89,6 +89,33 @@ nav button.active{background:linear-gradient(135deg,#102d59,#2475d0);color:#fff;
 .categories button.active{background:var(--navy);color:white;border-color:var(--navy);box-shadow:0 4px 10px #102d5920}
 .games{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
 .game{position:relative;overflow:hidden;background:linear-gradient(160deg,#fff,#f8faff);border:1px solid #e0e8f2;border-radius:16px;padding:16px;box-shadow:0 5px 15px #102d5908;transition:transform .18s,border-color .18s,box-shadow .18s}
+/* Compact, text-free game previews on selected game cards only. */
+.game-animation{height:58px;width:100%;margin:0 0 12px;border-radius:11px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;isolation:isolate}
+.game-animation-slots{gap:5px;background:linear-gradient(135deg,#32104f,#16102e)}
+.game-animation-slots span{width:35px;height:37px;border-radius:6px;background:#fff4d7;border:2px solid #d8a842;display:grid;place-items:center;font-size:21px;box-shadow:0 3px 0 #8b5a17;animation:cardReelSpin 1s ease-in-out infinite}
+.game-animation-slots span:nth-child(2){animation-delay:.14s}.game-animation-slots span:nth-child(3){animation-delay:.28s}
+@keyframes cardReelSpin{0%,100%{transform:translateY(-3px)}45%{transform:translateY(4px) scale(.94);filter:blur(1px)}}
+.game-animation-roulette{background:radial-gradient(ellipse,#18824e,#063b2b)}
+.game-animation-roulette span{width:48px;height:48px;border-radius:50%;border:5px solid #d9b76b;background:repeating-conic-gradient(#c51e32 0 15deg,#f4e7c8 15deg 30deg,#202a35 30deg 45deg);box-shadow:0 0 0 3px #65451d;animation:cardRouletteSpin 2.6s linear infinite}
+.game-animation-roulette:after{content:"";position:absolute;width:7px;height:7px;border-radius:50%;background:#f8e8b0;border:2px solid #7a5423;z-index:2}
+@keyframes cardRouletteSpin{to{transform:rotate(360deg)}}
+.game-animation-aviator{justify-content:flex-start;padding-left:12px;background:linear-gradient(180deg,#82d5fa 0 68%,#64a85b 68%,#287c40)}
+.game-animation-aviator span{position:relative;z-index:2;font-size:29px;animation:cardPlaneFly 3.4s ease-in-out infinite}
+.game-animation-aviator i{position:absolute;width:27px;height:9px;border-radius:50%;background:#fff;opacity:.8;top:13px;right:12%;animation:cardCloudMove 3.2s linear infinite}
+.game-animation-aviator i:nth-of-type(2){top:30px;right:38%;transform:scale(.7);animation-delay:-1.5s}
+@keyframes cardPlaneFly{0%,100%{transform:translate(0,8px) rotate(-8deg)}50%{transform:translate(95px,-9px) rotate(3deg)}}
+@keyframes cardCloudMove{from{transform:translateX(30px)}to{transform:translateX(-105px)}}
+.game-animation-bottle{background:linear-gradient(#bceaff 0 70%,#d4ae78 70%)}
+.game-animation-bottle span{font-size:31px;transform-origin:50% 90%;animation:cardBottleFlip 1.5s cubic-bezier(.3,.05,.65,.95) infinite}
+@keyframes cardBottleFlip{0%,100%{transform:translateY(7px) rotate(0)}35%{transform:translateY(-17px) rotate(180deg)}70%{transform:translateY(-4px) rotate(360deg)}}
+.game-animation-number{background:radial-gradient(ellipse,#39236d,#130e2b)}
+.game-animation-number span{width:30px;height:30px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#b7a1ff 28%,#6a40d4 65%,#21104f);box-shadow:0 0 12px #bda2ff,0 0 26px #7b4cff;animation:cardCrystalPulse 1.8s ease-in-out infinite}
+.game-animation-number i{position:absolute;width:6px;height:6px;border-radius:50%;background:#fff1a8;box-shadow:0 0 8px #fff;animation:cardOrbit 2.6s linear infinite}
+.game-animation-number i:nth-of-type(2){animation-delay:-.85s}.game-animation-number i:nth-of-type(3){animation-delay:-1.7s}
+@keyframes cardCrystalPulse{0%,100%{transform:scale(.88);filter:brightness(.9)}50%{transform:scale(1.13);filter:brightness(1.3)}}
+@keyframes cardOrbit{from{transform:rotate(0) translateX(25px) rotate(0)}to{transform:rotate(360deg) translateX(25px) rotate(-360deg)}}
+@media(prefers-reduced-motion:reduce){.game-animation *{animation:none!important}}
+
 .game:hover{transform:translateY(-3px);border-color:#bdd0e8;box-shadow:0 12px 23px #102d5913}
 .game-icon{display:grid;place-items:center;width:48px;height:48px;border-radius:14px;background:linear-gradient(145deg,#e8f0fb,#d9e7f8);font-size:26px}
 .game h3{margin:13px 0 5px;font-size:16px}
@@ -1628,6 +1655,14 @@ $('withdrawBtn').onclick=async()=>{
 /* Game cards, favourites and frequently played */
 function gameCard(g){
  const d=document.createElement('div');d.className='game';
+ const animationMarkup={
+  slots:'<div class="game-animation game-animation-slots" aria-hidden="true"><span>🍒</span><span>7️⃣</span><span>💎</span></div>',
+  roulette:'<div class="game-animation game-animation-roulette" aria-hidden="true"><span></span></div>',
+  aviator:'<div class="game-animation game-animation-aviator" aria-hidden="true"><span>✈️</span><i></i><i></i></div>',
+  bottle_flip:'<div class="game-animation game-animation-bottle" aria-hidden="true"><span>🍾</span></div>',
+  number_prediction:'<div class="game-animation game-animation-number" aria-hidden="true"><span></span><i></i><i></i><i></i></div>'
+ };
+ if(animationMarkup[g.id])d.insertAdjacentHTML('beforeend',animationMarkup[g.id]);
  const top=document.createElement('div');top.className='game-top';
  const icon=document.createElement('span');icon.className='game-icon';icon.textContent=g.icon;
  const fav=document.createElement('button');fav.className='fav';
