@@ -1677,15 +1677,10 @@ $('gameSearch').oninput=()=>render(activeCategory);
 /* Game preview. Real stakes, payouts and lock enforcement belong in Supabase. */
 function renderGameStage(g){
  const el=$('gameStage');el.classList.remove('active');el.innerHTML='';
- const scenes={
-  aviator:'<div class="stage-sky"><span class="stage-cloud c1">☁</span><span class="stage-cloud c2">☁</span><span class="stage-plane">✈</span><span class="stage-runway"></span></div><span class="stage-caption">AVIATOR · AIRCRAFT IN FLIGHT</span>',
-  slots:'<div class="slots-cabinet"><div class="slots-marquee">TRUSTBET SLOTS</div><div class="slot-reels"><span>🍒</span><span>🔔</span><span>7️⃣</span></div><div class="slots-controls"><i></i><i></i><i></i></div></div><span class="stage-caption">SLOT MACHINE · REELS SPINNING</span>',
-  roulette:'<div class="roulette-table"><div class="roulette-wheel"><div class="roulette-rim"><div class="roulette-number-ring">0 · 32 · 15 · 19 · 4 · 21 · 2 · 25 · 17 · 34 · 6 · 27</div><div class="roulette-center">TRUST</div></div><span class="roulette-ball">●</span></div><div class="roulette-label">ROULETTE</div></div><span class="stage-caption">ROULETTE · WHEEL IN MOTION</span>',
-  bottle_flip:'<div class="bottle-court"><div class="bottle-platform"></div><span class="stage-bottle">🧴</span></div><span class="stage-caption">FLIP THE BOTTLE · BOTTLE FLIP</span>',
-  under_over:'<div class="dice-table"><div class="dice-cup">🎲 🎲</div><div class="dice-pair"><span class="stage-die">⚄</span><span class="stage-die">⚁</span></div><div class="dice-total">UNDER 7&nbsp; · &nbsp;OVER 7</div></div><span class="stage-caption">UNDER OR OVER 7 · TWO DICE</span>',
-  lucky_wheel:'<div class="lucky-stage"><div class="wheel-pointer">▼</div><div class="lucky-wheel"><span>★</span><span>7</span><span>◆</span><span>🍀</span><span>★</span><span>7</span><span>◆</span><span>🍀</span></div><div class="wheel-hub">LUCK</div></div><span class="stage-caption">LUCKY WHEEL · SPIN TO PLAY</span>'
- };
- if(scenes[g.id]){el.innerHTML=scenes[g.id];el.classList.add('active');}
+ if(g.id==='lucky_wheel'){
+  el.innerHTML='<div class="lucky-stage"><div class="wheel-pointer">▼</div><div class="lucky-wheel"><span>★</span><span>7</span><span>◆</span><span>🍀</span><span>★</span><span>7</span><span>◆</span><span>🍀</span></div><div class="wheel-hub">LUCK</div></div><span class="stage-caption">LUCKY WHEEL · SPIN TO PLAY</span>';
+  el.classList.add('active');
+ }
 }
 function openGame(g){
  if(isSelfExcluded())return alert('Self-exclusion is active.');
