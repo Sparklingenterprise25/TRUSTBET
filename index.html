@@ -952,6 +952,25 @@ function renderAdminOddsEditor(){
    const input=document.createElement('input');input.type='text';input.inputMode='decimal';input.autocomplete='off';input.maxLength=12;input.required=true;input.value=isSpecial?String(Math.round(Number(odd[1]))):Number(odd[1]).toFixed(2);input.dataset.gameId=g.id;input.dataset.selectionKey=key;input.dataset.special=isSpecial?'true':'false';
    input.pattern=isSpecial?'[0-9]+':'[0-9]+\\.[0-9]+';input.title=isSpecial?'SPECIAL ODDS must be a whole number.':'A decimal is compulsory, e.g. 8.0 or 4.5.';
    input.setAttribute('aria-label',g.name+' '+odd[0]+' odds multiplier');
+   if(!isSpecial){
+    const protectDecimalPoint=event=>{
+     const dot=input.value.indexOf('.');
+     if(dot<0)return;
+     const start=input.selectionStart??0,end=input.selectionEnd??start,type=event.inputType||'';
+     const selectedDot=start<=dot&&end>dot;
+     const backspaceAtDot=type==='deleteContentBackward'&&start===end&&start===dot+1;
+     const deleteAtDot=type==='deleteContentForward'&&start===end&&start===dot;
+     if(type.startsWith('delete')&&(selectedDot||backspaceAtDot||deleteAtDot))event.preventDefault();
+    };
+    input.addEventListener('beforeinput',protectDecimalPoint);
+    input.addEventListener('input',()=>{
+     let value=input.value.replace(/[^0-9.]/g,'');
+     const dot=value.indexOf('.');
+     if(dot>=0)value=value.slice(0,dot+1)+value.slice(dot+1).replace(/\\./g,'');
+     else value=value+'.';
+     if(input.value!==value)input.value=value;
+    });
+   }
    field.append(label,input);options.append(field);
   });
   const actions=document.createElement('div');actions.className='odds-admin-card-actions';
