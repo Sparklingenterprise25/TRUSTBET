@@ -90,7 +90,7 @@ nav button.active{background:linear-gradient(135deg,#102d59,#2475d0);color:#fff;
 .games{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
 .game{position:relative;overflow:hidden;background:linear-gradient(160deg,#fff,#f8faff);border:1px solid #e0e8f2;border-radius:16px;padding:16px;box-shadow:0 5px 15px #102d5908;transition:transform .18s,border-color .18s,box-shadow .18s}
 /* Compact animations appear only inside an opened game. */
-#gameStage .game-animation{height:112px;width:min(100%,340px);margin:0 auto 16px;border-radius:14px}
+#gameStage.admin-game-stage{height:84px;width:min(100%,160px);margin:10px auto 12px;border-radius:13px}#gameStage .game-animation{height:84px;width:100%;margin:0;border-radius:13px}
 .game:hover{transform:translateY(-3px);border-color:#bdd0e8;box-shadow:0 12px 23px #102d5913}
 .game-icon{display:grid;place-items:center;width:48px;height:48px;border-radius:14px;background:linear-gradient(145deg,#e8f0fb,#d9e7f8);font-size:26px}
 .game h3{margin:13px 0 5px;font-size:16px}
