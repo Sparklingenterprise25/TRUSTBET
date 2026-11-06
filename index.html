@@ -1622,6 +1622,7 @@ async function checkPaystackStatus(reference=paystackPendingReference){
    paystackPendingReference=null;verifyButton.classList.add('hidden');
    say('paystackMsg','Payment confirmed! Your TRUSTBET wallet has been credited.');
    await loadWallet();
+   await refresh();
   }else{
    say('paystackMsg',data?.message||'Paystack has not confirmed this payment yet. Try checking again shortly.');
    verifyButton.classList.remove('hidden');
@@ -1652,7 +1653,14 @@ async function dailyRequestTotal(table){
  const{data,error}=await supabase.from(table).select('amount,created_at')
   .eq('user_id',user.id).gte('created_at',start).lt('created_at',end);
  if(error)throw error;
- return(data||[]).reduce((sum,row)=>sum+Number(row.amount||0),0);
+ let total=(data||[]).reduce((sum,row)=>sum+Number(row.amount||0),0);
+ if(table==='deposit_requests'){
+  const{data:paystack,error:paystackError}=await supabase.from('paystack_payments')
+   .select('amount,created_at').eq('user_id',user.id).gte('created_at',start).lt('created_at',end);
+  if(paystackError)throw paystackError;
+  total+=(paystack||[]).reduce((sum,row)=>sum+Number(row.amount||0),0);
+ }
+ return total;
 }
 
 /* Deposit request: creates a pending request only; it never credits the wallet. */
