@@ -937,10 +937,6 @@ async function loadGameOdds(){
  if(isAdmin())renderAdminOddsEditor();
  return true;
 }
-function isOddsPreviewEnvironment(){
- const host=String(location.hostname||'').toLowerCase();
- return host.startsWith('trustbet-')&&host.endsWith('-sparklingenterprise25.vercel.app');
-}
 function renderAdminOddsEditor(){
  const area=$('adminGameOddsEditor');if(!area||!isAdmin())return;
  area.innerHTML='';
@@ -960,16 +956,13 @@ function renderAdminOddsEditor(){
   });
   const actions=document.createElement('div');actions.className='odds-admin-card-actions';
   const status=document.createElement('span');status.className='odds-admin-card-status';status.setAttribute('role','status');status.setAttribute('aria-live','polite');status.textContent='Changes not saved';
-  const button=document.createElement('button');button.type='button';button.className='odds-admin-save';button.textContent='SAVE';button.disabled=isOddsPreviewEnvironment();button.setAttribute('aria-label','Save '+g.name+' odds only');
-  if(isOddsPreviewEnvironment())status.textContent='Preview only · saving disabled';
+  const button=document.createElement('button');button.type='button';button.className='odds-admin-save';button.textContent='SAVE';button.disabled=false;button.setAttribute('aria-label','Save '+g.name+' odds only');
   button.onclick=()=>saveAdminGameOdds(g.id,button,status);
   actions.append(status,button);card.append(title,options,actions);area.append(card);
  });
- if(isOddsPreviewEnvironment())say('adminGameOddsStatus','Preview only: edit the fields to inspect them. Saving is disabled because this preview shares the live odds database.');
 }
 async function saveAdminGameOdds(gameId,button,status){
  if(!isAdmin())return say('adminGameOddsStatus','Administrator access required.',true);
- if(isOddsPreviewEnvironment())return say('adminGameOddsStatus','Saving is disabled in preview because it shares the live odds database.',true);
  const card=document.querySelector('#adminGameOddsEditor .odds-admin-game[data-game-id="'+gameId+'"]');
  if(!card)return;
  const inputs=[...card.querySelectorAll('input[data-game-id]')];
