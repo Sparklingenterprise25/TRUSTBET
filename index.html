@@ -90,7 +90,28 @@ nav button.active{background:linear-gradient(135deg,#102d59,#2475d0);color:#fff;
 .games{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
 .game{position:relative;overflow:hidden;background:linear-gradient(160deg,#fff,#f8faff);border:1px solid #e0e8f2;border-radius:16px;padding:16px;box-shadow:0 5px 15px #102d5908;transition:transform .18s,border-color .18s,box-shadow .18s}
 /* Compact animations appear only inside an opened game. */
-#gameStage.admin-game-stage{height:84px;width:min(100%,160px);margin:10px auto 12px;border-radius:13px}#gameStage .game-animation{height:84px;width:100%;margin:0;border-radius:13px}
+#gameStage.admin-game-stage{height:84px;width:min(100%,160px);margin:10px auto 12px;border-radius:13px}
+#gameStage .game-animation{height:84px;width:100%;margin:0;border-radius:13px;position:relative;display:flex;align-items:center;justify-content:center;gap:8px;overflow:hidden;box-sizing:border-box}
+#gameStage .game-animation-slots{background:linear-gradient(145deg,#481b73,#17112e)}
+#gameStage .game-animation-slots span{display:grid;place-items:center;width:36px;height:40px;flex:0 0 36px;background:#fff;border:3px solid #d7a63a;border-radius:7px;font-size:22px;line-height:1;box-shadow:0 3px 0 #8b5a17}
+#gameStage .game-animation-roulette{background:radial-gradient(ellipse,#16854f,#06452e)}
+#gameStage .game-animation-roulette span{display:block;flex:0 0 62px;width:62px;height:62px;border:5px solid #d7b66c;border-radius:50%;box-sizing:border-box;background:repeating-conic-gradient(#bd1e2d 0 15deg,#f4e5bd 15deg 30deg,#1e2731 30deg 45deg);box-shadow:0 0 0 3px #563e1c;animation:rouletteSpin 5s linear infinite}
+#gameStage .game-animation-aviator{background:linear-gradient(180deg,#8ed8ff,#e8f7ff 70%,#66b66a 70%,#319b55)}
+#gameStage .game-animation-aviator span{position:relative;z-index:1;display:block;font-size:30px;line-height:1;animation:miniPlaneFly 2.8s ease-in-out infinite}
+#gameStage .game-animation-aviator i{position:absolute;width:28px;height:8px;border-radius:50%;background:#fff;opacity:.8;top:18px;left:14px}
+#gameStage .game-animation-aviator i:last-child{top:45px;left:auto;right:13px}
+@keyframes miniPlaneFly{0%,100%{transform:translate(-22px,7px) rotate(-8deg)}50%{transform:translate(22px,-7px) rotate(3deg)}}
+#gameStage .game-animation-bottle{background:linear-gradient(#c7e9fa 0 68%,#c69a61 68%)}
+#gameStage .game-animation-bottle span{display:block;font-size:37px;line-height:1;transform-origin:50% 85%;animation:miniBottleFlip 1.6s cubic-bezier(.2,.7,.3,1) infinite}
+@keyframes miniBottleFlip{0%,100%{transform:translateY(9px) rotate(0)}35%{transform:translateY(-12px) rotate(180deg)}70%{transform:translateY(0) rotate(360deg)}}
+#gameStage .game-animation-number{background:radial-gradient(ellipse,#16804a,#06432c)}
+#gameStage .game-animation-number span,#gameStage .game-animation-number i{display:block;flex:0 0 27px;width:27px;height:27px;border:3px solid #e5e7eb;border-radius:6px;box-sizing:border-box;background-color:#fff;box-shadow:0 3px 0 #bbb}
+#gameStage .game-animation-number span{background-image:radial-gradient(circle at 50% 50%,#25344a 2.5px,transparent 3px)}
+#gameStage .game-animation-number i:nth-of-type(1){background-image:radial-gradient(circle at 30% 30%,#25344a 2.5px,transparent 3px),radial-gradient(circle at 70% 70%,#25344a 2.5px,transparent 3px)}
+#gameStage .game-animation-number i:nth-of-type(2){background-image:radial-gradient(circle at 30% 30%,#25344a 2.5px,transparent 3px),radial-gradient(circle at 70% 70%,#25344a 2.5px,transparent 3px),radial-gradient(circle at 50% 50%,#25344a 2.5px,transparent 3px)}
+#gameStage .game-animation-number span{animation:diceTumble 1.4s ease-in-out infinite}
+#gameStage .game-animation-number i:nth-of-type(1){animation:diceTumble 1.4s ease-in-out .2s infinite}
+#gameStage .game-animation-number i:nth-of-type(2){animation:diceTumble 1.4s ease-in-out .4s infinite}
 .game:hover{transform:translateY(-3px);border-color:#bdd0e8;box-shadow:0 12px 23px #102d5913}
 .game-icon{display:grid;place-items:center;width:48px;height:48px;border-radius:14px;background:linear-gradient(145deg,#e8f0fb,#d9e7f8);font-size:26px}
 .game h3{margin:13px 0 5px;font-size:16px}
