@@ -137,6 +137,8 @@ nav button.active{background:linear-gradient(135deg,#102d59,#2475d0);color:#fff;
 .odd-box .odd-name{font-size:11px;font-weight:800;display:block;letter-spacing:.65px;color:#71829a}
 .odd-box .odd-value{font-size:23px;font-weight:900;display:block;margin-top:7px;color:#174b88;letter-spacing:-.4px}
 .lock{position:absolute;right:9px;top:7px;font-size:17px}
+.odd-box.winning-odd,.odd-box.winning-odd.selected{border:3px solid #16a34a!important;background:linear-gradient(145deg,#f0fdf4,#dcfce7)!important;box-shadow:0 0 0 3px #16a34a24,0 7px 16px #15803d20!important;color:#14532d!important}
+.odd-box.winning-odd .odd-name,.odd-box.winning-odd .odd-value{color:#166534!important}
 .odd-box.selected{border:2px solid var(--blue);background:linear-gradient(145deg,#eff5ff,#e1edff);box-shadow:0 0 0 3px #2475d018,0 7px 16px #2475d014}
 .special-odd{background:linear-gradient(145deg,#fff8e6,#f2d995 52%,#fff3d0);border:1px solid #d6b45f;color:#5b4515;box-shadow:inset 0 1px 3px #fff9,0 5px 13px #b58b3425}
 .special-odd .odd-value{color:#795713}
@@ -832,6 +834,7 @@ import{supabase}from'./supabase.js';
 const $=id=>document.getElementById(id);
 let user=null,profile=null,days=0,conversation=null,channel=null,game=null,supportAdminChannel=null;
 let selectedOdd=null,notificationChannel=null,activeCategory='All';
+let settledWinningSelection=null;
 let homeBalanceHidden=false;
 let requestRedirectTimer=null;
 let supportIdleTimer=null;
@@ -1729,7 +1732,7 @@ function openGame(g){
  if(isSelfExcluded())return alert('Self-exclusion is active.');
  if(isBettingLocked())return alert('Betting is locked. Submit a deposit request and wait for administrator approval.');
  go('games');
- game=g;selectedOdd=null;
+ game=g;selectedOdd=null;settledWinningSelection=null;
  $('play').classList.remove('hidden');
  $('gameTitle').textContent=g.icon+' '+g.name;
  renderGameStage(g);
@@ -1748,6 +1751,8 @@ function drawOdds(){
   b.querySelector('.odd-value').textContent=odd[1]+'x';
   b.onclick=()=>{
    if(isBettingLocked()||isSelfExcluded())return;
+   settledWinningSelection=null;
+   grid.querySelectorAll('.odd-box').forEach(x=>x.classList.remove('winning-odd'));
    selectedOdd=index;
    grid.querySelectorAll('.odd-box').forEach(x=>{
     x.classList.remove('selected');x.querySelector('.lock').textContent='';
@@ -1760,7 +1765,7 @@ function drawOdds(){
  });
 }
 $('closeGame').onclick=()=>{
- $('play').classList.add('hidden');game=null;selectedOdd=null;
+ $('play').classList.add('hidden');game=null;selectedOdd=null;settledWinningSelection=null;
 };
 $('bet').onclick=async()=>{
  if(isBettingLocked())return say('betMsg','Betting is locked for this account.',true);
@@ -1787,11 +1792,12 @@ $('bet').onclick=async()=>{
   const title=document.createElement('strong');
   title.textContent=data.won?'WIN':(Number(data.payout)>0?'PARTIAL RETURN':'YOU LOST!');
   const detail=document.createElement('div');detail.className='result-detail';
-  detail.textContent=data.outcome+' · '+(Number(data.payout)>0?'Payout: '+money(data.payout):'Stake lost: '+money(stake))+' · Wallet: '+money(data.balance);
+  const winningLabel=game.odds.find(option=>normalizeOddLabel(option[0])===settledWinningSelection)?.[0]||data.winning_selection;
+  detail.textContent='Winning odd: '+winningLabel+' · '+data.outcome+' · '+(Number(data.payout)>0?'Payout: '+money(data.payout):'Stake lost: '+money(stake))+' · Wallet: '+money(data.balance);
   panel.append(title,detail);
   const againRow=document.createElement('div');againRow.className='play-again-row';
   const again=document.createElement('button');again.className='play-again';again.textContent='Play Again';
-  again.onclick=()=>{selectedOdd=null;$('stake').value='';$('resultArea').innerHTML='';say('betMsg','Choose your odds to play again.');drawOdds();$('bet').disabled=true;$('stake').focus();};
+  again.onclick=()=>{selectedOdd=null;settledWinningSelection=null;$('stake').value='';$('resultArea').innerHTML='';say('betMsg','Choose your odds to play again.');drawOdds();$('bet').disabled=true;$('stake').focus();};
   againRow.append(again);$('resultArea').replaceChildren(panel,againRow);
   say('betMsg','');
   played[game.id]=(played[game.id]||0)+1;
