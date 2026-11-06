@@ -1800,7 +1800,7 @@ $('bet').onclick=async()=>{
   const panel=document.createElement('div');
   panel.className='result-panel '+(data.won?'win':'lost');
   const title=document.createElement('strong');
-  title.textContent=data.won?'WIN':(data.winning_selection==null?'NO WIN THIS ROUND':(Number(data.payout)>0?'PARTIAL RETURN':'YOU LOST!'));
+  title.textContent=data.won?'WIN':(Number(data.payout)>0?'PARTIAL RETURN':'YOU LOST !');
   const detail=document.createElement('div');detail.className='result-detail';
   const winningLabel=game.odds.find(option=>normalizeOddLabel(option[0])===settledWinningSelection)?.[0]||data.winning_selection;
   detail.textContent=(winningLabel?'Winning odd: '+winningLabel:'No listed odd won this round')+' · '+data.outcome+' · '+(Number(data.payout)>0?'Payout: '+money(data.payout):'Stake lost: '+money(stake))+' · Wallet: '+money(data.balance);
