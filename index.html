@@ -693,8 +693,8 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
        <button type="button" id="creditSelectAllUsers" class="secondary">SELECT ALL USERS</button>
        <button type="button" id="creditClearSelectedUsers" class="secondary">CLEAR SELECTION</button>
       </div>
-      <small id="creditSelectedCount" style="display:block;margin:0 0 8px;color:#12a875;font-weight:800">0 users selected</small>
-      <div id="creditUserChecklist" role="group" aria-label="Choose users for bonus or compensation" style="max-height:280px;overflow-y:auto;border:1px solid #d8e2ef;border-radius:12px;padding:8px;background:#fbfcff;margin-bottom:14px">
+      <small id="creditSelectedCount" class="hidden" style="display:block;margin:0 0 8px;color:#12a875;font-weight:800">0 users selected</small>
+      <div id="creditUserChecklist" class="hidden" role="group" aria-label="Choose users for bonus or compensation" style="max-height:280px;overflow-y:auto;border:1px solid #d8e2ef;border-radius:12px;padding:8px;background:#fbfcff;margin-bottom:14px">
        <p class="muted">Registered users will appear here.</p>
       </div>
      <label>Credit type</label>
@@ -2423,6 +2423,7 @@ let creditSelectedUserIds=new Set();
 let creditPendingBatchFingerprint='';
 let creditPendingBatchId='';
 let creditSelectAllAfterLoad=false;
+let creditChecklistExpanded=false;
 function creditUserLabel(p){return p.full_name||p.email||p.phone||'User';}
 function updateCreditSelectionCount(){
  const count=creditSelectedUserIds.size;
@@ -2430,6 +2431,8 @@ function updateCreditSelectionCount(){
 }
 function renderCreditUserChecklist(){
  const host=$('creditUserChecklist');if(!host)return;
+ host.classList.toggle('hidden',!creditChecklistExpanded);
+ $('creditSelectedCount')?.classList.toggle('hidden',!creditChecklistExpanded);
  const q=String($('creditUserSearch')?.value||'').trim().toLowerCase();
  const filtered=creditRegisteredUsers.filter(p=>(String(p.full_name||'')+' '+String(p.email||'')+' '+String(p.phone||'')+' '+String(p.trustbet_uid||'')).toLowerCase().includes(q));
  host.replaceChildren();
@@ -2490,27 +2493,33 @@ $('searchCreditUsers')?.addEventListener('click',()=>{
  if(!q){status.textContent=creditRegisteredUsers.length+' users available. Use the checkboxes or Select All Users.';renderCreditUserChecklist();return;}
  const matches=creditRegisteredUsers.filter(p=>(String(p.full_name||'')+' '+String(p.email||'')+' '+String(p.phone||'')+' '+String(p.trustbet_uid||'')).toLowerCase().includes(q));
  if(matches.length===1){
-  creditSelectedUserIds.add(matches[0].id);$('creditUserSelect').value=matches[0].id;
+  creditSelectedUserIds.add(matches[0].id);$('creditUserSelect').value=matches[0].id;creditChecklistExpanded=true;
   status.textContent='User found and added to selection.';say('walletCreditMsg','Added: '+creditUserLabel(matches[0]));
   creditPendingBatchFingerprint='';creditPendingBatchId='';
  }else if(matches.length>1)status.textContent=matches.length+' users match. Select the required users below.';
  else status.textContent='No matching user found.';
  renderCreditUserChecklist();
 });
-$('creditUserSearch')?.addEventListener('input',renderCreditUserChecklist);
+$('creditUserSearch')?.addEventListener('input',()=>{
+ creditChecklistExpanded=true;renderCreditUserChecklist();
+});
 $('creditSelectAllUsers')?.addEventListener('click',()=>{
+ creditChecklistExpanded=true;
  if(!creditRegisteredUsers.length){creditSelectAllAfterLoad=true;loadCreditRegisteredUsers();return;}
  creditSelectedUserIds=new Set(creditRegisteredUsers.map(p=>p.id));
  creditPendingBatchFingerprint='';creditPendingBatchId='';renderCreditUserChecklist();
  say('walletCreditMsg','All '+creditRegisteredUsers.length.toLocaleString()+' registered users selected.');
 });
 $('creditClearSelectedUsers')?.addEventListener('click',()=>{
- creditSelectedUserIds.clear();creditPendingBatchFingerprint='';creditPendingBatchId='';renderCreditUserChecklist();
+ creditSelectedUserIds.clear();creditPendingBatchFingerprint='';creditPendingBatchId='';
+ creditChecklistExpanded=false;
+ $('creditUserSelect').value='';
+ renderCreditUserChecklist();
 });
 $('creditUserSelect')?.addEventListener('focus',()=>{if(!creditRegisteredUsers.length&&!creditUsersLoading)loadCreditRegisteredUsers();});
 $('creditUserSelect')?.addEventListener('change',()=>{
  const p=creditRegisteredUsers.find(item=>item.id===$('creditUserSelect').value);
- if(p){creditSelectedUserIds.add(p.id);creditPendingBatchFingerprint='';creditPendingBatchId='';renderCreditUserChecklist();say('walletCreditMsg','Added to selection: '+creditUserLabel(p));}
+ if(p){creditSelectedUserIds.add(p.id);creditPendingBatchFingerprint='';creditPendingBatchId='';creditChecklistExpanded=true;renderCreditUserChecklist();say('walletCreditMsg','Added to selection: '+creditUserLabel(p));}
 });
 function newCreditBatchId(){
  if(globalThis.crypto?.randomUUID)return globalThis.crypto.randomUUID();
