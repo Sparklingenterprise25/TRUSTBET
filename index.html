@@ -1594,7 +1594,7 @@ async function startPaystackCheckout(){
  const amount=readAmountInput('paystackAmount');
  const email=$('paystackEmail').value.trim().toLowerCase();
  if(!Number.isSafeInteger(amount)||amount<500||amount>5000000)return say('paystackMsg','Enter a valid deposit amount from ₦500 to ₦5,000,000.',true);
- if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email))return say('paystackMsg','Enter a valid email address for your Paystack receipt.',true);
+ if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return say('paystackMsg','Enter a valid email address for your Paystack receipt.',true);
  const button=$('paystackCheckoutBtn');button.disabled=true;button.textContent='Connecting securely to Paystack…';
  say('paystackMsg','Preparing your secure checkout. Please wait…');
  try{
