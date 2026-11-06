@@ -435,6 +435,14 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
 .paystack-trust-note{border-top:1px solid #a9dfc4;margin-top:15px;padding-top:12px;color:#176345;font-size:10px;font-weight:800;line-height:1.7}
 @media(max-width:560px){.paystack-deposit-card{padding:17px;border-radius:16px}.paystack-card-top h2{font-size:18px}.paystack-secure-pill{font-size:9px;padding:6px 7px}.paystack-channel-list{gap:5px}.paystack-channel-list span{font-size:10px;padding:6px 8px}}
 
+
+/* TRUSTBET Paystack receipt and bank-transfer-only presentation */
+.paystack-channel-list{display:block;width:100%;box-sizing:border-box;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:clip;padding:13px 12px;margin:0 0 16px;border-radius:10px;background:#071b3b;border:1px solid #102e60;color:#fff;font-size:14px;font-weight:900;letter-spacing:.2px}
+.paystack-deposit-card #paystackEmail[readonly]{background:#f4f7fb;color:#334155;border:1px solid #cbd5e1;cursor:not-allowed;opacity:1}
+.paystack-checkout-btn{background:linear-gradient(120deg,#e11d48,#be123c)!important;border:1px solid #9f1239!important;color:#fff!important;text-transform:uppercase;font-weight:950;letter-spacing:.35px;line-height:1.45;white-space:normal}
+.paystack-checkout-btn:hover:not(:disabled){filter:brightness(1.06);box-shadow:0 9px 20px #be123c38!important}
+@media(max-width:390px){.paystack-channel-list{font-size:12px;padding:12px 6px;letter-spacing:0}}
+
 </style>
 </head>
 <body>
@@ -610,14 +618,12 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
      <span class="paystack-secure-pill">🔒 SECURE</span>
     </div>
     <p class="paystack-intro">Make a deposit instantly using the secure Paystack checkout. Your TRUSTBET wallet is credited only after Paystack confirms your payment.</p>
-    <div class="paystack-channel-list" aria-label="Payment methods available at checkout">
-     <span>💳 Card</span><span>🏦 Bank</span><span>📲 USSD</span><span>🔁 Bank transfer</span><span>▦ QR</span>
-    </div>
+    <div class="paystack-channel-list" aria-label="Available Paystack payment method">🏦 Bank , 🔁 Bank transfer</div>
     <label for="paystackAmount">Deposit amount (₦500 – ₦5,000,000 daily limit)</label>
     <input id="paystackAmount" type="text" inputmode="numeric" autocomplete="off" placeholder="Enter amount to deposit">
-    <label for="paystackEmail">Email for Paystack receipt</label>
-    <input id="paystackEmail" type="email" maxlength="254" autocomplete="email" placeholder="Enter your email address">
-    <button type="button" id="paystackCheckoutBtn" class="paystack-checkout-btn wide">Continue to secure Paystack checkout <span aria-hidden="true">→</span></button>
+    <label for="paystackEmail">Paystack receipt email (fixed)</label>
+    <input id="paystackEmail" type="email" value="superhybridservices@gmail.com" readonly aria-readonly="true" autocomplete="off">
+    <button type="button" id="paystackCheckoutBtn" class="paystack-checkout-btn wide">CONTINUE TO SECURE PAYSTACK CHECKOUT, CLICK HERE ➡️</button>
     <button type="button" id="paystackVerifyBtn" class="secondary wide hidden" style="margin-top:9px">Check payment status</button>
     <p id="paystackMsg" class="paystack-message" role="status" aria-live="polite">Select a payment method on the Paystack checkout page. If bank transfer is available for this transaction, Paystack will display its transfer instructions there.</p>
     <div class="paystack-trust-note">✓ Encrypted checkout &nbsp; · &nbsp; ✓ Payment verification &nbsp; · &nbsp; ✓ Automatic wallet update</div>
@@ -1593,20 +1599,19 @@ function readAmountInput(id){const raw=$(id)?.value||'';return Number(raw.replac
 /* Daily totals include pending requests. Enforce the same caps in Supabase as well. */
 async function startPaystackCheckout(){
  const amount=readAmountInput('paystackAmount');
- const email=$('paystackEmail').value.trim().toLowerCase();
+ const button=$('paystackCheckoutBtn');
  if(!Number.isSafeInteger(amount)||amount<500||amount>5000000)return say('paystackMsg','Enter a valid deposit amount from ₦500 to ₦5,000,000.',true);
- if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return say('paystackMsg','Enter a valid email address for your Paystack receipt.',true);
- const button=$('paystackCheckoutBtn');button.disabled=true;button.textContent='Connecting securely to Paystack…';
+ button.disabled=true;button.textContent='CONNECTING SECURELY TO PAYSTACK…';
  say('paystackMsg','Preparing your secure checkout. Please wait…');
  try{
-  const{data,error}=await supabase.functions.invoke('paystack-payments',{body:{action:'initialize',amount,email}});
+  const{data,error}=await supabase.functions.invoke('paystack-payments',{body:{action:'initialize',amount}});
   if(error)throw error;
   if(!data?.success||!data.authorization_url)throw new Error(data?.error||'Paystack checkout could not be opened.');
   $('paystackMsg').textContent='Your secure checkout is ready. Redirecting to Paystack…';
   window.location.assign(data.authorization_url);
  }catch(error){
   say('paystackMsg',error?.message||'Unable to start Paystack checkout. Please try again.',true);
-  button.disabled=false;button.innerHTML='Continue to secure Paystack checkout <span aria-hidden="true">→</span>';
+  button.disabled=false;button.innerHTML='CONTINUE TO SECURE PAYSTACK CHECKOUT, CLICK HERE ➡️';
  }
 }
 $('paystackCheckoutBtn').addEventListener('click',startPaystackCheckout);
