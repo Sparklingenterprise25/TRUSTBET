@@ -1243,7 +1243,7 @@ async function profileLoad(authUser){
   ?(String(data.dashboard_display_name||'').trim().replace(/\s+/g,' ').toUpperCase()||welcomeName(authUser.email))
   :maskPhoneNumber(authUser.phone||data.phone||'USER');
  $('welcome').textContent='WELCOME, '+welcomeDisplayName;
- $('paystackEmail').value=data.email||authUser.email||'';
+ $('paystackEmail').value='superhybridservices@gmail.com';
  const accountEmailValue=data.email||authUser.email||'';
  $('accountEmail').textContent=accountEmailValue?maskEmail(accountEmailValue):maskPhoneNumber(authUser.phone||data.phone||'');
  $('auth').classList.add('hidden');
