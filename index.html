@@ -512,8 +512,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
   <h3 style="margin:0 0 6px">Customer Support</h3>
   <p style="margin:0 0 6px">Email Support</p>
   <p class="muted" style="margin:0 0 8px">Need help? Contact our customer support team.</p>
-  <p style="margin:0 0 10px">superhybridservices@gmail.com</p>
-  <a href="mailto:superhybridservices@gmail.com" style="display:inline-block;padding:12px 22px;border-radius:11px;background:#12a875;border:1px solid #12a875;color:#fff;font-weight:750;text-decoration:none">Click Here</a>
+  <a href="mailto:superhybridservices@gmail.com" aria-label="Email customer support" style="display:inline-block;padding:12px 22px;border-radius:11px;background:#12a875;border:1px solid #12a875;color:#fff;font-weight:750;text-decoration:none">EMAIL CUSTOMER SUPPORT</a>
  </div>
 </section>
 
@@ -627,6 +626,7 @@ summary{font-weight:750;color:#31547f;cursor:pointer}
     <label for="paystackEmail">Paystack receipt email (fixed)</label>
     <input id="paystackEmail" type="email" value="superhybridservices@gmail.com" readonly aria-readonly="true" autocomplete="off">
     <button type="button" id="paystackCheckoutBtn" class="paystack-checkout-btn wide">CONTINUE TO SECURE PAYSTACK CHECKOUT, CLICK HERE ➡️</button>
+    <button type="button" id="paystackCancelBtn" class="secondary wide paystack-cancel-btn hidden" style="margin-top:9px">CANCEL CHECKOUT</button>
     <button type="button" id="paystackVerifyBtn" class="secondary wide hidden" style="margin-top:9px">Check payment status</button>
     <p id="paystackMsg" class="paystack-message" role="status" aria-live="polite">Select a payment method on the Paystack checkout page. If bank transfer is available for this transaction, Paystack will display its transfer instructions there.</p>
     <div class="paystack-trust-note">✓ Encrypted checkout &nbsp; · &nbsp; ✓ Payment verification &nbsp; · &nbsp; ✓ Automatic wallet update</div>
@@ -1600,21 +1600,40 @@ function readAmountInput(id){const raw=$(id)?.value||'';return Number(raw.replac
 });
 
 /* Daily totals include pending requests. Enforce the same caps in Supabase as well. */
+let paystackCheckoutAttempt=0;
+function resetPaystackCheckoutButton(){
+ const button=$('paystackCheckoutBtn');
+ button.disabled=false;button.textContent='CONTINUE TO SECURE PAYSTACK CHECKOUT, CLICK HERE ➡️';
+ $('paystackCancelBtn').classList.add('hidden');
+}
+// Restore checkout controls when the customer returns from Paystack (including browser back/BFCache).
+window.addEventListener('pageshow',()=>resetPaystackCheckoutButton());
+$('paystackCancelBtn').addEventListener('click',()=>{
+ // Invalidate the in-flight attempt so a late initialization response cannot redirect the user.
+ paystackCheckoutAttempt++;
+ resetPaystackCheckoutButton();
+ say('paystackMsg','Checkout cancelled. No redirect to Paystack was opened. You can try again whenever you are ready.');
+});
 async function startPaystackCheckout(){
  const amount=readAmountInput('paystackAmount');
  const button=$('paystackCheckoutBtn');
  if(!Number.isSafeInteger(amount)||amount<500||amount>5000000)return say('paystackMsg','Enter a valid deposit amount from ₦500 to ₦5,000,000.',true);
+ const attempt=++paystackCheckoutAttempt;
  button.disabled=true;button.textContent='CONNECTING SECURELY TO PAYSTACK…';
- say('paystackMsg','Preparing your secure checkout. Please wait…');
+ $('paystackCancelBtn').classList.remove('hidden');
+ say('paystackMsg','Preparing your secure checkout. Tap CANCEL CHECKOUT below if you change your mind.');
  try{
   const{data,error}=await supabase.functions.invoke('paystack-payments',{body:{action:'initialize',amount}});
+  if(attempt!==paystackCheckoutAttempt)return;
   if(error)throw error;
   if(!data?.success||!data.authorization_url)throw new Error(data?.error||'Paystack checkout could not be opened.');
   $('paystackMsg').textContent='Your secure checkout is ready. Redirecting to Paystack…';
+  $('paystackCancelBtn').classList.add('hidden');
   window.location.assign(data.authorization_url);
  }catch(error){
+  if(attempt!==paystackCheckoutAttempt)return;
   say('paystackMsg',error?.message||'Unable to start Paystack checkout. Please try again.',true);
-  button.disabled=false;button.innerHTML='CONTINUE TO SECURE PAYSTACK CHECKOUT, CLICK HERE ➡️';
+  resetPaystackCheckoutButton();
  }
 }
 $('paystackCheckoutBtn').addEventListener('click',startPaystackCheckout);
@@ -3001,11 +3020,13 @@ async function exStatus(){
  }
 }
 document.querySelectorAll('#exclusion button').forEach(b=>b.onclick=()=>{
+ if(isAdmin())return say('exMsg','⚠️ ADMIN CANNOT MANUALLY APPLY FOR SELF EXCLUSION IN ADMIN PAGE EXCEPT THROUGH SUPABASE',true);
  if(isSelfExcluded()||currentExclusionRequest?.status==='PENDING')return;
  days=Number(b.dataset.days);
  document.querySelectorAll('#exclusion button').forEach(x=>x.classList.toggle('selected',x===b));
 });
 $('activate').onclick=async()=>{
+ if(isAdmin())return say('exMsg','⚠️ ADMIN CANNOT MANUALLY APPLY FOR SELF EXCLUSION IN ADMIN PAGE EXCEPT THROUGH SUPABASE',true);
  if(isSelfExcluded())return say('exMsg','Self-exclusion is already active.',true);
  if(!days)return say('exMsg','Select an exclusion period first.',true);
  if(!confirm('Submit a self-exclusion request for '+days+' days?'))return;
@@ -3033,7 +3054,7 @@ $('cancelExclusion').onclick=async()=>{
 /* Customer account deletion */
 $('unlockDangerZone').onclick=()=>{const content=$('dangerZoneContent');const opening=content.classList.contains('hidden');content.classList.toggle('hidden',!opening);$('unlockDangerZone').textContent=opening?'🔒 LOCK DANGER ZONE':'🔓 UNLOCK DANGER ZONE';};
 $('requestAccountDeletion').onclick=async()=>{
- if(!user||isAdmin())return say('deletionMsg','Administrator accounts cannot request deletion through TRUSTBET. Use Supabase manually.',true);
+ if(!user||isAdmin())return say('deletionMsg','⚠️ADMINISTRATOR ACCOUNTS CANNOT REQUEST DELETION THROUGH TRUSTBET. USE SUPABASE MANUALLY.',true);
  if(!confirm('First confirmation: Submit a permanent account deletion request? Your account will only be deleted if the administrator approves.'))return;
  const typed=await new Promise(resolve=>{
   const overlay=document.createElement('div');overlay.style.cssText='position:fixed;inset:0;z-index:2300;background:#071a36e8;display:flex;align-items:center;justify-content:center;padding:18px';
